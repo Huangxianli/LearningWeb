@@ -55,7 +55,7 @@ function fn1(class1: SomeConstructor) {
 interface CallOrConstructor {
   new(s: string): Date,
   (n?: string): string
-}t
+}
 
 function fn2(fn: CallOrConstructor) {
   let d = new fn("2023-12-01");
