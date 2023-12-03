@@ -25,6 +25,7 @@ class Ctor {
 function fn1(class1) {
     return new class1("huangxianli");
 }
+t;
 function fn2(fn) {
     let d = new fn("2023-12-01");
     let s = fn();
@@ -99,3 +100,49 @@ function cccGood(s) {
 function ccc(s) {
     console.log(s);
 }
+/*
+可选参数
+ */
+function f(n, m) {
+    if (typeof m === "string") {
+        return n + m;
+    }
+    else {
+        return undefined;
+    }
+}
+/*
+回调中的可选参数
+当为回调函数写一个函数类型的时候，永远不要写一个可选参数，除非打算在不传递该参数的时候调用函数
+ */
+function myForEach(arr, callback) {
+    for (let i = 0; i < arr.length; i++) {
+        callback(arr[i], i);
+    }
+}
+myForEach([1, 2, 1], (arr, i) => {
+    // console.log(i.toFixed()) // 这里的编译会报出问题，因为前面定义的时候，定义了该回调参数的第二个参数是可选的，不一定可以使用这个参数 
+});
+function makeDate(mOrTimestamp, d, y) {
+    if (d !== undefined && y !== undefined) {
+        return new Date(y, mOrTimestamp, d);
+    }
+    else {
+        return new Date(mOrTimestamp);
+    }
+}
+makeDate(1);
+makeDate(12, 12, 12);
+function len(x) {
+    return x.length;
+}
+// len(Math.random() > 0.5 ? "hello" : [4, 5]); // 这里编译会报错，现在函数的入参满足的是string | any[]，而不是满足重载签名中的一个
+// let a = Math.random() > 0.5 ? "hello" as string : [4, 5];
+// len(a);
+function lenGood(x) {
+    return x.length;
+}
+lenGood(Math.random() > 0.5 ? "hello" : [4, 5]);
+/*
+函数内的this声明
+ */ 
