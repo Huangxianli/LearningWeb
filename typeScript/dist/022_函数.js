@@ -25,7 +25,6 @@ class Ctor {
 function fn1(class1) {
     return new class1("huangxianli");
 }
-t;
 function fn2(fn) {
     let d = new fn("2023-12-01");
     let s = fn();
@@ -144,5 +143,29 @@ function lenGood(x) {
 }
 lenGood(Math.random() > 0.5 ? "hello" : [4, 5]);
 /*
-函数内的this声明
- */ 
+形参展开
+ */
+function multiply(n, ...m) {
+    return m.map(x => n * x);
+}
+multiply(11, 12, 12, 12, 1);
+/*
+实参展开
+ */
+const arr_1 = [];
+const arr_2 = [12, 2, 1];
+arr_1.push(...arr_2);
+const args = [8, 3];
+Math.atan2(...args); // 这里atan2只接收两个参数，但是args其实在ts看来其中的内容是可变的，不一定是两个
+/*
+参数解构
+ */
+function sum({ a = 1, b = 2, c = 3 } = { a: 1, b: 2, c: 3 }) {
+    console.log(a + b + c); // a,b,c是从对象中结构出来的
+}
+sum({ a: 1, b: 2, c: 3 });
+const f1 = () => true;
+const result1 = f1(); // 这里的result1会被判断成void类型
+function f2() {
+    // return true // 字面量函数的写法，返回定义了是void之后，在函数中就不能返回
+}

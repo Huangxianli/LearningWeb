@@ -221,6 +221,46 @@ function lenGood(x: string | any[]): number {
 
 lenGood(Math.random() > 0.5 ? "hello" : [4, 5]);
 
-/*
-函数内的this声明 
+/* 
+形参展开
  */
+
+function multiply(n: number, ...m: number[]) {
+  return m.map(x => n * x)
+}
+multiply(11, 12, 12, 12, 1);
+
+/* 
+实参展开
+ */
+
+const arr_1 = [];
+const arr_2 = [12, 2, 1];
+arr_1.push(...arr_2);
+
+const args = [8, 3] as const;
+Math.atan2(...args) // 这里atan2只接收两个参数，但是args其实在ts看来其中的内容是可变的，不一定是两个
+
+/* 
+参数解构
+ */
+
+function sum({ a = 1, b = 2, c = 3 }: { a: number, b: number, c: number } = { a: 1, b: 2, c: 3 }) {
+  console.log(a + b + c); // a,b,c是从对象中结构出来的
+}
+
+sum({ a: 1, b: 2, c: 3 });
+
+/* 
+返回void类型
+一个具有返回void返回类型的上下文函数类型，在实现时，可以返回任何的其他值，但它会被忽略（接受这个返回值的变量，ts会判断这个变量为void类型）
+当一个字面的函数定义有一个void的返回类型时，该函数必须不返回任何东西
+ */
+
+type voidFunc = () => void;
+const f1: voidFunc = () => true;
+const result1 = f1(); // 这里的result1会被判断成void类型
+
+function f2(): void {
+  // return true // 字面量函数的写法，返回定义了是void之后，在函数中就不能返回
+}
