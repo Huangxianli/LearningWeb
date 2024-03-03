@@ -47,7 +47,29 @@ function selectionSort (arr = [], isOrder = true) {
 }
 
 
+/**
+ * 插入排序
+ * @param { Array } arr 需要排序的数组
+ * @param { boolean } isOrder 是否是顺序排列
+ * @description 插入排序是将数组分为已排序和未排序左右两部分，每次取未排序的第一个，与前面的已排序的内容去比较，找到合适的位置就将该位置后面的数据后移（或者比较一个移动一个元素，直到找到合适的位置）O(n^2)
+ * @example
+ * let arr = [32, 5, 1, 2, 4, 3, 6, 321];
+ * insertionSort(arr, false);
+ */
+
+function insertionSort (arr = [], isOrder = true) {
+  const arrLength = arr.length;
+  for (let lastOrerIndex = 0; lastOrerIndex <= arrLength - 1; lastOrerIndex++) {
+    for (let j = lastOrerIndex; j > 0; j--) {
+      if ((isOrder && arr[j] < arr[j - 1]) || (!isOrder && arr[j] > arr[j - 1])) {
+        [arr[j], arr[j - 1]] = [arr[j - 1], arr[j]];
+      } else {
+        break;
+      }
+    }
+  }
+}
 
 /* 
-export { bubbleSort };
+export { bubbleSort, selectionSort, insertionSort };
  */
