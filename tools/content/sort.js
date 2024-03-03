@@ -20,4 +20,34 @@ function bubbleSort (arr = [], isOrder = true) {
   }
 }
 
+
+/** 
+ * 选择排序
+ * @param { Array } 需要排序的数组
+ * @param { boolean } isOrder 是否是顺序排序
+ * @description 选择排序是在未排序的元素中第一个元素和第二个元素比较，记录小的元素的位置，然后小的元素和第三个元素进行比较，记录小的元素的位置，直到比较到最后一个元素，将未排序的第一个元素和最小元素的内容替换；再在未排序的元素中进行前面的操作
+ * @example
+ *  let arr = [1, 2, 4, 3, 6];
+ *  selectionSort(arr, false);
+ */
+
+function selectionSort (arr = [], isOrder = true) {
+  const arrLength = arr.length;
+  for (let i = 0; i <= arrLength - 1; i++) {
+    let targetValueIndex = i;
+    for (let j = i + 1; j <= arrLength - 1; j++) {
+      if ((isOrder && arr[j] < arr[targetValueIndex]) || (!isOrder && arr[j] > arr[targetValueIndex])) {
+        targetValueIndex = j;
+      }
+    }
+    if (targetValueIndex !== i) {
+      [arr[i], arr[targetValueIndex]] = [arr[targetValueIndex], arr[i]];
+    }
+  }
+}
+
+
+
+/* 
 export { bubbleSort };
+ */
