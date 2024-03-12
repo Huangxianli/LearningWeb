@@ -54,7 +54,7 @@ console.log(12.0 === 12); // 这个要注意，会返回true的
  * 1. 如果是同一种类型的时候：
  *     1.1. 数字类型的时候 相同值 -0 +0 会判断为相等 NaN 与 NaN 不相等
  * 2. 如果有一边为undefined 或者 null 另一边要为其中一个才会为true
- * 3. 如果一个为对象，一个原始值，对象会转化成原始值（String、Number、Boolean、Symbol、BigInt） （Symbol.toPrimitive: (hint)=> {return ...}）
+ * 3. 如果一个为对象，一个原始值，对象会转化成原始值（String、Number、Boolean、Symbol、BigInt） （Symbol.toPrimitive: (hint)=> {return ...},valueOf(),toString()）
  * 4. 对象转化成原始值之后： 
  *     4.1. 两者之间相同类型，按照1来
  *     4.2. 只有一方为Symbol的时候 false
