@@ -46,6 +46,7 @@ console.log(Number({ [Symbol.toPrimitive]: () => 12 })); // 12
  */
 
 console.log(parseFloat == Number.parseFloat); // true
+console.log(Number.parseFloat()); // NaN
 console.log(Number.parseFloat("  12.22.33")); // 12.22
 console.log(Number.parseFloat(" s12.12dsd")); // NaN
 console.log(Number.parseFloat("12.sdsf")); // 12
@@ -62,6 +63,7 @@ console.log(Number.parseFloat({ [Symbol.toPrimitive]: () => "12" })); // 12
  */
 
 console.log(Number.parseInt === parseInt); // true
+console.log(Number.parseInt()); // NaN
 console.log(Number.parseInt("021,")); // 21
 console.log(Number.parseInt("0xE")); // 14
 console.log(Number.parseInt("12", 13)); // 15
@@ -69,7 +71,7 @@ console.log(Number.parseInt("31", 3)); // NaN
 
 /**
  * Number.prototye.toString(*radix)
- * 根据传入的进制，将数转化成对应的数字，在转化成字符串[2,36];
+ * 根据传入的进制[2,36]之间，将数转化成对应进制的数字，再转化成字符串;
  * 只有this为数字的时候才掉Number的toString
  */
 
