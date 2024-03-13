@@ -70,7 +70,7 @@ console.log(Number.parseInt("12", 13)); // 15
 console.log(Number.parseInt("31", 3)); // NaN
 
 /**
- * Number.prototye.toString(*radix)
+ * Number.prototye.toString(?radix)
  * 根据传入的进制[2,36]之间，将数转化成对应进制的数字，再转化成字符串;
  * 只有this为数字的时候才掉Number的toString
  */
