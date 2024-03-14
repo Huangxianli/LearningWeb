@@ -33,7 +33,7 @@ console.log(d); // "1"
 
 `` 模板字符串 会强制字符串的转换
 String() 会强制转化，只是Symbol不会抛错，而是返回 "Symbol(description)"
-+ 运算符 如果有一边为字符串，会将另一个操作符强制转化成字符
++ 运算符 如果有一边为字符串，会将另一个操作符强制转化成字符，这里转化成原始值的顺序 Symbol.toPrimitive("string")，valueOf()，toString()
  */
 
 console.log(String(null)); // "null"

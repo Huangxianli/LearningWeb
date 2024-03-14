@@ -20,7 +20,7 @@ console.log(typeof b); // "number"
  * 4. true转化为1，false转化为0
  * 5. 字符串，去除掉前后空格后，如果是正常的数值组成的字符串（包括Infinity，-Infinity），转化成对应的数字；只有 "" 和 " "时会转化成0;其他转化成NaN
  * 6. BigInt 和 Symbol 会直接报错，BigInt报错防止精度丢失
- * 7. 对象，转化成原始值（调用 Symbol.toPrimitive(number) valueOf() toString()），再按照前面的转化为数字（如果第一次转化之后还是对象，转化成NaN）
+ * 7. 对象，转化成原始值（调用 Symbol.toPrimitive("number") valueOf() toString()），再按照前面的转化为数字（如果第一次转化之后还是对象，转化成NaN）
  * 
  * 一元+ 按照上面的规则执行
  * Number() 会按照上面的规则执行，但是BigInt转化为Number时不会报错，但是可能丢失精度
