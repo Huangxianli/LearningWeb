@@ -1,6 +1,6 @@
 /**
  * Boolean()
- * 0 -0 false NaN undefined null "" 
+ * 0 -0 false NaN undefined null "" document.all 0n
  */
 
 
