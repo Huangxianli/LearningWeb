@@ -49,3 +49,77 @@ arr1[2]();
 // 1
 // 2
  */
+
+
+/* 
+不存才变量提升
+暂时性死区
+typeof 也不再是一个绝对安全的操作符
+
+在同一作用域内，不允许重复声明
+ */
+
+/* 
+// typeof a; // 这里会报错ReferenceError，因为没有变量提升，在变量声名前使用对象会报错
+let a;
+
+function temp(a) {
+  let a; // 这里就会报错，函数的参数已经被命名为a了
+  let b;
+  let b; // 这里会报错
+}
+ */
+
+
+
+/* 
+块级作用域 
+let 和 const 出现前，基本上定义了只有全局作用域和函数作用域 
+let 和 const 提供了块级作用域 以 {} 界定
+
+函数只能在定制作用域中声明，不能在块级作用域中声明（但是为了兼容以前旧代码，浏览器还是支持在块级作用域中声明函数）
+同时允许有自己的行为
+1. 允许在块级作用域中生声明函数
+2. 会有和var一样的作用，提升到当前函数作用域或全局作用域的顶端
+3. 提升到当前块级作用域的顶端
+ */
+
+function f () { console.log('I am outside!'); }
+(function () {
+  if (false) {
+    function f () { console.log('I am inside!'); }
+  }
+  f(); // 这里在es5中可以顺利运行，但是在es6中会报错
+}());
+
+// 上面的代码在es6中的替代
+function f () { console.log('I am outside!'); }
+(function () {
+  let f = undefined; // 主要差异在这里，也是执行f()报错的原因，因为这里f的值是undefined
+  if (false) {
+    function f () { console.log('I am inside!'); }
+  }
+  f();
+}());
+
+// 如果要在块级作用域中声明函数，最好使用函数表达式，这样不会有变量提升
+function f () { console.log('I am outside!'); }
+(function () {
+  if (false) {
+    let f = function () { console.log('I am inside!'); }
+  }
+  f(); // 这里无论是es5还是es6环境都不会报错，但是输出的是，'I am outside!'
+}());
+
+/* 
+const 的表现和let差不多，只不过，不能修付的值 （声明的时候就要付值，不然会报错）
+如果是对象的话，要不让修改里面 属性的值，可以使用 Object.freeze()
+ */
+
+
+/* 
+顶级对象
+浏览器中 window
+node中 global
+在es5中在全局作用域中，使用var声明，会将属性添加到window上，es6中就不会在window上，
+ */
