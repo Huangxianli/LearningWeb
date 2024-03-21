@@ -96,6 +96,7 @@ b2();
 
 /* 
 switch 语句
+使用的是严格相等
  */
 function c1 () {
   console.log("c1")
@@ -142,3 +143,29 @@ function c3 () {
   }
 }
 c3(); // 0 有一次满足条件就不会继续判断了
+
+function c4 () {
+  let day = 2;
+  switch (day) {
+    case 1 || 2: // 会进入到这个里面，这里的转化成 if(day === (1 || 2)) => if(day === 1) 
+      console.log("c4", "1 or 2");
+      break;
+    default:
+      console.log("c4", "默认");
+  }
+
+}
+c4(); // "1 or 2"
+
+function c5 () {
+  let day = 2;
+  switch (day) {
+    case 1:
+    case 2: // 这里两个case 相当于 if(day === 1 || day === 2) 
+      console.log("c5", "1 or 2");
+      break;
+    default:
+      console.log("5", "默认");
+  }
+}
+c5(); // "1 or 2"
