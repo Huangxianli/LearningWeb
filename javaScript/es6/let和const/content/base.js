@@ -79,9 +79,9 @@ let 和 const 提供了块级作用域 以 {} 界定
 
 函数只能在定制作用域中声明，不能在块级作用域中声明（但是为了兼容以前旧代码，浏览器还是支持在块级作用域中声明函数）
 同时允许有自己的行为
-1. 允许在块级作用域中生声明函数
+1. 允许在块级作用域中声明函数
 2. 会有和var一样的作用，提升到当前函数作用域或全局作用域的顶端
-3. 提升到当前块级作用域的顶端
+3. 将函数提升到当前块级作用域的顶端
  */
 
 function f () { console.log('I am outside!'); }
@@ -95,7 +95,7 @@ function f () { console.log('I am outside!'); }
 // 上面的代码在es6中的替代
 function f () { console.log('I am outside!'); }
 (function () {
-  let f = undefined; // 主要差异在这里，也是执行f()报错的原因，因为这里f的值是undefined
+  var f = undefined; // 主要差异在这里，也是执行f()报错的原因，因为这里f的值是undefined
   if (false) {
     function f () { console.log('I am inside!'); }
   }
@@ -122,4 +122,11 @@ const 的表现和let差不多，只不过，不能修付的值 （声明的时�
 浏览器中 window
 node中 global
 在es5中在全局作用域中，使用var声明，会将属性添加到window上，es6中就不会在window上，
+ */
+
+
+/* 
+函数的参数（如果是在函数作用域中）
+函数声明
+变量
  */

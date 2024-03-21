@@ -92,7 +92,7 @@ console.log(12.0 == 12); // 这个要注意，会返回true的
 /**
  * 同值相等 Object.is()
  * 不会特殊处理 +0 -0 NaN 其他的和严格相等是一样的
- * Object.is(-0,+0) // false
+ * Object.is(-0, +0) // false
  * OObject.is(NaN, NaN) // true
  */
 

@@ -24,7 +24,7 @@
 1. 字符串类型按照原样返回
 2. undefined 转化成 "undefined"，
 3. null 转换成 "null"，
-4. Number类型 会按照调用 toString(10) 返回
+4. Number类型 会按照调用 toString(10) 返回 // 将数字转化为十进制再转化为字符串
 5. BigInt类型 会按照调用 toString(10) 返回
 6. Symbol类型 会抛出TypeError的错误
 7. 对象类型 会转化成原始类型（Symbol.toPrimitive("string")，toString()，valueOf()），然后转化成字符串
