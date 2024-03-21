@@ -151,5 +151,5 @@ Math.atanh(x) 返回 x 的反双曲正切
 Math.atan2(y, x) 返回 y/x 的反正切
 Math.cos(x) 返回 x 的余弦
 Math.sin(x) 返回 x 的正弦
-Math.tan(x) 返回 x 的正切
+Math.tan(x) 返回 x 的正切    
  */
