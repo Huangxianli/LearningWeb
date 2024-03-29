@@ -6,11 +6,27 @@ function print(a) {
     console.log(a);
 }
 greeter(print);
+let function1 = function (aaa, bbb) {
+    return "";
+};
+function1(1, "1");
+let function2 = function () {
+    return "";
+};
+function2(1, "");
+let canIndex1 = {
+    0: false,
+    "nihao": false,
+};
+// interface DescripFunction {
+//   description: string,
+//   (arg: number): string
+// }
 function doSomething(fn) {
-    console.log(fn.description + fn(1));
+    console.log(fn.description + fn(1, 2, "2"));
 }
-function fn(n) {
-    return String(n);
+function fn(n, m, z) {
+    return String(n) + String(m) + String(z);
 }
 fn.description = "hello World";
 doSomething(fn);

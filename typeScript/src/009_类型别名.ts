@@ -1,8 +1,8 @@
 /* 
-类型在多个地方重复的使用，或者是一个类型比较复，不利于阅读的时候
+类型在多个地方重复的使用，或者是一个类型比较复杂，不利于阅读的时候
  */
 
-type Id = number | string;
+type Id = number | string; // Id就是类型别名
 
 type Point = {
   name: string;
@@ -37,7 +37,11 @@ const bear1: Bear = {
   name: "huangxianli",
   age: 12
 }
-
+/* 
+const baer2: Bear = {
+  name: "hahah"
+}
+ */
 
 type Persion = {
   name: string,
@@ -65,3 +69,20 @@ const swimming: Swimming = {
   sex: "men",
   job: "swimer"
 }
+
+type A1 = {
+  name: string
+}
+type A2 = {
+  name: number
+}
+type A3 = A1 & A2
+/* 
+// 这里的两次付值否会报错，不能将  类型赋值给never
+const a1: A3 = {
+  name: 1
+};
+const a2: A3 = {
+  name: "12"
+}
+ */

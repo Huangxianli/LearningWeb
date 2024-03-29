@@ -17,7 +17,7 @@ function fun4(id) {
 fun4("1");
 fun4(1);
 function circleArea(circle) {
-    // return circle.r * Math.PI; // 由于Shape中的r是你一定存在的，所以编译的时候会报错
+    // return circle.r * Math.PI; // 由于Shape中的r是不一定存在的，所以编译的时候会报错
 }
 function squareArea(square) {
     if (square.kind === "square") {

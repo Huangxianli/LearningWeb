@@ -10,20 +10,65 @@ function print(a: string) {
 
 greeter(print);
 
+interface Funciton1 {
+  (a1: number, a2: string): string
+}
+let function1: Funciton1 = function (aaa: number, bbb: string): string { // 这里可以不写参数和返回值类型，如果写的话，必须与Function1相同，但是名称可以不同
+  return ""
+}
+function1(1, "1");
+
+type Function2 = (a1: number, a2: string) => String
+let function2: Function2 = function () {
+  return ""
+}
+function2(1, "");
+
+
+/*
+可索引类型 
+ */
+type CanIndex1 = {
+  [a: number]: boolean,
+  // [a: string]: number, // 这里的boolean会报错，因为编译成js的时候，100 =》 "100"
+  [a: string]: boolean,
+}
+let canIndex1: CanIndex1 = {
+  0: false,
+  "nihao": false,
+}
+interface CanIndex2 {
+  [a: string]: boolean,
+  [a: number]: boolean,
+}
+// let arr: CanIndex2 = [false, true]; // 不存在string类型索引，所以会报错
+
 /*
 调用签名 
  */
 
+// type DescripFunction = {
+//   description: string,
+//   (arg: number): string
+// }
+
+// type DescripFunction = (arg: number) => string; // 缺少了description 属性
+
 type DescripFunction = {
   description: string,
-  (arg: number): string
+  (arg: number, arg1: number, arg2: string): string,
 }
 
+// interface DescripFunction {
+//   description: string,
+//   (arg: number): string
+// }
+
 function doSomething(fn: DescripFunction) {
-  console.log(fn.description + fn(1))
+  console.log(fn.description + fn(1, 2, "2"))
 }
-function fn(n: number) {
-  return String(n)
+function fn(n: number, m: number, z: string): string {
+  return String(n) + String(m) + String(z);
 }
 fn.description = "hello World";
 

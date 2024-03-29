@@ -30,8 +30,8 @@ const bear2: Bear1 = {
 
 
 /* 
-接口向已有的接口中添加新的属性，两个同名的会合并
-type 就没有这种方法，不会合并，而且会报错
+允许定义同名的接口，同名的会合并，如果相同的属性冲突了，后面定义的那个会报错
+type 不允许定义同名的类型别名，而且会报错
 */
 
 interface MyWindow1 {
@@ -56,17 +56,18 @@ const persion: Interface_persion = {
   name: "Huang Xianli",
   age: 25
 }
-
-/* interface Interface_persion {
-  sex: string
+/* 
+interface Interface_persion { // 两个同名的接口，会合并，同属性冲突，后面定义的会报错
+  sex: string,
+  name: age
 }
 
 const persion_extend: Interface_persion = {
   name: "Huang Xiannli",
   age: 12,
   sex: "men"
-} */
-
+}
+ */
 
 /*
 interface 的继承  
@@ -80,7 +81,7 @@ interface Persion_extend_1 {
 }
 
 
-interface Swimmer extends Persion_extend, Persion_extend_1 {
+interface Swimmer extends Persion_extend, Persion_extend_1 { // 这种写法好奇怪
   job: string
 }
 
@@ -93,3 +94,20 @@ const swimmer: Swimmer = {
 /* const swimmer_1: Swimmer{
   job:"swimmer"
 } */
+/* 
+interface A1 {
+  name: string
+};
+interface A2 {
+  name: number,
+  age: number
+}
+
+interface A3 extends A1, A2 { };
+// 接口“A3”不能同时扩展类型“A1”和“A2”。
+// “A1”和“A2”类型的命名属性“name”不完全相同
+const a1: A3 = {
+  name: "", // 这里也会报错，string和number都报错
+  age: 12,
+}
+ */

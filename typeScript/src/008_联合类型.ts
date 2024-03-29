@@ -25,7 +25,7 @@ interface Shape {
 }
 
 function circleArea(circle: Shape) {
-  // return circle.r * Math.PI; // 由于Shape中的r是你一定存在的，所以编译的时候会报错
+  // return circle.r * Math.PI; // 由于Shape中的r是不一定存在的，所以编译的时候会报错
 }
 
 interface Circle {
