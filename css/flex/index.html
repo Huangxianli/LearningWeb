@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>flex布局</title>
+  <link type="text/css" rel="stylesheet" href="D:\Learning\LearningWeb\LearningWeb\css\flex\content\base.css">
+  <link type="text/css" rel="stylesheet" href="D:\Learning\LearningWeb\LearningWeb\css\flex\content\test.css">
+  <style>
+    .notShow {
+      display: none;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- 设置了display: flex之后，子元素的float、clear和vertical-align属性将失效 -->
+  <div class="notShow">
+    <h1>base</h1>
+    <h3>flex-direction</h3>
+    <div id="flex-direction" class="flexBox grey">
+      <div class="h50 w50 red">1</div>
+      <div class="h50 w50 green">2</div>
+      <div class="h50 w50 yellow">3</div>
+      <div class="h50 w50 pink">4</div>
+      <div class="h50 w50 blue">5</div>
+    </div>
+    <hr />
+    <h3>flex-wrap</h3>
+    <div id="flex-wrap" class="flexBox w200 grey">
+      <div class="h50 red">
+        <div class="w50">1</div>
+      </div>
+      <div class="h50 w50 green">
+        <div class="w50">2</div>
+      </div>
+      <div class="h50 w50 yellow">
+        <div class="w50">3</div>
+      </div>
+      <div class="h50 w50 pink">4</div>
+      <div class="h50 w50 blue">5</div>
+    </div>
+    <hr />
+    <h3>flex-flow</h3>
+    <div id="flex-flow" class="flexBox w200 grey">
+      <div class="h50 w50 red">1</div>
+      <div class="h50 w50 green">2</div>
+      <div class="h50 w50 yellow">3</div>
+      <div class="h50 w50 pink">4</div>
+      <div class="h50 w50 blue">5</div>
+    </div>
+    <hr />
+    <h3>justify-content</h3>
+    <div id="justify-content" class="flexBox w220 grey">
+      <div class="h50 w50 red">1</div>
+      <div class="h50 w50 green">2</div>
+      <div class="h50 w50 yellow">3</div>
+      <div class="h50 w50 pink">4</div>
+      <div class="h50 w50 blue">5</div>
+    </div>
+    <hr />
+    <h3>align-items</h3>
+    <div id="align-items" class="flexBox w220 h200 grey">
+      <div class="w50 red">1</div>
+      <div class="w50 green">2</div>
+      <div class="w50 yellow">3</div>
+      <div class="w50 pink">4</div>
+      <div class="w50 blue">5</div>
+    </div>
+    <hr />
+    <h3>align-content</h3>
+    <div id="align-content" class="flexBox w220 h200 grey">
+      <div class="w50 red">1</div>
+      <div class="w50 green">2</div>
+      <div class="w50 yellow">3</div>
+      <div class="w50 pink">4</div>
+      <div class="w50 blue">5</div>
+    </div>
+    <hr />
+    <h3>order</h3>
+    <div id="order" class="flexBox w220 h200 grey">
+      <div class="w50 red">1</div>
+      <div class="w50 green">2</div>
+      <div class="w50 yellow order1">3</div>
+      <div class="w50 pink">4</div>
+      <div class="w50 blue">5</div>
+    </div>
+    <hr />
+
+  </div>
+  <div>
+    <h1>test</h1>
+    <h3>1</h3>
+    <div class="flexBox test1 red h200 w200">
+      <div class="green h50 w50"></div>
+    </div>
+    <hr />
+    <h3>2</h3>
+    <div class="flexBox test2 red h170 w170">
+      <div class="green h50 w50"></div>
+      <div class="green h50 w50"></div>
+      <div class="green h50 w50"></div>
+      <div class="green h50 w50"></div>
+      <div class="green h50 w50"></div>
+      <div class="green h50 w50"></div>
+    </div>
+    <hr />
+    <h3>3</h3>
+    <div class="flexBox test3 red h200 w200">
+      <div class="green h50 w50"></div>
+      <div class="test3-1 green h50 w50"></div>
+    </div>
+    <hr />
+    <h3>4</h3>
+    <div class="flexBox test4 red h200 w200">
+      <div class="test4-1 green h50 w50"></div>
+      <div class="green h50 w50"></div>
+      <div class="test4-2 green h50 w50"></div>
+    </div>
+    <hr />
+    <h3>5</h3>
+    <div class="flexBox test5 red h200 w200">
+      <div class="w100_ test5_2">
+        <div class="test green h50 w50"></div>
+        <div class="test green h50 w50"></div>
+      </div>
+      <div class="w100_ test5_2">
+        <div class="test green h50 w50"></div>
+        <div class="test green h50 w50"></div>
+      </div>
+    </div>
+    <hr />
+    <h3>6</h3>
+    <div class="flexBox test6 red h200 w200">
+      <div class="w100_ test6_1">
+        <div class="green h50 w50"></div>
+        <div class="green h50 w50"></div>
+      </div>
+      <div class="w100_ test6_2">
+        <div class="green h50 w50"></div>
+      </div>
+      <div class="w100_ test6_1">
+        <div class="green h50 w50"></div>
+        <div class="green h50 w50"></div>
+      </div>
+    </div>
+    <hr />
+    <h3>7</h3>
+    <div class="flexBox test7 red h170 w170">
+      <div class="green h50 w50"></div>
+      <div class="green h50 w50"></div>
+      <div class="green h50 w50"></div>
+      <div class="green h50 w50"></div>
+      <div class="green h50 w50"></div>
+      <div class="green h50 w50"></div>
+    </div>
+    <hr />
+    <h3>8</h3>
+    <div class="test8 flexBox w100_">
+      <div class="test8_1 w100 green h50 w50"></div>
+      <div class="test8_2 red">会随着浏览器的大小自动的改变宽度</div>
+      <div class="test8_1 w100 green h50 w50"></div>
+    </div>
+  </div>
+
+  </div>
+</body>
+
+</html>

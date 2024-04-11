@@ -1,0 +1,136 @@
+.red {
+  background-color: red;
+}
+.green {
+  background-color: green;
+}
+.yellow {
+  background-color: yellow;
+}
+.pink {
+  background-color: pink;
+}
+.blue {
+  background-color: blue;
+}
+.black {
+  background-color: black;
+}
+.orange {
+  background-color: orange ;
+}
+.grey {
+  background-color: grey;
+}
+
+.h50 {
+  height: 50px;
+}
+.h100 {
+  height: 100px;
+}
+.h170 {
+  height: 170px;
+}
+.h200 {
+  height: 200px;
+}
+.w100_{
+  width: 100%;
+}
+.w50 {
+  width: 50px;
+}
+.w170 {
+  width: 170px;
+}
+.w200{
+  width: 200px;
+}
+.w220 {
+  width: 220px;
+}
+
+.flexBox {
+  display: flex;
+}
+
+#flex-direction {
+  /* flex-direction: 设置主轴的方向 */
+  flex-direction: row;
+  /* flex-direction: column; */
+  /* flex-direction: row-reverse; */
+  /* flex-direction: column-reverse; */
+}
+
+#flex-wrap {
+  /* flex-wrap: 当主轴上排列不下的时候，如何换行 */
+  /* flex-wrap: nowrap; */
+  /* 不换行，当宽度小的时候压缩子的宽度，即使子设置了宽度，但是子的子的宽度是固定了的话，将不会压缩该子 */
+  flex-wrap: wrap;
+  /* flex-wrap: wrap-reverse;  */
+  /* 换行，而且从远离交叉轴开始排列，向靠近交叉轴的方向换行 */
+}
+
+#flex-flow {
+  /* flex-flow: flex-direction fkex-wrap */
+  /* row row-reverse cloumn cloumn-reverse */
+  /* nowrap wrap wrap-reverse */
+  /* flex-flow: column wrap-reverse; 这里的效果有意思*/
+  flex-flow: row wrap;
+}
+
+#justify-content {
+  /* 在主轴上的的对齐方式（如何分配剩余空间） */
+  /* flex-start flex-end  center space-between    space-around */
+  /* 主轴的开始  主轴的末尾 居中   两端占满，中间平分 子元素的左右搜分配相同的空间*/
+  flex-flow: row wrap;
+  justify-content: space-around;
+}
+
+#align-items {
+  /* 在交叉轴上的对齐方式 （作用在自己的一行又作用在整个交叉轴上） */
+  /* flex-start flex-end  center    stretch                       baseline */
+  /* 交叉轴起点  交叉轴终点 交叉轴中间 （默认值）没有设置高度会自动拉满 第一行文字的基线对齐 */
+  flex-flow: row wrap;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+#align-content {
+  /* 将一条主轴当做一个元素，在交叉轴上的排列方式 */
+  /* flex-start flex-end center space-between space-around stretch（默认值） */
+  flex-flow: row wrap;
+  /* align-items: baseline; */
+  align-content: flex-start;
+}
+
+#order {
+  /* 定义排序顺序，数值越小，排列越靠前 默认为0 */
+  flex-flow: row wrap;
+  align-content: center;
+}
+.order1{
+ order: 1;
+}
+
+#flex-grow {
+  /* 定义在主轴反向上的放大的比例 默认为0 不放大 */
+}
+
+#flex-shrink {
+  /* 在主轴方向上的缩小比例 */
+}
+
+#flex-basis {
+  /* 定义了在分配多余空间时，子项占据的主轴空间 */
+}
+
+#flex {
+  /* flex-grow flex-shrink flex-basis */
+}
+
+#align-self {
+/* 单个项目在交叉轴的对齐方式，继承父的align-items */
+/* auto flex-start flex-end center baseline stretch */
+}

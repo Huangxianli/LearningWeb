@@ -139,6 +139,7 @@ myForEach([1, 2, 1], (arr, i) => {
     // console.log(i.toFixed()) // 这里的编译会报出问题，因为前面定义的时候，定义了该回调参数的第二个参数是可选的，不一定可以使用这个参数 
 });
 function makeDate(mOrTimestamp, d, y) {
+    // 由于第一个重载签名只有一个入参，所以这里的d和y要是可选的
     if (d !== undefined && y !== undefined) {
         return new Date(y, mOrTimestamp, d);
     }
@@ -151,13 +152,16 @@ makeDate(12, 12, 12);
 function len(x) {
     return x.length;
 }
-// len(Math.random() > 0.5 ? "hello" : [4, 5]); // 这里编译会报错，现在函数的入参满足的是string | any[]，而不是满足重载签名中的一个
+// len(Math.random() > 0.5 ? "hello" : [4, 5]); // 这里编译会报错，现在函数的入参满足的是string | any[]，而不是满足重载签名中的一个，也就是说，推断的结果必须要100%的包含在去一个重载签名内
 // let a = Math.random() > 0.5 ? "hello" as string : [4, 5];
 // len(a);
 function lenGood(x) {
     return x.length;
 }
 lenGood(Math.random() > 0.5 ? "hello" : [4, 5]);
+/*
+手动的声明this
+ */
 /*
 形参展开
  */
@@ -180,6 +184,7 @@ function sum({ a = 1, b = 2, c = 3 } = { a: 1, b: 2, c: 3 }) {
     console.log(a + b + c); // a,b,c是从对象中结构出来的
 }
 sum({ a: 1, b: 2, c: 3 });
+sum();
 const f1 = () => true;
 const result1 = f1(); // 这里的result1会被判断成void类型
 function f2() {

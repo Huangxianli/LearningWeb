@@ -12,6 +12,7 @@ greeter(print);
 
 interface Funciton1 {
   (a1: number, a2: string): string
+  // 注意这里用的是 : 而不是 => 
 }
 let function1: Funciton1 = function (aaa: number, bbb: string): string { // 这里可以不写参数和返回值类型，如果写的话，必须与Function1相同，但是名称可以不同
   return ""
@@ -221,6 +222,7 @@ myForEach([1, 2, 1], (arr, i) => {
 
 
 注意： 在调用函数的时候，参数和返回值的匹配，其实匹配的是重载签名中的
+重载签名是告诉编译器和调用者可以怎样的传递参数，实现签名是具体的实现这个函数
  */
 
 /* 
@@ -232,6 +234,7 @@ function makeDate(mOrTimestamp: number, d?: number, y?: number): Date; // 实现
 function makeDate(timestamp: number): Date;
 function makeDate(m: number, d: number, y: number): Date;
 function makeDate(mOrTimestamp: number, d?: number, y?: number): Date {
+  // 由于第一个重载签名只有一个入参，所以这里的d和y要是可选的
   if (d !== undefined && y !== undefined) {
     return new Date(y, mOrTimestamp, d);
   } else {
@@ -256,7 +259,7 @@ function len(x: any) {
   return x.length
 }
 
-// len(Math.random() > 0.5 ? "hello" : [4, 5]); // 这里编译会报错，现在函数的入参满足的是string | any[]，而不是满足重载签名中的一个
+// len(Math.random() > 0.5 ? "hello" : [4, 5]); // 这里编译会报错，现在函数的入参满足的是string | any[]，而不是满足重载签名中的一个，也就是说，推断的结果必须要100%的包含在去一个重载签名内
 // let a = Math.random() > 0.5 ? "hello" as string : [4, 5];
 // len(a);
 
@@ -265,6 +268,14 @@ function lenGood(x: string | any[]): number {
 }
 
 lenGood(Math.random() > 0.5 ? "hello" : [4, 5]);
+
+
+
+/* 
+手动的声明this
+ */
+
+
 
 /* 
 形参展开
@@ -295,6 +306,7 @@ function sum({ a = 1, b = 2, c = 3 }: { a: number, b: number, c: number } = { a:
 }
 
 sum({ a: 1, b: 2, c: 3 });
+sum();
 
 /* 
 返回void类型
