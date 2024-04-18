@@ -49,6 +49,11 @@
 
     import * as moduleA from './content/moduleA.js';
     console.log(moduleA); // moduleA文件中所有的export都在里面（包括default）
+
+    const C = await import('./content/moduleC.js');;
+    console.log(C);
+
+
   </script>
 
 </body>
