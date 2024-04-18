@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>es6 module</title>
+</head>
+
+<body>
+  <!-- 通过http-server 代理解决跨域问题 -->
+  <!-- 
+    1、npm i http-server（live-server 热更新） -g 
+    2、对应的文件夹下执行 http-server --port=8080（live-server --port=8080）
+  -->
+
+  <!-- 
+    commonjs的require()是引入一个对象，然后将对象解构；在运行时才能确定（运行时加载）
+    es的import是静态的（不是一个对象），在编译的时候就能确定模块的依赖关系以及输出输入的变量
+    -->
+  <script type="module">
+    // const {a, b, c} = require('fs'); // 这种写法是先加载整个fs模块，再从模块中解构出 a，b，c
+    // import {a, b, c} from 'fs'; // 从fs模块中加载 a，b，c，其他的不加载（编译时加载/静态加载，可以在编译时完成模块加载）
+
+    import { A, A1, A2 } from './content/moduleA.js';
+    console.log(A);
+    console.log(A1);
+    console.log(A2);
+
+    import { c, setC } from './content/moduleA.js';
+    console.log(c);
+    setTimeout(() => {
+      console.log(c);
+      setC();
+      console.log(c);
+    }, 3000);
+
+
+    // import命令输入的接口都是只读的
+    // c = 12; // 会报错
+
+    // import from的后面可以接模块，但是必须要有配置文件，告诉引擎怎么获取这个模块
+    // import { } from moduleA;
+
+    // import 会提升到顶部，而且相同路径的会合并，无论写多少个相同的都只加载一次
+    // 可以直接import moduleA;
+
+
+    import * as moduleA from './content/moduleA.js';
+    console.log(moduleA); // moduleA文件中所有的export都在里面（包括default）
+  </script>
+
+</body>
+
+</html>
