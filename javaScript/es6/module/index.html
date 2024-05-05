@@ -20,6 +20,8 @@
     es的import是静态的（不是一个对象），在编译的时候就能确定模块的依赖关系以及输出输入的变量
     -->
   <script type="module">
+    // type='module' 等同于同时打开了defer，在渲染完之后才会执行该script标签的内容，也可以手动加async属性
+
     // const {a, b, c} = require('fs'); // 这种写法是先加载整个fs模块，再从模块中解构出 a，b，c
     // import {a, b, c} from 'fs'; // 从fs模块中加载 a，b，c，其他的不加载（编译时加载/静态加载，可以在编译时完成模块加载）
 
@@ -52,8 +54,15 @@
 
     const C = await import('./content/moduleC.js');;
     console.log(C);
+  </script>
 
-
+  <script type="module">
+    import { D_A, changeD_A } from './content/moduleD.js';
+    import './content/moduleD_1.js';
+    console.log('------------------1-------------------');
+    console.log(`index-D_A：${D_A}`);
+    changeD_A(); // 两个文件中的是同步被修改的
+    console.log(`index-D_A：${D_A}`);
   </script>
 
 </body>
