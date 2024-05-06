@@ -52,8 +52,9 @@ function test1_2 () {
 };
 
 /**
- * from 可以在任何构造函数上调用，只要构造函数接受一个表示新数组长度的单个参数
- * Array.form.call(thisObj(NotArray), arrayLike)
+ * from 可以在任何构造函数上调用，只要构造函数接受一个表示新数组长度的单个参数，返回的是新构造函数的实例，而不是Array的实例
+ * 非函数调用from的时候，返回的是数组
+ * Array.from.call(thisObj(NotArray), arrayLike)
  */
 function test1_3 () {
   console.log('---test1_3----------------------------------------');
@@ -142,6 +143,7 @@ function test3_1 () {
 function test4 () {
   console.log('---test4----------------------------------------');
   test4_1();
+  test4_2();
 };
 
 /**
@@ -154,4 +156,29 @@ function test4_1 () {
 
   const arr2 = Array.of(12, 23, 34, {});
   console.log('arr2: ', arr2); // [12, 23, 34, {}]
+};
+
+/**
+ * 非数组构造函数调用of()，返回的是新构造函数的实例，而不Array实例
+ * 不是构造函数调用of()的时候，返回的是数组
+ */
+function test4_2 () {
+  console.log('---test4_2----------------------------------------');
+
+  function NotArray1 (arg1, arg2) {
+    console.log('arg1: ', arg1);
+    console.log('arg2: ', arg2);
+  };
+  const arr1 = Array.of.call(NotArray1, 1, 23, 233);
+  console.log('arr1: ', arr1);
+  const isArray1 = Array.isArray(arr1);
+  console.log('isArray1: ', isArray1); // false
+
+  const arr2 = Array.of.call(Object, 1, 23, 3);
+  console.log('arr2: ', arr2); // Number {0: 1, 1: 23, 2: 3, length: 3}
+
+  const arr3 = Array.of.call({}, 1, 2, 3);
+  console.log('arr3: ', arr3); // [1, 2, 3]
+  const isArray3 = Array.isArray(arr3);
+  console.log('isArray3: ', isArray3); // true
 };
