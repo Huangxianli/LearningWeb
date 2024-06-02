@@ -40,11 +40,41 @@ function test2 () {
 };
 
 /**
- * 
+ * 在第一次执行callback的时候，访问的长度就确定了
+ * 在callback中删除就像是empty
  */
 function test3 () {
-  console.log('---test2---------------------------------------------');
+  console.log('---test3---------------------------------------------');
 
+  const arr3_1 = new Array(2).fill(12);
+  const arr3_2 = arr3_1.filter((ele, index) => {
+    if (index === 0) {
+      arr3_1.push(12);
+    };
+    return true;
+  });
+  console.log('arr3_2: ', arr3_2); // [12, 12] 第一次执行callback的时候访问的长度就确定了
+
+  const arr3_3 = Array.from({ length: 2 }, () => 2);
+  const arr3_4 = arr3_3.filter((ele, index, arr) => {
+    if (index === 0) {
+      delete arr[arr.length - 1];
+    };
+    return true;
+  });
+  console.log('arr3_4: ', arr3_4); // [2]
+
+  const arr3_5 = Array.prototype.fill.call({ length: 3 }, 3);
+  const arr3_6 = Array.from(arr3_5).filter((ele, index, arr) => {
+    if (index === 0) {
+      delete arr[arr.length - 1];
+    };
+    if (index === 1) {
+      arr.push(4);
+    }
+    return true;
+  });
+  console.log('arr3_6: ', arr3_6); // [3, 3] 开始就限定了访问数组的长度为3，删除了一个元素值，没有改变数组长度，后又添加了一个
 };
 
 export default test;
