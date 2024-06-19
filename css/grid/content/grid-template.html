@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>grid-template</title>
+  <style>
+    .outer_container_box {
+      height: 330px;
+      width: 330px;
+      background-color: aliceblue;
+      display: grid;
+      /* grid-template-columns: 110px 110px 110px; */
+      /* 定义每一列的宽度 */
+      /* grid-template-columns: repeat(3, 110px); */
+      grid-template-columns: repeat(1, 110px 110px 110px);
+      grid-template-rows: 110px 110px 110px;
+      /* 定义每一行的行高 */
+    }
+
+    .inner_box {
+      height: 100px;
+      width: 100px;
+      background-color: aqua;
+    }
+  </style>
+</head>
+
+<body>
+  <h3>grid-template</h3>
+  <hr />
+  <div class="outer_container_box">
+    <div class="inner_box">1</div>
+    <div class="inner_box">2</div>
+    <div class="inner_box">3</div>
+    <div class="inner_box">4</div>
+    <div class="inner_box">5</div>
+    <div class="inner_box">6</div>
+    <div class="inner_box">7</div>
+    <div class="inner_box">8</div>
+    <div class="inner_box">9</div>
+  </div>
+</body>
+
+</html>

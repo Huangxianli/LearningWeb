@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
 
 <head>
   <meta charset="UTF-8">
@@ -7,17 +7,30 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Document</title>
   <style>
-    .outer_box {
+    .outer_container_box.outer1 {
       height: 400px;
       width: 400px;
       background-color: aqua;
       display: grid;
     }
+
+    .outer_container_box.outer2 {
+      height: 500px;
+      width: 500px;
+      background-color: red;
+      display: inline-grid;
+    }
   </style>
 </head>
 
 <body>
-  <div class="outer_box">
+  <h3>base</h3>
+  <hr />
+  <div class="outer_container_box outer1">
+    <div></div>
+  </div>
+  <hr />
+  <div class="outer_container_box outer2">
     <div></div>
   </div>
 </body>

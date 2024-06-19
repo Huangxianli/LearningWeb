@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>repeat函数</title>
+  <style>
+    .h330 {
+      height: 330px;
+    }
+
+    .h220 {
+      height: 220px;
+    }
+
+    .h100 {
+      height: 100px;
+    }
+
+    .w100_ {
+      width: 100%;
+    }
+
+    .w330 {
+      width: 330px;
+    }
+
+    .w100 {
+      width: 100px;
+    }
+
+    .bc {
+      background-color: aqua;
+    }
+
+    .bcr {
+      background-color: red;
+    }
+
+    .outer_container_box {
+      display: grid;
+    }
+
+    .repeat1 {
+      /* grid-template-columns: repeat(3, 110px); */
+      grid-template-columns: repeat(2, 110px 110px);
+      /* 超出父容器的部分不会被挤压 */
+      grid-template-rows: repeat(3, 110px);
+    }
+
+    .repeat2 {
+      grid-template-columns: repeat(auto-fill, 110px);
+      grid-template-rows: repeat(auto-fill, 110px);
+    }
+
+    .repeat3 {
+      grid-template-columns: repeat(2, 110px) repeat(3, 150px) auto;
+    }
+  </style>
+</head>
+
+<body>
+  <h3>repeat函数</h3>
+  <!-- repeat现在只在 grid-template-columns 和 grid-template-rows 中有效 -->
+  <hr />
+  <h5>repeat1</h5>
+  <div class="outer_container_box h330 w330 bc repeat1">
+    <div class="inner_box w100 h100 bcr"></div>
+    <div class="inner_box w100 h100 bcr"></div>
+    <div class="inner_box w100 h100 bcr"></div>
+    <div class="inner_box w100 h100 bcr"></div>
+    <div class="inner_box w100 h100 bcr"></div>
+    <div class="inner_box w100 h100 bcr"></div>
+    <div class="inner_box w100 h100 bcr"></div>
+    <div class="inner_box w100 h100 bcr"></div>
+    <div class="inner_box w100 h100 bcr"></div>
+  </div>
+  <hr />
+  <h5>repeat2</h5>
+  <div class="h330">
+    <div class="outer_container_box h220 w330 bc repeat2">
+      <div class="inner_box w100 h100 bcr"></div>
+      <div class="inner_box w100 h100 bcr"></div>
+      <div class="inner_box w100 h100 bcr"></div>
+      <div class="inner_box w100 h100 bcr"></div>
+      <div class="inner_box w100 h100 bcr"></div>
+      <div class="inner_box w100 h100 bcr"></div>
+      <div class="inner_box w100 h100 bcr"></div>
+      <div class="inner_box w100 h100 bcr"></div>
+      <div class="inner_box w100 h100 bcr"></div>
+    </div>
+  </div>
+  <hr />
+  <h5>repeact重复使用</h5>
+  <div class="outer_container_box w100_ bc repeat3">
+    <div class="w100 h100 bcr"></div>
+    <div class="w100 h100 bcr"></div>
+    <div class="w100 h100 bcr"></div>
+    <div class="w100 h100 bcr"></div>
+    <div class="w100 h100 bcr"></div>
+    <div class="w100 h100 bcr"></div>
+    <div class="w100 h100 bcr"></div>
+    <div class="w100 h100 bcr"></div>
+    <div class="w100 h100 bcr"></div>
+  </div>
+  <hr />
+  <div class="outer_container_box h330 w330 bc">
+  </div>
+  <hr />
+  <div class="outer_container_box h330 w330 bc"></div>
+  <hr />
+  <div class="outer_container_box h330 w330 bc"></div>
+  <hr />
+  <div class="outer_container_box h330 w330 bc"></div>
+  <hr />
+  <div class="outer_container_box h330 w330 bc"></div>
+  <hr />
+  <div class="outer_container_box h330 w330 bc"></div>
+  <hr />
+  <div class="outer_container_box h330 w330 bc"></div>
+
+</body>
+
+</html>
