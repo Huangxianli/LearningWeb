@@ -38,6 +38,10 @@
       background-color: red;
     }
 
+    .bcg {
+      background-color: green;
+    }
+
     .outer_container_box {
       display: grid;
     }
@@ -56,6 +60,16 @@
 
     .repeat3 {
       grid-template-columns: repeat(2, 110px) repeat(3, 150px) auto;
+    }
+
+    .repeat4 {
+      grid-template-columns: 1fr 1fr 1fr;
+      grid-template-rows: 1fr 1fr 1fr;
+    }
+
+    .repeat5 {
+      grid-template-columns: 1fr 2fr 1fr;
+      grid-template-rows: 1fr 1fr 1fr;
     }
   </style>
 </head>
@@ -105,10 +119,33 @@
     <div class="w100 h100 bcr"></div>
   </div>
   <hr />
-  <div class="outer_container_box h330 w330 bc">
+  <h5>fr1</h5>
+  <div class="outer_container_box h330 w330 bc repeat4">
+    <div class="w100 h100 bcr"></div>
+    <div class="w100 h100 bcr"></div>
+    <div class="w100 h100 bcr"></div>
+    <div class="w100 h100 bcr"></div>
+    <div class="w100 h100 bcr"></div>
+    <div class="w100 h100 bcr"></div>
+    <div class="w100 h100 bcr"></div>
+    <div class="w100 h100 bcr"></div>
+    <div class="w100 h100 bcr"></div>
   </div>
   <hr />
-  <div class="outer_container_box h330 w330 bc"></div>
+  <h5>fr2</h5>
+  <div class="outer_container_box h330 w330 bc repeat5">
+    <!-- <div class="h100 bcr">1</div>
+    <div class="h100 bcg">2</div>
+    <div class="h100 bcr">3</div> -->
+    <!-- 子元素设置了基础宽度的时候，即使计算后设置的fr小于基础宽度，该元素的最小宽度还是按照自己设置的宽度来设置的，随后减去该元素的宽度再计算 -->
+    <div class="w100 h100 bcr">4</div>
+    <!-- 按照计算，4应该是占据82.5px，但是设置了为100px超过了这个宽度，排除，然后拿230/3再来计算 -->
+    <div class="w100 h100 bcg">5</div>
+    <div class="h100 bcr">6</div>
+    <div class="w100 h100 bcr">7</div>
+    <div class="w100 h100 bcg">8</div>
+    <div class="h100 bcr">9</div>
+  </div>
   <hr />
   <div class="outer_container_box h330 w330 bc"></div>
   <hr />
