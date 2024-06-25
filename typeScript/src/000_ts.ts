@@ -1,6 +1,6 @@
 /* 
 要使用TypeScript 要先安装typeScript编译器
-npm install -g typesppcript 
+npm install -g typespcript 
  */
 
 /*

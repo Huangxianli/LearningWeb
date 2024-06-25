@@ -1,7 +1,7 @@
 "use strict";
 /*
 要使用TypeScript 要先安装typeScript编译器
-npm install -g typesppcript
+npm install -g typespcript
  */
 /*
 安装好typeScript编译器之后，就可以使用 tsc 文件名.ts 来编译代码 生成js代码文件
