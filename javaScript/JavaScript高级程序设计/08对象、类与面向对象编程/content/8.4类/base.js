@@ -215,5 +215,83 @@ function test11 () {
   console.log(Object.getPrototypeOf(Test11_4.prototype) === test11_1.prototype); // true
   const test11_4_1 = new Test11_4();
   console.log(test11_4_1 instanceof test11_1); // true
+
+  function test11_5 () {
+    this.functionName = 'test11_5';
+  };
+  test11_5.prototype.protoFunc = function () { };
+
+  class Test11_6 extends test11_5 {
+    constructor() {
+      super();
+      this.test11_6Name = 'test11_6';
+    };
+    test11_6Fun () { };
+  };
+
+  const test11_6_1 = new Test11_6();
+  console.log('test11_6_1', test11_6_1); // {functionName: 'test11_5', test11_6Name: 'test11_6'}
+  console.log(Object.keys(test11_6_1)); // ['functionName', 'test11_6Name']
 };
 test11();
+
+/**
+ * 在类的原型方法中，super指向的是父.prototype
+ * 那么可以可以调到祖父的方法吗？
+ * --- 可以访问到，因为在这里super指向的是 父.prototype ，继承的时候，父.prototype[[Prototype]] 指向 祖父.prototype，所以即使在super在父.prototype上找不到，通过[[prototype]]也可以找到
+ */
+function test12 () {
+  class Test12_1 {
+    retrurnName () {
+      return 'Test12_1';
+    };
+  };
+  class Test12_2 extends Test12_1 {
+    getFatherName () {
+      const fatherName = super.retrurnName();
+      console.log('fatherName', fatherName);
+    };
+  };
+  const test12_2_1 = new Test12_2();
+  test12_2_1.getFatherName(); // fatherName Test12_1
+
+  class Test12_3 extends Test12_2 {
+    getGrandFatherName () {
+      const grandFatherName = super.retrurnName();
+      console.log('grandFatherName', grandFatherName);
+    };
+  }
+  const test12_3_1 = new Test12_3();
+  test12_3_1.getGrandFatherName(); // grandFatherName Test12_1
+};
+test12();
+
+/**
+ * 扩展类中如果显示的写了constructor方法，就要调用spuer方法，或者手动的返回一个对象，否则实例化的时候会报错
+ */
+function test13 () {
+  class Test13_1 {
+    proFuncName () {
+      return 'Test13_1';
+    }
+    static StaticName () {
+      return 'Test13_1_Static'
+    };
+  };
+  class Test13_2 extends Test13_1 {
+    constructor() {
+      // 显示的定义了constructor方法，但是没有调用super方法，实例化的时候会报错
+    };
+  };
+  // const test13_2_1 = new Test13_2(); // ReferenceError: Must call super constructor in derived class before accessing 'this' or returning from derived constructor
+
+  class Test13_3 extends Test13_1 {
+    constructor() {
+      return {}; // 这里返回了一个空对象，实例化的时候不会报错
+    };
+  };
+  const test13_3_1 = new Test13_3();
+  console.log(Object.getPrototypeOf(Test13_3.prototype)); // {proFuncName: ƒ}
+  console.log(test13_3_1.proFuncName); // 因为constructor中返回了一个{}，导致test13_3_1[[Prototype]]与Test13_3.prototype不再指向同一个对象
+};
+test13()
