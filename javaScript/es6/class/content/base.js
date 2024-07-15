@@ -1,3 +1,4 @@
+console.log('----base--------------------------------');
 class A1 {
   console (data) {
     console.log(data);
@@ -59,6 +60,7 @@ console.log(b1_1 instanceof B1); // false
  * 如果是直接在类上面，那么Object.getOwnPropertyNames为什么获取不到这个方法？？？
  */
 function test1 () {
+  console.log('----test1--------------------------------');
   class Test1_1 {
     constructor() { };
     protFun () { };
@@ -76,6 +78,7 @@ test1();
  * 类中的方法都是不可枚举的，包括实例方法和静态方法
  */
 function test2 () {
+  console.log('----test2--------------------------------');
   class Test2_1 {
     fun () { };
     static staticFun () { };
@@ -92,6 +95,7 @@ test2();
  * --- 是直接绑定在实例上的
  */
 function test3 () {
+  console.log('----test3--------------------------------');
   class Test3_1 {
     property = 'test3_1';
   };
@@ -107,6 +111,7 @@ test3();
  * --- 是绑定在类的prototype属性上的
  */
 function test4 () {
+  console.log('----test4--------------------------------');
   class Test4_1 {
     get testName () {
       return 'testName';
