@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>选择器类型</title>
+  <style>
+    * {
+      margin-left: 8px;
+    }
+
+    .ele_select UL {
+      /* 元素选择器，大小写不敏感 */
+      color: red;
+    }
+
+    .class_select {
+      color: blue;
+    }
+
+    .class_select .class1.class1_1 {
+      color: red;
+    }
+
+    .class_select .class2 {
+      color: green;
+    }
+
+    .id_select {
+      color: skyblue;
+    }
+
+    .id_select #id1 {
+      color: green;
+    }
+
+    .id_select #id1 {
+      /* 这里不会生效 */
+      color: green;
+    }
+
+    .id_select [id="id1 id1_1"] {
+      /* 这里会生效 */
+      color: blue;
+    }
+
+    .id_select [id~="id2"] {
+      /* 这里也能匹配到 */
+      color: red;
+    }
+
+    .id_select #id3 {
+      color: black;
+    }
+
+    .attr_select [colorRed] {
+      /* 只有属性，自定义属性，也可以被匹配到 */
+      color: red;
+    }
+
+    .attr_select [class|="class2"] {
+      /* 不能匹配到，因为class2在设置的时候，后面不是连接符“-” */
+      color: green;
+    }
+
+    .attr_select [class|='class3'] {
+      /* 可以匹配到 */
+      color: yellow;
+    }
+
+    .attr_select [class^="class4_"] {
+      /* 匹配不到，使用^标识符的时候，会将属性值作为一个整体 */
+      color: rgb(43, 189, 226);
+    }
+
+    .attr_select [class^="class4"] {
+      color: crimson;
+    }
+
+    .attr_select [class$="class5_2"] {
+      color: chartreuse;
+    }
+
+    .attr_select [class*="class6"] {
+      color: brown;
+    }
+
+    .pseudo_class_select .active:active {
+      /* 点击的时候会变红 */
+      color: red;
+    }
+
+    .relation_select li {
+      background: red;
+      margin-top: 4px;
+    }
+
+    .relation_select ul>li {
+      /* 匹配子元素 */
+      border: solid 1px black;
+    }
+
+    .relation_select .class2_1+li {
+      /* 匹配相邻元素 */
+      color: yellow;
+    }
+
+    .relation_select .class2_1~li::after {
+      content: "12";
+    }
+  </style>
+
+</head>
+
+<body>
+  <div>
+    <h2>全局选择器</h2>
+    <ul>
+      <li>1</li>
+      <li>2</li>
+      <li>3</li>
+      <li>4</li>
+    </ul>
+  </div>
+  <div class="ele_select">
+    <h2>元素选择器</h2>
+    <ul>
+      <li>1</li>
+      <li>2</li>
+      <li>3</li>
+      <li>4</li>
+    </ul>
+  </div>
+  <div class="class_select">
+    <h2>类选择器</h2>
+    <ul>
+      <li class="class1 class1_1">1</li>
+      <li class="class2">2</li>
+      <li class="class3">3</li>
+      <li>4</li>
+    </ul>
+  </div>
+  <div class="id_select">
+    <h2>ID选择器</h2>
+    <ul>
+      <li id="id1 id1_1">1</li>
+      <li id="id2 id2_1">2</li>
+      <li id="id3">3</li>
+      <li>4</li>
+    </ul>
+  </div>
+  <div class="attr_select">
+    <h2>属性选择器</h2>
+    <ul>
+      <li colorRed>1</li>
+      <li class="class2_1">2</li>
+      <li class="class3-1 class3-2">3</li>
+      <li class="class4 class4_1 class4_2">4</li>
+      <li class="class5 class5_1 class5_2">5</li>
+      <li class="class6_1 class6_2">6</li>
+    </ul>
+  </div>
+  <div class="pseudo_class_select">
+    <h1>伪类选择器</h1>
+    <ul>
+      <li class="active">1</li>
+      <li></li>
+      <li></li>
+      <li></li>
+      <li></li>
+    </ul>
+  </div>
+
+  <div class="relation_select">
+    <h2>关系选择器</h2>
+    <ul>
+      <li class="class1_1">1</li>
+      <li class="class2_1">2</li>
+      <li class="class3_1">3</li>
+      <li class="class4_1">4</li>
+      <li>5</li>
+      <li>6</li>
+    </ul>
+  </div>
+</body>
+
+</html>
