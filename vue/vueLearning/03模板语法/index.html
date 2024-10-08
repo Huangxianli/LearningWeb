@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>模板语法</title>
+</head>
+
+<body>
+  <div id="root"></div>
+  <hr />
+  <div id="root1"></div>
+  <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+  <script>
+    /**
+     * 所有的模板都是合法的HTML
+     * Vue会将模板编译成虚拟DOM渲染函数
+     */
+    Math.Symbol1 = Symbol.for('symbol1');
+    const ChildComponent1 = {
+      data: () => ({
+        data1: {
+          [Math.Symbol1]: '1'
+        }
+      }),
+      template:
+        `
+        <div>
+          <hr />
+          <div>
+            <span>这里是子组件，测试以symbol为key的内容是否进行了响应式</span>
+            <button @click="changeData">点击修改对象中以symbol类型值为key的值</button>
+            <span>data1[symbol.for('symbol1')]：{{data1[Math.Symbol1]}}</span>
+            {{computed1}}
+          </div>
+        </div>
+      `,
+      beforeCreate () {
+        Math.Symbol1 = Symbol.for('symbol1'); // 这里这么做的原因是 模板表达式中有一个全局变量的白名单Symbol没有在里面，无法访问
+        console.log("beforeCreate，Math.Symbol1 = Symbol.for('symbol1')：", Math.Symbol1 === Symbol.for('symbol1'));
+      },
+      computed: {
+        computed1 () {
+          console.log("computed1，Math.Symbol1 = Symbol.for('symbol1')：", Math.Symbol1 === Symbol.for('symbol1'));
+          console.log('改变了'); // 这里也只会在第一次进来的时候触发，点击按钮修改后就不会触发了
+          return this.data1[Symbol.for('symbol1')];
+        },
+      },
+      methods: {
+        changeData () {
+          this.data1[Symbol.for('symbol1')] = Math.random();
+          console.log("changeData，this.data1[Symbol.for('symbol1')]：", this.data1[Math.Symbol1]); // 注意这里修改成功了，但是没有驱动视图的更新
+        },
+      },
+    };
+
+    const vm = new Vue({
+      el: '#root',
+      data: () => ({
+        data1: {},
+        data2: new Map([[1, 1], [2, 2]]),
+      }),
+      template:
+        `
+        <div>
+          <button @click="changeData1">修改data1的值</button>
+          <span>data1：{{data1}}</span>
+          <br/>
+          <button @click="changeData2">修改data2的值</button>
+          <span>data2：{{data2}}</span>
+          <span>data2.get(1)：{{data2.get(1)}}</span>
+          <ChildComponent1 />
+        </div>
+        `,
+      components: {
+        ChildComponent1: ChildComponent1
+      },
+      methods: {
+        changeData1 () {
+          this.data1.name = 1; // 增加新属性，这里向data1中添加属性，成功但是视图没有被驱动修改
+          this.data1 = 12; // 这里修改data1的值，会驱动视图的更新1
+        },
+        changeData2 () {
+          this.data2.set(1, Math.random());  // 修改map，这里是修改成功的，但是视图没有驱动修改
+          console.log(this.data2.get(1));
+        },
+      },
+    });
+
+
+  </script>
+
+</body>
+
+</html>

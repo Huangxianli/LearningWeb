@@ -96,6 +96,7 @@ test4();
 /**
  * instanceof 操作符的原理
  * a instanceof A a沿着[[Prototype]]一直查找，如果找到 A.prototype 就返回true
+ * 其实 a instanceof A 内部是 A[Symbol.hasInstance](a) 如果该方法返回的是false，即使满足上面的条件沿着a[[Prototype]]查找到了A.prototype,也会返回false
  */
 function test5 () {
   function test5_1 () { };

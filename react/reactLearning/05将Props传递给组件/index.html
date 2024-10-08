@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>将Props传递给组件</title>
+
+  <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+
+<body>
+  <div id="root"></div>
+
+  <script type="text/babel">
+
+    /**
+     * 可以将任何的props传递给自己的组件，props是组件唯一的参数
+     * 可以将JSX作为子组件传递
+     * 
+     * 不要在组件内修改props，必须由来源组件修改并传递一个新的props（一个新的对象）
+     */
+    function ChildComponent1 ({ persion, children }) {
+      return (
+        <>
+          <div>
+            <span>name </span>
+            <span>{persion.name}</span>
+          </div>
+          <div>
+            <span>age </span>
+            <span>{persion.age}</span>
+          </div>
+          {children}
+        </>
+      );
+    };
+    function ChildComponent2 () {
+      return (
+        <>
+          <div>ChildComponent2</div>
+        </>
+      );
+    };
+
+    function RootComponent () {
+      const persion = {
+        name: 'name1',
+        age: 1
+      };
+
+      return (
+        <>
+          <ChildComponent1 persion={persion} >
+            <ChildComponent2 />
+          </ChildComponent1>
+        </>
+      );
+    };
+    const container = document.getElementById('root');
+    const root = ReactDOM.createRoot(container);
+    root.render(<RootComponent />);
+  </script>
+</body>
+
+</html>

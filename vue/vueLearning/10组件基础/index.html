@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>组件基础</title>
+</head>
+
+<body>
+  <div id="root"></div>
+  <script src="https://c
+  dn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+  <script>
+
+    const ChildComponent2 = {
+      props: {
+      },
+      data: vm => ({
+      }),
+      template:
+        `
+        <div>
+          <div>ChildComponent1</div>
+        </div>
+        `
+      ,
+      computed: {
+      },
+      methods: {
+      },
+      watch: {
+      },
+    }
+
+
+    new Vue({
+      el: '#root',
+      data: vm => ({}),
+      components: {
+        ChildComponent1
+      },
+      template:
+        `
+        <div>
+          <ChildComponent1 />
+        </div>
+        `
+      ,
+    });
+  </script>
+</body>
+
+</html>

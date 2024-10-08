@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>hello World</title>
+</head>
+
+<body>
+  <div id="root"></div>
+  <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+  <script>
+    const vm = new Vue({ // 创建一个Vue实例
+      el: '#root', // 有el属性的话，会在html中查找后面的内容，将生成的vue实例将挂载到对应DOM上
+      template: `<div>Hello World</div>`, // 声明了template的话，该模板会 替换 挂载的元素，挂载的元素都将被忽略，除非模板内容有分发插槽
+    });
+  </script>
+
+</body>
+
+</html>

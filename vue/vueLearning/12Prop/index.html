@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Prop</title>
+</head>
+
+<body>
+  <div id="root"></div>
+  <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+  <script>
+
+    /**
+     * 由于HTML中的attribute的大小写不敏感，会将大写转化成小写
+     * 如果是在DOM的模板中使用，要将小驼峰命名的转化成kebab-case的写法，如果是在字符串模板中就不需要
+    */
+    const ChildComponent1 = {
+      props: {
+        fatherComponentName: String,
+        content: String,
+      },
+      data: vm => ({
+      }),
+      template:
+        `
+        <div>
+          <div>ChildCompoent1</div>
+          <div>fatherComponentName：{{fatherComponentName}}</div>
+          <div>content：{{content}}</div>
+        </div>
+        `
+      ,
+      computed: {
+      },
+      methods: {
+      },
+      watch: {
+      },
+    };
+
+
+    /**
+     * prop验证
+     * prop会在组件床架你之前进行验证，所以在default validtor中访问不到data computed等
+     * 支持的类型 String、Number、Boolean、Symbol、Object、Array、Function、Date、构造函数（会通过insatanceof来判断是不是当前实例）
+    */
+    const ChildComponent2 = {
+      props: {
+        fatherName: {
+          type: [Number, String],
+          required: true,
+          // default可以通过一个方法返回，也可以是直接默认的值，要注意如果本身就是要传一个函数的话，default: ()=> (()=> {})
+          default: function () {
+            return ''
+          },
+          validator: function (value) {
+            if (typeof value === 'string') {
+              return value.indexOf('o') !== -1;
+            }
+            return value > 12;
+          }
+        }
+      },
+      data: vm => ({
+      }),
+      template:
+        `
+        <div>
+          <div>ChildComponent2</div>
+          <div>fatherName：{{fatherName}}</div>
+        </div>
+        `
+      ,
+      computed: {
+      },
+      methods: {
+      },
+      watch: {
+      },
+    };
+
+
+    /**
+     * 对于在组件内没有设置prop接受的attribute，会自动的加载根节点上作为attribute
+    */
+    const ChildComponent3 = {
+      props: {
+      },
+      data: vm => ({
+      }),
+      template:
+        `
+        <div>
+          <div>ChildComponent3</div>
+        </div>
+        `
+      ,
+      computed: {
+      },
+      methods: {
+      },
+      watch: {
+      },
+    };
+
+    /**
+     * 限制attribute可以被根组件继承
+     * inheritAttris: false; 不会继承attribute，不会影响style和class
+     * $attrs: 父作用域中不作为prop识别的attribute（除去class和style）
+    */
+    const ChildComponent4 = {
+      inheritAttris: false,
+      props: {
+        fatherName: String,
+      },
+      data: vm => ({
+      }),
+      template:
+        `
+        <div>
+          <div>ChildComponent4</div>
+          <!-- { "dataProp1": "1", "dataProp2": "2", "dataProp3": "3" }由于prop中有fatherName，所以不会包含在这个对象内，在这个里面，还没有全部转化为小写 -->
+          <div>{{$attrs}}</div>
+        </div>
+        `
+      ,
+      computed: {
+      },
+      methods: {
+      },
+      watch: {
+      },
+    };
+
+    new Vue({
+      el: '#root',
+      comments: true,
+      data: vm => ({
+        info: {
+          content: 'abcd',
+        },
+        otherProp: {
+          dataProp1: '1',
+          dataProp2: '2',
+          dataProp3: '3'
+        },
+      }),
+      components: {
+        ChildComponent1,
+        ChildComponent2,
+        ChildComponent3,
+        ChildComponent4
+      },
+      template:
+        `
+        <div>
+          <!-- v-bind="obj" 这种绑定的方法，会将obj中的内容解构传给子组件 -->
+          <ChildComponent1 fatherComponentName="root" v-bind="info"/>
+          <hr />
+          <ChildComponent2 fatherName="root"/>
+          <hr />
+          <!-- 由于3内部没有prop接收fatherName，会转化成全小写，添加到组件内的根节点上；如果已经有相同的attribute名，则会替换为传入的值（除了class和style）-->
+          <ChildComponent3 fatherName="root"/>
+          <hr />
+          <ChildComponent4 fatherName="root" v-bind="otherProp"/>
+        </div>
+        `
+      ,
+    });
+  </script>
+</body>
+
+</html>

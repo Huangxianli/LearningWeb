@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>表单输入绑定</title>
+</head>
+
+<body>
+  <div id="root"></div>
+  <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+  <script>
+
+    /**
+     * 注意v-model其实是一个事件和一个property的语法糖
+     * <input />
+     *  type为text，使用的是 value property 和 input 事件
+     *  type为radio，使用的是 checked property 和 change 事件
+     *  type为checkbox，使用的是 checked property 和 change 事件
+     * 
+     * <select></select> value property 和 change 事件 注意原生的select没有value属性
+     * 我可以通过修改v-model绑定的变量，控制选择，这和是怎么实现的？？？
+     * 
+     * <textarea /> 使用的是 value property和 input 事件
+    */
+    const ChildComponent1 = {
+      props: {
+      },
+      data: vm => ({
+        text1: '',
+        text2: '',
+        vRadio: '',
+        radio: '',
+        vCheckbox1: false,
+        vCheckbox2: [],
+        vSelect1: [],
+        select1: [],
+        vSelect2: '',
+      }),
+      template:
+        `
+        <div>
+          <div>ChildComponent1</div>
+          <form>
+            <!-- input[type="text"] -->
+            <label for="text1">input[type="text"] v-model</label>
+            <input id="text1" v-model="text1" type="text" />
+            <div>input[tyep="text"]绑定的v-model值：{{text1}}</div>
+
+            <label for="">input[type="text"] 自己实现v-model</label>
+            <input id="text2" :value="text2" type="text" @input="text2Input"/>
+            <div>自定义的v-model的值：{{text2}}</div>
+            <br/>
+
+            <!-- input[type="radio"] -->
+            <label for="radio1">v-radio1</label>
+            <input id="radio1" type="radio" v-model="vRadio" value="v-radio1" />
+            <label for="radio2">v-radio2</label>
+            <input id="radio2" type="radio" v-model="vRadio" value="v-radio2" />
+            <div>input[type="radio"]绑定的v-model值：{{vRadio}}</div>
+           
+            <!-- 绑定的checked属性（value属性本身就用来表示当个radio对应的值）和change事件 -->
+            <label for="radio1">自定义的v-model radio1</label>
+            <input id="radio1" :checked="radio==='radio1'" value="radio1" type="radio" @change="radioChange"/>
+            <label for="radio2">自定义的v-model radio1</label>
+            <input id="radio2" :checked="radio==='radio2'" value="radio2" type="radio" @change="radioChange"/>
+            <div>自定义的v-model的值：{{radio}}</div>
+            <br />
+
+            <!-- input[type="checkbox"] -->
+            <!-- 单个复选框 v-model是boolean值-->
+            <label for="vCheckbox1">vCheckBox1_1</lable>
+            <input id="vCheckbox1" value="vCheckbox1" v-model="vCheckbox1" type="checkbox" />
+            <div>input[type="checkbox"] v-model：{{vCheckbox1}}</div>
+            
+            <!--多个复选框 v-model是数组，其中的值是checked的项的value属性的值-->
+            <label for="vCheckbox2_1">vCheckBox2_1</lable>
+            <input id="vCheckbox2_1" value="vCheckbox2_1" v-model="vCheckbox2" type="checkbox" />
+            <label for="vCheckbox2_2">vCheckbox2_2</lable>
+            <input id="vCheckbox2_2" value="vCheckbox2_2" v-model="vCheckbox2" type="checkbox" />
+            <label for="vCheckbox2_3">vCheckbox2_3</lable>
+            <input id="vCheckbox2_3" value="vCheckbox2_3" v-model="vCheckbox2" type="checkbox" />
+            <label for="vCheckbox2_4">vCheckbox2_4</lable>
+            <input id="vCheckbox2_4" value="vCheckbox2_4" v-model="vCheckbox2" type="checkbox" />
+            <div>input[type="checkbox"] v-model：{{vCheckbox2}}</div>
+            <br />
+
+
+            <!-- select[multiple=true]-->
+            <label for="vSelect1"  >select[multiple=true] v-model</label>
+            <select id="vSelect1" key="vSelect1" v-model="vSelect1" multiple >
+              <option value="option11">option1</option>
+              <option value="option22">option2</option>
+              <option value="option33">option3</option>
+            </select>
+            <div>v-model的值：{{vSelect1}}</div>
+            
+            <label for="select1" >自定义的select[multiple=true] v-model</label>
+            <select id="select1" :value="select1" multiple @change="selectChange" >
+              <option value="option1" key="1">option1</option>
+              <option value="option2" key="2">option2</option>
+              <option value="option3" key="13">option3</option>
+            </select>
+            <div>自定义的v-model的值：{{select1}}</div>
+
+          </form>
+        </div>
+        `
+      ,
+      computed: {
+      },
+      methods: {
+        text2Input (event) {
+          this.text2 = event.target.value;
+        },
+        radioChange (event) {
+          this.radio = event.target.value;
+        },
+        selectChange (event) {
+          this.select1 = [...event.target.selectedOptions].map(option => option.value);
+        },
+      },
+      watch: {
+      },
+    };
+
+
+    new Vue({
+      el: '#root',
+      data: vm => ({}),
+      components: {
+        ChildComponent1,
+      },
+      template:
+        `
+        <div>
+          <ChildComponent1 />
+        </div>
+        `
+      ,
+    });
+  </script>
+</body>
+
+</html>

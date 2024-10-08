@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>vue实例</title>
+</head>
+
+<body>
+  <div id="root"></div>
+  <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+  <script>
+    const childCompoent1 = {
+      data: vm => ({
+        childData1: vm.formFather
+      }), // 如果使用箭头函数，里面的this就不指向当前vue实例，但是箭头函数的第一个参数表示当前实例
+      props: {
+        formFather: '',
+      },
+      template: `<span>这里是子组件，formFatrher：{{formFather}}，childData1：{{childData1}}</span>`,
+    };
+    const symbol1 = Symbol.for('symbol1');
+    const data1 = {
+      a: 1,
+      b: {
+        [symbol1.for(1)]: 'symbol1'
+      },
+      c: {
+        c1: 1,
+        c2: Symbol(),
+      },
+    };
+    console.log(data1);
+    const vm = new Vue({
+      el: '#root', // el确定了vue最终要挂载的地方
+      data: data1, // new实例的时候，会将data1对象中的property加入到响应式系统中，当property对应的内容发生改变的时候，视图会自动更新
+      components: {
+        'child-compoent1': childCompoent1,
+      },
+      template: // 使用了template的话，template的内容会覆盖el对应的元素
+        `
+        <div>
+          <span>这里是父的data a：{{a}}，symbol1：{{b}}，c：{{c}}</span>
+          <br/>
+          <child-compoent1 formFather="123"/>
+        </div>
+        `,
+    });
+    // 注意这里两个对象是完全一样
+    console.log('data1 === vm.$data: ', data1 === vm.$data); // data1 === vm.$data:  true
+    console.log('vm.$data: ', vm.$data); // 在浏览器打印中可以看到 __ob__ get set
+
+    setTimeout(() => {
+      data1.a = 12;
+      data1.b[symbol1] = 12;
+      data1.c.c1 = 12;
+      console.log(JSON.parse(JSON.stringify(vm.$data))); // 注意这种写法会将以Symbol类型作为key或者value的属性丢失掉，同时map和set都会变成“{}”，并不能还原到原来的对象，和官网的说法有差异 https://v2.cn.vuejs.org/v2/api/#data
+    }, 1000);
+
+  </script>
+</body>
+
+</html>

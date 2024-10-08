@@ -1,0 +1,27 @@
+/* 根据props或state来更新state */
+import { useState } from 'react';
+function FullName () {
+  const [firstName, setFirstName] = useState('');
+  const [secondName, setSecondName] = useState('');
+  // 这里的fullName就可以不用Effect中来进行，因为本身调用组件中的state的setter函数的时候，就会触发渲染，会执行该组件（函数），直接用普通变量拼接就可以了
+  const fullName = firstName + ' ' + secondName; // 可以基于现有的state or props计算出，就不要再设置一个多余的state
+  return (
+    <>
+      <input value={firstName} onChange={e => { setFirstName(e.target.value) }} />
+      <br />
+      <input value={secondName} onChange={e => { setSecondName(e.target.value) }} />
+      <br />
+      <div>{fullName}</div>
+    </>
+  );
+};
+
+function UpdatingStateBasedOnPropsOrState () {
+  return (
+    <>
+      <div>根据props或state来更新state</div>
+      <FullName />
+    </>
+  );
+};
+export default UpdatingStateBasedOnPropsOrState;

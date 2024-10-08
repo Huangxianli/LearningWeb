@@ -1,0 +1,13 @@
+.over-show-component {
+  line-height: 1.5em;
+  max-height: 4.5em;
+
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.over-show-component-checkbox {
+  cursor: pointer;
+  float: right;
+  clear: both;
+}

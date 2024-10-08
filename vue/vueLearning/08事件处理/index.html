@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>事件处理</title>
+</head>
+
+<body>
+  <div id="root"></div>
+  <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+  <script>
+
+    /**
+     * 事件处理方法 默认的第一个参数是event
+     * 内联处理方法 内联的代码中，可以直接访问vue实例的内容，无需this.xxx; $event是原生的事件对象
+    */
+    const ChildComponent1 = {
+      props: {
+      },
+      data: vm => ({
+        clicks: 0,
+        clicks1: 0,
+      }),
+      template:
+        `
+        <div>
+          <div>ChildComponent1</div>
+          <div 
+            style="height: 100px; backgroundColor: red"
+            @click="clickDiv"
+            >
+            <button data-1="data-1">事件处理方法</button>
+            <br />
+            <span>点击了button{{clicks}}次</span>
+          </div>
+          <div 
+            style="height: 100px; backgroundColor: green"
+            @click="$event.target.tagName !== 'BUTTON' ? clicks1++ : ''"
+            >
+            <!--注意模板表达式中，只能用表达式，if判断都不能用；强烈不建议在模板处理事件的逻辑-->
+            <button>点击按钮</button>
+            <div>点击了非按钮{{clicks1}}次</div>
+          </div>
+        </div>
+        `
+      ,
+      computed: {
+      },
+      methods: {
+        clickDiv (event) { // 默认的参数是原生的DOM事件对象
+          debugger
+          if (Object.values(event.target.dataset).includes('data-1')) {
+            this.clicks++; // 注意在这里写的方法调用vue的内容要加this
+          }
+        }
+      },
+      watch: {
+      },
+    };
+
+    /**
+     * 事件修饰符
+     * .stop
+     * .prevent
+     * .capture
+     * .self
+     * .once
+     * .passive
+    */
+    const ChildComponent2 = {
+      props: {
+      },
+      data: vm => ({
+      }),
+      template:
+        `
+        <div>
+        </div>
+        `
+      ,
+      computed: {
+      },
+      methods: {
+      },
+      watch: {
+      },
+    }
+
+
+
+    new Vue({
+      el: '#root',
+      data: vm => ({}),
+      components: {
+        ChildComponent1,
+      },
+      template:
+        `
+        <div>
+          <ChildComponent1 />
+        </div>
+        `
+      ,
+    });
+  </script>
+</body>
+
+</html>

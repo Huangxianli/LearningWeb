@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>渲染函数</title>
+  <style>
+    .bgRed {
+      background-color: red;
+    }
+
+    .bgGreen {
+      background-color: green;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="root"></div>
+  <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+
+  <script type="text/x-template" id="ChildComponent3">
+    <div>
+      <div>ChildComponent3</div>
+      <slot name="default1" v-bind="textInfo">deafault1插槽</slot>
+    </div>
+  </script>
+
+  <script>
+
+    const bgColor = ['bgRed', 'bgGreen'];
+    const ChildComponent1 = {
+      props: {
+      },
+      data: vm => ({
+        classData: 'bgRed'
+      }),
+      computed: {
+      },
+      methods: {
+        changeBg () {
+          const data = this.classData;
+          this.classData = bgColor.find(color => color !== data);
+          this.$emit('changeBgColor');
+        },
+      },
+      watch: {
+      },
+      template:
+        `
+        <div>
+          <div :class="classData">ChildComponent1</div>
+          <button @click="changeBg">修改背景</button>
+          <div>与渲染函数的对比</div>
+        </div>
+        `
+      ,
+    };
+
+
+    const ChildComponent2 = {
+      data: () => ({
+        classData: bgColor[0],
+      }),
+      render: function (createElement) {
+        // createElement函数会返回VNode
+        return createElement(
+          'div',
+          [
+            createElement(
+              'button',
+              {
+                on: {
+                  click: function () {
+                    const data = this.classData;
+                    this.classData = bgColor.find(color => color !== data);
+                    this.$emit('changeBgColor');
+                  }.bind(this),
+                }
+              },
+              '修改背景'
+            ),
+            createElement(
+              'div',
+              {
+                class: this.classData,
+              },
+              'ChildComponent2'
+            ),
+            createElement(
+              'div',
+              {},
+              '测试render函数'
+            )
+          ]
+        );
+      },
+    };
+
+
+    const ChildComponent3 = {
+      data: () => ({
+        textInfo: {
+          a: 'a',
+          b: 'b'
+        }
+      }),
+      template: '#ChildComponent3',
+    };
+
+    const ChildComponent4 = {
+      props: {
+        info: {
+          type: String,
+          default: 'test render props',
+          required: false,
+          validator: () => true
+        }
+      },
+      render (createElement) {
+        return createElement(
+          'div',
+          {
+            props: {
+              info: '123123'
+            }
+          },
+          [
+            createElement(
+              'div',
+              'ChildComponent4'
+            ),
+            this.$scopedSlots.default1({
+              info: this.$props.info
+            }),
+          ]
+        );
+      },
+    };
+
+    new Vue({
+      el: '#root',
+      data: vm => ({}),
+      components: {
+        ChildComponent1,
+        ChildComponent2,
+        ChildComponent3,
+        ChildComponent4,
+      },
+      render (createElement) {
+        return createElement(
+          'div',
+          {
+          },
+          [
+            createElement(ChildComponent1),
+            createElement(
+              'hr'
+            ),
+            createElement(
+              ChildComponent2,
+              {
+                on: {
+                  changeBgColor: () => {
+                    console.log('测试render的接收子组件发出的事件');
+                  }
+                },
+                // 监听组件的原生事件
+                nativeOn: {
+                }
+              }
+            ),
+            createElement('hr'),
+            createElement(
+              ChildComponent3,
+              {
+                // 注意是直接卸载这个上面
+                scopedSlots: {
+                  default1: (props) => {
+                    return createElement('div', props.a + props.b)
+                  }
+                },
+              },
+            ),
+            createElement('hr'),
+            createElement(
+              ChildComponent4,
+              {
+                scopedSlots: {
+                  default1: function (props) {
+                    console.log(props.info);
+                    return props.info
+                  }
+                }
+              },
+            ),
+          ]
+        );
+      }
+    });
+  </script>
+</body>
+
+</html>

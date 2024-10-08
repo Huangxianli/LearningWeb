@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>列表渲染</title>
+  <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+
+<body>
+  <div id="root"></div>
+
+  <script type="text/babel">
+    /**
+     * 可以用map遍历生成包含元素标签的数组，会自动的将数组展开
+     * 可以用filter过滤
+     * 记得加key（注意，key应该是在数据中提前准备好的，而不要在运行时才生成）
+     * 如果每个列表项对应多个节点，应该用<Fragment key={}>包裹，<></>不能接受key
+     */
+    function ChildComponent1 () {
+      const liList = [
+        { key: 1, name: 'name1' },
+        { key: 2, name: 'name2' },
+        { key: 3, name: 'name3' },
+        { key: 4, name: 'name4' },
+      ];
+      return (
+        <>
+          <ul>
+            {liList.map(item => <li key={item.key}>{item.name}</li>)}
+          </ul>
+        </>
+      );
+    };
+
+    function RootComponent () {
+      return (
+        <>
+          <ChildComponent1 />
+        </>
+      );
+    };
+
+    const container = document.getElementById('root');
+    const root = ReactDOM.createRoot(container);
+    root.render(<RootComponent />);
+  </script>
+</body>
+
+</html>

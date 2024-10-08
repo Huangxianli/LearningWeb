@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Class与Style的绑定</title>
+  <style>
+    #root {
+      height: 100%;
+      width: 100%;
+    }
+
+    .h100 {
+      height: 100px;
+    }
+
+    .active {
+      background-color: red;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="root"></div>
+  <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+  <script>
+
+    /**
+     * class的绑定支持对象和数组，支持动态和静态一起存在
+     * 在组件上使用class的时候，会将class绑定在组件的根节点上
+    */
+    const ChildComponent1 = {
+      data: vm => ({
+        isActive: false,
+      }),
+      template:
+        `
+        <div>
+          <div>ChildComponent1</div>
+          <button @click="changeActive">点击切换状态</button>
+          <div class="h100" :class="{active: isActive}">
+            <span>状态{{state}}</span>
+          </div>
+          <div :class="['h100', activClass]">
+            <span>状态</span>
+           </div>
+        </div>
+        `
+      ,
+      computed: {
+        state () {
+          return this.isActive ? '激活' : '失活';
+        },
+        activClass () {
+          return this.isActive ? 'active' : '';
+        },
+      },
+      methods: {
+        changeActive () {
+          this.isActive = !this.isActive;
+        }
+      },
+    };
+
+    /**
+     * style中的属性采用小驼峰，或者链接符的写法
+     * 对象和数组都可以使用
+     * 要添加前缀的地方会自动的添加前缀
+     * 
+    */
+    const ChildComponent2 = {
+      data: vm => ({
+        isActive: false,
+      }),
+      template:
+        `
+        <div>
+          <div>ChildComponent2</div>
+          <button @click="changeState">点击切换状态</button>
+          <div :style="{'height': '100px', 'background-color': bgc}"></div>
+        </div>
+        `
+      ,
+      computed: {
+        bgc () {
+          return this.isActive ? 'green' : 'yellow'
+        },
+      },
+      methods: {
+        changeState () {
+          this.isActive = !this.isActive;
+        },
+      },
+    };
+
+
+    new Vue({
+      el: '#root',
+      components: {
+        ChildComponent1,
+        ChildComponent2,
+      },
+      data: vm => ({}),
+      template:
+        `
+        <div>
+          <ChildComponent1 />
+          <hr />
+          <ChildComponent2 />
+        </div>
+        `
+      ,
+    });
+  </script>
+</body>
+
+</html>
