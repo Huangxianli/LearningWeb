@@ -111,7 +111,7 @@ function test6 () {
 test6();
 
 /**
- * WeakSet和Set的第一个不同，之能使用非null对象orSymbol作为其项
+ * WeakSet和Set的第一个不同，只能使用 非null对象 or Symbol 作为其项
  * 第二个不通过是WeakSet引用对象，这一步不会记录到垃圾回收机制中
  * 其他的特性和Set类似 不会存储相同的数据
  */

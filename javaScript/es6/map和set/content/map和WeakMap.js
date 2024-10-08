@@ -1,21 +1,26 @@
 /**
  * Map构造函数，接受的是实现了iterable接口，每一项是一个数组，数组含有俩项数据，前为key后为value
+ * 任何一项不是数组会报错，任何一项都必须至少有两项，没有的话，会取undefined作为默认值
  * 重复的key会被后面加入的覆盖掉，key可以是任何类型，不会被转化成字符串
  */
 function test1 () {
   console.log('---test1------------------------------------------------');
   const map1_1 = new Map([[], [, 1]]);
   console.log('map1_1: ', map1_1); // map1_1: Map(1) {undefined => 1}
+  const map1_2 = new Map([[], [, 0, 1], [, 0], [, 1], [,]]);
+  console.log('map1_2: ', map1_2); // map1_2: Map(1) {undefined => undefined}
+  const map1_3 = new Map([[]]);
+  console.log('map1_3: ', map1_3); // map1_3:  Map(1) {undefined => undefined}
 };
 test1();
 
 /**
  * Map的增、删、改、查
  * size属性
- * set（增、改）（返回的是map本身）
- * get（查）
+ * set（增、改）（返回的是map本身，可以实现链式调用）
+ * get（查）（使用get前最好用has判断一下，因为map中一项的value可以是undefined，get一个不存在的key对应的value也是返回undefined）
  * has（查）
- * delete（删）
+ * delete（删）（删除成功会返回true，如果是删除一个不存在的值，会返回false）
  * clear（删）
  */
 function test2 () {
@@ -26,6 +31,7 @@ function test2 () {
   map2_1.delete(1);
   console.log('map2_1: ', map2_1); // map2_1:  Map(1) {2 => 2}
   console.log(map2_1.delete(1)); // false 如果要删除一个不存在的key对应的项，会返回false
+  console.log(map2_1.get(1)); // undefined
 };
 test2();
 
