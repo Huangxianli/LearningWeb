@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>padding</title>
+  <style>
+    .test-padding {
+      box-sizing: border-box;
+      padding: 10px;
+      background-color: red;
+      height: 120px;
+      width: 100px;
+      margin: 10px;
+    }
+
+    .test-padding-1 {
+      background-color: green;
+      /* 是以父的content的宽度为基础，不是以设置的width为基础 */
+      padding: 10%;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="test-padding">
+    <div class="test-padding-1"></div>
+  </div>
+</body>
+
+</html>

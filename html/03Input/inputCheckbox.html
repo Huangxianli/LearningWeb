@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>input checkbox</title>
+</head>
+
+<body>
+  <label>
+    <input type="checkbox" id="inputCheckBox1">
+    选项
+  </label>
+
+  <script type="text/javascript">
+    let CheckBox = document.getElementById('inputCheckBox1');
+    // 注意 input[type='checkbox']是通过checked来获取是否选中了的
+    let CheckBoxProxy = new Proxy(CheckBox, {
+      get: function (target, propKey, receiver) {
+        console.log(`getting ${propKey}!`);
+        return Reflect.get(target, propKey, receiver);
+      },
+      set: function (target, propKey, value, receiver) {
+        // if (propKey === 'checked') {
+        //   // 该属性要手动设置，不能使用下面的值，会报错
+        //   target.checked = value;
+        //   const event = new Event('change', { bubbles: true });
+        //   target.dispatchEvent(event);
+        //   return true;
+        // }
+        return Reflect.set(target, propKey, value, receiver);
+      }
+    })
+    CheckBoxProxy.checked = true;
+    CheckBoxProxy.q = 1;
+
+
+
+    // CheckBox.select(); // tab选中，不是勾选
+    // CheckBox.onChange = () => {
+    //   console.log('change');
+    // };
+    // CheckBox.addEventListener('input', () => {
+    //   console.log('input');
+    // });
+
+  </script>
+</body>
+
+</html>

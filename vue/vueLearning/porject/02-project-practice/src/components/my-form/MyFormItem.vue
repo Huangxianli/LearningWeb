@@ -18,11 +18,13 @@
                 </div>
 
                 <span class="my-form-item__required_icon" v-if="isRequired || required"></span>
-                <div ref="formItemLabel" class="form-item-label-date" v-mutilOverShow="2">
+                <!-- <div ref="formItemLabel" class="form-item-label-date"> -->
+                <OverShow>
                   <slot name="label">
                     <div>{{ label }}</div>
                   </slot>
-                </div>
+                </OverShow>
+                <!-- </div> -->
               </div>
             </el-col>
             <el-col :span="layout.inline ? 21 : 18">
@@ -38,7 +40,11 @@
 </template>
 
 <script>
+import OverShow from '../OverShow.vue';
 export default {
+  components: {
+    OverShow,
+  },
   directives: {
     mutilOverShow: {
       inserted (el) {

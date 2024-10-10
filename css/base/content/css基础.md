@@ -183,17 +183,33 @@ all: unset
   决定了盒子内元素的布局方式，一般可用display设置
 
 #### CSS标准盒模型
-![alt text](standard-box-model.png)
+![CSS标准盒模型](standard-box-model.png)
 width和height不包含padding、border、margin
 box-sizing: content-box
 
 #### CSS替代盒模型
-![alt text](alternate-box-model.png)
+![CSS替代盒模型](alternate-box-model.png)
 width和height包含了padding、border、margin
-box-sizing: border-box 可以设置盒模型为替代和模型
+box-sizing: border-box 可以设置盒模型为替代和模型（不包含外边距）
 
 ##### 外边距
 外边距折叠（上下外边距）
 + 如果两个都为正，取大的值进行合并
 + 如果都为负，取离0元的值，进行折叠（覆盖）
 + 如果一正一负，两值相加
+
+产生外边距折叠的情况
++ 相邻的兄弟元素（除非后面的元素要清除之前的浮动）
++ 没有内容将父元素和后代元素分开
++ 空的区块
+
+##### 边框
+![border系类详解](https://developer.mozilla.org/zh-CN/docs/Web/CSS/border)
+![border属性应用](./boder.html)
+border: width style color
+
+##### 内边距
+![padding系类详解](https://developer.mozilla.org/zh-CN/docs/Web/CSS/padding)
+![padding属性应用](./padding.html)
+padding: top right bottom left 
+padding的值必须是*非负值* 如果是百分比，则是相对于包含块（父元素）水平语言中的宽度（content的宽度，而不是width的宽度）为基础进行计算

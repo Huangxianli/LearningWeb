@@ -6,7 +6,7 @@
 
 ### 严格模式
 es6的模块已经开启了严格模式，无需要手动的写"use strict"
-特别注意，在模块中，顶级的this不是指向window的，而是指向undefined，不应该在es6模块的顶层中使用this
+特别注意，*在模块中，顶级的this不是指向window的，而是指向undefined*，不应该在es6模块的顶层中使用this
 
 ### export命令
 export用来规定模块的对外*接口*
