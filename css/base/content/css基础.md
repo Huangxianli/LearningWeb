@@ -213,3 +213,42 @@ border: width style color
 ![padding属性应用](./padding.html)
 padding: top right bottom left 
 padding的值必须是*非负值* 如果是百分比，则是相对于包含块（父元素）水平语言中的宽度（content的宽度，而不是width的宽度）为基础进行计算
+
+#### 盒子模型和行内盒子
+行内盒子的width height margin-right margin-left属性设置都没有用
+
+##### display: inline-block
++ 设置width和height和行内盒子表现一致，不会生效
++ 设置margin和块级盒子一致，会全部生效，并推开其他元素
+和块级盒子不同，它不会换行
+
+## 背景与边框
+#### 背景颜色
+background-color: #121212 / red / rgb() / rgba()
+
+#### 背景图像
+background-image: url()
+如果还同时设置了background-color，background-image 会显示在颜色的顶部
+
+#### 背景平铺
+用于控制图像的平铺行为
+background-repeat: no-repeat repeat-x repeat-y repeat
+
+#### 背景图片大小
+background-size 长度 百分比 cover（保持比例的情况下，完全覆盖背景） contain（保持比例，水平垂直方向一方被覆盖，不会切割图片）
+
+#### 背景图像定位
+background-position 0 0; 数字 百分比 top/center/bottom right/center/left
+
+#### 渐变背景
+
+#### 多个背景图像
+背景默认会覆盖在一起
+background-image: url(), url();
+background-repeat: no-repeat, repeat;
+background-position: top, top;
+
+#### 背景附加
+background-attachment
+
+#### background
