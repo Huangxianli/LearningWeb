@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>渲染函数</title>
+  <style>
+    .bgRed {
+      background-color: red;
+    }
+
+    .bgGreen {
+      background-color: green;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- 
+  生命周期 一个组件 创建 到 销毁 全过程 （创建 挂载 更新 销毁）
+  主要分为四个阶段：创建 挂载 更新 销毁 
+   -->
+  <!-- https://i-blog.csdnimg.cn/blog_migrate/81237a78ed9bb4b5ad0781517adb8f24.png -->
+  <!-- 
+  new Vue()
+  初始化 事件 和 生命周期钩子
+  beforeCreate()
+  初始化数据 使用Object.defineProperty()和组件实例 配置wathcer观察者实例，实现数据监测与数据代理
+  created() {
+    实例完成创建
+    由于前面实现了数据监测与数据代理，可以通过this访问到data computed watch methods 
+  }
+  （实例创建完之后，就要考虑将实例与DOM关联起来）
+  （找到需要挂载的地方，找到要挂载的内容，将要挂载的内容生成虚拟DOM）
+  有el选项的直接找template
+  没有el选项的等待$mount(el)，再去找template
+    有template的转化成render函数执行
+    没有template的找el的outerHTML，编译成template，然后转化成render函数执行
+  beforeMount() {
+    这里是我们已经找到了 挂载的根节点 和 将要挂载的内容生成了虚拟DOM，
+    但是注意还没有挂载
+
+    无法访问到$el
+  }
+  将虚拟DOM转化成真实DOM，并插入到页面中。用$el替换掉el，$el中存储了真实DOM
+  mounted() {
+    这里$el替换el已经完成，挂载完成
+  }
+
+
+  当 data 改变的时候
+  beforeUpdate() {
+    内存中数据是新的，但是页面是旧的，这个时候页面和数据不同步
+    注意 没有被视图依赖的data的更新不会进入该回调
+  }
+  生成了一个新的虚拟DOM，和原来的虚拟DOM做比较（diff算法）
+  跟新render函数中的数据，渲染成真实DOM
+  updated() {
+    页面和数据保持了同步
+  }
+
+  beforeDestroy() {}
+  销毁实例中的date、methods等等
+  destroyed() {}
+    -->
+
+  <!-- 
+  如果是有父子嵌套的话，要注意
+  以 mounted 为界限，只有子的 mounted 执行完了之后才会执行 父的 mounted
+  父 beforeCreate
+  父 created
+  父 beforeMount
+  子 beforeCreate
+  子 created
+  子 beforeMount
+  子 mounted
+  父 mounted
+
+  当销毁父的时候，也是先执行父的beforeDestroy再将子销毁完，再销毁父
+  父 beforeDestroy
+  子 beforeDestroy
+  子 destroyed
+  父 destroyed
+  
+  如果父的data作为props传入子的时候，更新父的该项data时，
+  父 beforeUpdate
+  子 beforeUpdate
+  子 updated
+  父 updated
+   -->
+  <div id="root"></div>
+  <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+  <script type="module">
+    import FatherComponent from './fatherComponent.js'
+    new Vue({
+      el: '#root',
+      components: {
+        FatherComponent,
+      },
+      data () {
+        return {
+          isShow: true,
+        }
+      },
+      methods: {
+        changeShowClick () {
+          this.isShow = !this.isShow;
+        }
+      },
+      render (h) {
+        return h('div',
+          [
+            h('button', {
+              on: {
+                click: this.changeShowClick
+              },
+            },
+              this.isShow ? '销毁父' : '挂载父'
+            ),
+            h(this.isShow ? FatherComponent : 'div')
+          ]
+        )
+      }
+    })
+  </script>
+</body>
+
+</html>

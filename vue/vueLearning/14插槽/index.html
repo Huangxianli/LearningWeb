@@ -88,6 +88,11 @@
           age: 12,
         },
       }),
+      mounted () {
+        setTimeout(() => {
+          this.userInfo = {};
+        }, 1000); // 这里会触发重新渲染，作用域插槽会获取最新的值
+      },
       computed: {
       },
       methods: {
@@ -101,19 +106,42 @@
           <div>作用域插槽</div>
           <!-- 这种写法 user1 = userInfo 并将user1塞入一个对象中 -->
           <slot name="user" v-bind:user1="userInfo"></slot>
+          <!--这里userInfo的改变会触发重新渲染，作用域插槽会获取最新的值-->
         </div>
         `
       ,
     };
 
+    const ChildComponent4 = {
+      data () {
+        return {
+          data1: '1'
+        }
+      },
+      mounted () {
+        setTimeout(() => { this.data1 = '2' }, 3000);
+      },
+      template:
+        `
+        <div>{{data1}}</div>
+        `,
+    }
 
     new Vue({
       el: '#root',
-      data: vm => ({}),
+      data: vm => ({
+        data1: '3',
+      }),
       components: {
         ChildComponent1,
         ChildComponent2,
-        ChildComponent3
+        ChildComponent3,
+        ChildComponent4
+      },
+      mounted () {
+        setTimeout(() => {
+          this.data1 = '4';
+        }, 2000);
       },
       template:
         `
@@ -136,6 +164,8 @@
             </template>
             <template v-slot:default>
               <div>default的内容3</div>
+              <div>{{data1}}</div>
+              <ChildComponent4 />
             </template>
           </ChildComponent2>
           <hr />

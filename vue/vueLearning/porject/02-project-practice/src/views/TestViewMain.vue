@@ -1,27 +1,32 @@
 <template>
-  <div>
+  <div class="test-view-main">
     <component :is="componentName"></component>
   </div>
 </template>
 
 <script>
+import LayoutTest from '@/components/LayoutTest.vue';
 import RadioTest from '@/views/RadioTest.vue';
 import CheckboxTest from '@/views/CheckboxTest.vue';
 import InputTest from '@/views/InputTest.vue';
 import FormTest from '@/views/FormTest.vue';
-import LayoutTest from '@/components/LayoutTest.vue';
+import TableTest from '@/views/tableTest'
 import MyFormItemTest from '@/views/MyFormItemTest.vue';
-
+import RenderTest from '@/views/renderTest/RenderTest.vue';
+import SlotTest from '@/views/slotTest/SlotTest.vue';
 import routerMap from '@/utils/testViewMap.js';
 
 export default {
   components: {
+    LayoutTest,
     RadioTest,
     CheckboxTest,
     InputTest,
     FormTest,
-    LayoutTest,
+    TableTest,
     MyFormItemTest,
+    RenderTest,
+    SlotTest
   },
   props: {
     compName: {
@@ -38,4 +43,9 @@ export default {
 }
 </script>
 
-<style></style>
+<style scoped>
+.test-view-main {
+  height: 100%;
+  overflow: auto;
+}
+</style>

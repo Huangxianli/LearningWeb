@@ -51,13 +51,14 @@ flex-direction flex-wrap的简写 默认值为row nowrap
 项目在主轴上的对齐方式（主轴做垂线）
 + flex-start
 + flex-end
-+ center
++ center（项目间不留空隙）
 + space-between 两端对齐，项目中间的间隔都相等（两端没有间隙）
 + space-around 每个项目的间隔相等，两端的间距是连续两个主轴的间距的一半
 + left
 + right
 + start （当主轴是水平方向的时候，在主轴上受direction属性影响，不受flex-direction影响；当主轴在垂直方向上，表现和flex-start一样）
 + end （当主轴是水平方向的时候，在主轴上受direction属性影响，不受flex-direction影响；当主轴在垂直方向上，表现和flex-end一样）
++ space-evenly 所有空间平均分割，哪怕两端也是一样的间隔
 
 在主轴方向上，当margin设置为auto的时候，会自动占据剩余的空间
 

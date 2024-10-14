@@ -1,5 +1,10 @@
 const routerMap = new Map(
   [
+    ['elLayout', {
+      name: 'layout',
+      compName: 'elLayout',
+      componentName: 'LayoutTest'
+    }],
     ['elRadio', {
       name: 'radio',
       compName: 'elRadio',
@@ -20,17 +25,26 @@ const routerMap = new Map(
       compName: 'elFrom', // 和map的key相同
       componentName: 'FormTest' // 组件文件名称
     }],
-    ['elLayout', {
-      name: 'layout',
-      compName: 'elLayout',
-      componentName: 'LayoutTest'
+    ['elTable', {
+      name: 'table',
+      compName: 'elTable',
+      componentName: 'TableTest'
     }],
     ['myFormItem', {
       name: 'myFormItem',
       compName: 'myFormItem',
       componentName: 'MyFormItemTest'
-
     }],
+    ['renderTest', {
+      name: 'renderTest',
+      compName: 'renderTest',
+      componentName: 'renderTest',
+    }],
+    ['slotTest', {
+      name: 'slotTest',
+      compName: 'slotTest',
+      componentName: 'slotTest',
+    }]
   ]
 );
 export default routerMap;

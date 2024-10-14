@@ -1,13 +1,11 @@
 <template>
-  <ul>
-    <li
-      v-for="{ label, key, compName } in list"
-      :key="key"
-      @click="gotoPage(compName)"
-    >
-      {{ label }}
-    </li>
-  </ul>
+  <section>
+    <ul>
+      <li v-for="{ label, key, compName } in list" :key="key" @click="gotoPage(compName)">
+        {{ label }}
+      </li>
+    </ul>
+  </section>
 </template>
 
 <script>
@@ -42,5 +40,4 @@ export default {
 }
 </script>
 
-<style>
-</style>
+<style></style>
