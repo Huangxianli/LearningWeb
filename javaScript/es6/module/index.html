@@ -65,6 +65,18 @@
     console.log(`index-D_A：${D_A}`);
   </script>
 
+  <script type="module">
+    import { f } from './content/moduleF.js';
+    import f1 from './content/moduleF.js';
+    console.log('--------f--------------------------');
+    console.log('f', f);
+    console.log('f1', f1);
+    setTimeout(() => {
+      console.log('f', f);
+      console.log('f1', f1);
+    }, 5000);
+  </script>
+
 </body>
 
 </html>
