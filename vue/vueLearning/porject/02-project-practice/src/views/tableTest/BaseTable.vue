@@ -1,19 +1,15 @@
 <template>
   <div class="base-table">
     <h4>基础表格</h4>
-    <el-table :data="tableData" stripe size="mini" max-height="216">
+    <el-table :data="tableData" stripe size="mini" :max-height="showTableRowLength">
       <el-table-column type="index" label="序号" center> </el-table-column>
-      <el-table-column v-for=" col in dataColsConfig" :key="col.prop" :prop="col.prop" :label="col.label"
-        :width="col.width">
-        <template v-slot="{ row }">
-          <span v-if="!row[col.prop].cellIsEdit" @dblclick="dblclickHandler(row, col.prop)">{{ row[col.prop].value
-            }}</span>
-          <template v-else>
-            <el-input v-model="row[col.prop].value" class="table-cell-edit-input"></el-input>
-          </template>
-        </template>
-      </el-table-column>
-      <el-table-column v-for="col in opreationIncoColsConfig" :key="col.prop" :label="col.lable || '操作'"
+      <MyTableColumn v-for=" col in dataColsConfig" :key="col.prop" :colConfig="col" @changeCellEdit="changeCellEdit"
+        @changeCellValue="changeCellValue">
+        <!-- <template v-slot:default="{ row, prop }">
+          {{ row[prop].value }}
+        </template> -->
+      </MyTableColumn>
+      <!-- <el-table-column v-for="col in opreationIncoColsConfig" :key="col.prop" :label="col.lable || '操作'"
         :width="col.width" :fixed="col.fixed">
         <template>
           <el-tooltip effect="light" placement="top" :hide-after="2000">
@@ -23,7 +19,8 @@
             <el-button class="table-opreation-col-icon-button" :icon="col.iconConfig.iconClass"></el-button>
           </el-tooltip>
         </template>
-      </el-table-column>
+      </el-table-column> -->
+      <!-- <MyTableColumn :colsConfig="dataColsConfig" /> -->
     </el-table>
   </div>
 
@@ -31,38 +28,79 @@
 </template>
 
 <script>
+import MyTableColumn from './MyTableColumn.vue';
 import { baseTableColumns } from './tableColsConfig'
 export default {
+  components: {
+    MyTableColumn
+  },
   data () {
     return {
+      headerMaxDeep: 1,
       tableData: [],
+      allMinColumnConfig: [],
       tableColumnConfig: baseTableColumns
     };
   },
   computed: {
+    showTableRowLength () {
+      console.log(this.headerMaxDeep);
+      return (this.headerMaxDeep + 10) * 36
+    },
     dataColsConfig () {
       return this.tableColumnConfig.filter(col => col.colType !== 'opreationIcon');
+      // return this.allMinColumnConfig.filter(col => col.colType !== 'opreationIcon');
+    },
+    dataMinColConfig () {
+      return this.allMinColumnConfig.filter(col => col.colType !== 'opreationIcon')
     },
     opreationIncoColsConfig () {
-      return this.tableColumnConfig.filter(col => col.colType === 'opreationIcon');
+      // return this.tableColumnConfig.filter(col => col.colType === 'opreationIcon');
+      return this.allMinColumnConfig.filter(col => col.colType === 'opreationIcon');
     },
   },
   created () {
-    for (let i = 0; i < 20; i++) {
-      const colsProp = this.dataColsConfig.map(col => col.prop);
-      const rowData = {};
-      colsProp.forEach(prop => {
-        const cellInfo = {};
-        cellInfo.value = prop + i;
-        cellInfo.cellIsEdit = false;
-        this.$set(rowData, prop, cellInfo);
-      });
-      this.tableData.push(rowData);
-    }
+    this.getAllMinColProp();
+    console.log(this.headerMaxDeep);
+    this.setTableData();
+
   },
   methods: {
+    getAllMinColProp (cols, deep = 1) {
+      let headerDeep = deep;
+      const colsData = cols || this.tableColumnConfig;
+      colsData.forEach(col => {
+        if (!col.childColConfig?.length) {
+          this.allMinColumnConfig.push(col);
+        } else {
+          this.getAllMinColProp(col.childColConfig, headerDeep + 1);
+        }
+      });
+      if (this.headerMaxDeep < deep) {
+        this.headerMaxDeep = deep;
+      }
+    },
+    setTableData () {
+      for (let i = 0; i < 20; i++) {
+        const colsProp = this.dataMinColConfig.map(col => col.prop);
+        const rowData = {};
+        colsProp.forEach(prop => {
+          const cellInfo = {};
+          cellInfo.value = prop + i;
+          cellInfo.cellIsEdit = false;
+          this.$set(rowData, prop, cellInfo);
+        });
+        this.tableData.push(rowData);
+      }
+    },
     dblclickHandler (row, prop) {
       this.$set(row[prop], 'cellIsEdit', true);
+    },
+    changeCellEdit (cell) {
+      cell.cellIsEdit = true
+    },
+    changeCellValue ({ cell, newValue }) {
+      cell.value = newValue;
     }
   }
 

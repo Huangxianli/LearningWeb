@@ -11,9 +11,9 @@ grid布局是基于网格的布局，带有行和列
 
 ### 网格轨道
 + grid-template-columns 定义网格中的列的*宽度*
-  > grid-template-columns: 100px 100px 100px;s
+  > grid-template-columns: 100px 100px 100px;
 + grid-template-rows 定义网格中的行的*高度*
-  > grid-template-rows: 100px 100px 100px;s
+  > grid-template-rows: 100px 100px 100px;
 
 #### repeat()
 两个参数
