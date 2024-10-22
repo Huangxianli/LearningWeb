@@ -1,45 +1,39 @@
 <template>
   <div class="base-table">
     <h4>基础表格</h4>
-    <el-table :data="tableData" stripe size="mini" :max-height="showTableRowLength">
+    <div class="base-table__before-table">
+      <slot name="beforeTable" v-bind="{ selection }">
+        <el-button size="mini" :disabled="!selection.length" @click="handlerClickDeleteBtn">删除选中行</el-button>
+      </slot>
+    </div>
+    <el-table ref="tableRef" :data="tableData" stripe size="mini" :max-height="showTableRowLength">
+      <el-table-column type="selection" align="center"></el-table-column>
       <el-table-column type="index" label="序号" center> </el-table-column>
       <MyTableColumn v-for=" col in dataColsConfig" :key="col.prop" :colConfig="col" @changeCellEdit="changeCellEdit"
-        @changeCellValue="changeCellValue">
-        <!-- <template v-slot:default="{ row, prop }">
-          {{ row[prop].value }}
-        </template> -->
-      </MyTableColumn>
-      <!-- <el-table-column v-for="col in opreationIncoColsConfig" :key="col.prop" :label="col.lable || '操作'"
-        :width="col.width" :fixed="col.fixed">
-        <template>
-          <el-tooltip effect="light" placement="top" :hide-after="2000">
-            <template slot="content">
-              {{ col.iconConfig.tipInfo }}
-            </template>
-            <el-button class="table-opreation-col-icon-button" :icon="col.iconConfig.iconClass"></el-button>
-          </el-tooltip>
-        </template>
-      </el-table-column> -->
-      <!-- <MyTableColumn :colsConfig="dataColsConfig" /> -->
+        @changeCellValue="changeCellValue" @filterClick="openFilterBox"></MyTableColumn>
     </el-table>
+    <FilterBox ref="filterBox"></FilterBox>
   </div>
-
-
 </template>
 
 <script>
+import FilterBox from './FilterBox.vue';
 import MyTableColumn from './MyTableColumn.vue';
 import { baseTableColumns } from './tableColsConfig'
 export default {
   components: {
+    FilterBox,
     MyTableColumn
   },
   data () {
     return {
+      tableRef: null,
+      filterBox: null,
       headerMaxDeep: 1,
       tableData: [],
       allMinColumnConfig: [],
-      tableColumnConfig: baseTableColumns
+      tableColumnConfig: baseTableColumns,
+      selection: [],
     };
   },
   computed: {
@@ -65,6 +59,9 @@ export default {
     this.setTableData();
 
   },
+  mounted () {
+    this.$refs.tableRef.$on('selection-change', this.selectionChange);
+  },
   methods: {
     getAllMinColProp (cols, deep = 1) {
       let headerDeep = deep;
@@ -80,10 +77,13 @@ export default {
         this.headerMaxDeep = deep;
       }
     },
+
     setTableData () {
       for (let i = 0; i < 20; i++) {
         const colsProp = this.dataMinColConfig.map(col => col.prop);
-        const rowData = {};
+        const rowData = {
+          key: i,
+        };
         colsProp.forEach(prop => {
           const cellInfo = {};
           cellInfo.value = prop + i;
@@ -93,15 +93,40 @@ export default {
         this.tableData.push(rowData);
       }
     },
+
     dblclickHandler (row, prop) {
       this.$set(row[prop], 'cellIsEdit', true);
     },
+
     changeCellEdit (cell) {
+      debugger
       cell.cellIsEdit = true
     },
+
     changeCellValue ({ cell, newValue }) {
       cell.value = newValue;
-    }
+    },
+
+    selectionChange (selection) {
+      this.selection = selection;
+      // 外部写的selectionChange(selection);
+    },
+
+    handlerClickDeleteBtn () {
+      const selectKeys = this.selection.map(row => row.key);
+      this.tableData = this.tableData.filter(row => !selectKeys.includes(row.key));
+      this.selection = [];
+    },
+
+    openFilterBox (e) {
+      this.$refs.tableRef.$el.append(this.$refs.filterBox.$el);
+      const tableClientRect = this.$refs.tableRef.$el.getBoundingClientRect();
+      const eClientRect = e.target.getBoundingClientRect();
+      console.log(e.target.getBoundingClientRect());
+      this.$refs.filterBox.$el.style.position = 'absolute';
+      this.$refs.filterBox.$el.style.top = (eClientRect.bottom - tableClientRect.top || 0) + 'px';
+      this.$refs.filterBox.$el.style.left = (eClientRect.left - tableClientRect.left || 0) + 'px';
+    },
   }
 
 }
@@ -160,6 +185,10 @@ export default {
 .table-cell-edit-input .el-input__inner {
   height: 23px;
   line-height: 23px;
+}
+
+.base-table__before-table {
+  margin-bottom: 8px;
 }
 </style>
 

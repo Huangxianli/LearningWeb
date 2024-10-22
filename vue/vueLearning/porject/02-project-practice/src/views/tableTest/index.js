@@ -6,7 +6,9 @@ export default {
   },
   render (h) {
     return h('div', [
-      h(BaseTable)
+      h(BaseTable, {
+
+      })
     ]);
   }
 };

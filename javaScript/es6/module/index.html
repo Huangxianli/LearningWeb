@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
 
 <head>
   <meta charset="UTF-8">
@@ -68,13 +68,29 @@
   <script type="module">
     import { f } from './content/moduleF.js';
     import f1 from './content/moduleF.js';
+    import * as a from './content/moduleF.js';
     console.log('--------f--------------------------');
     console.log('f', f);
+    console.log('a.f', a.f);
     console.log('f1', f1);
+    console.log('a.default', a.default);
     setTimeout(() => {
       console.log('f', f);
       console.log('f1', f1);
+      console.log('a.f', a.f);
+      console.log('a.default', a.default);
     }, 5000);
+    import('./content/moduleF.js').then(moduleInfo => {
+      console.log('import()-f', f);
+      setTimeout(() => {
+        console.log('import()-f', f);
+      }, 5000)
+    })
+  </script>
+
+  <script type="module">
+    import * as a from './content/moduleE1.mjs';
+    console.log('a.default', a.default);
   </script>
 
 </body>
