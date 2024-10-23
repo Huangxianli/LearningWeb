@@ -1,5 +1,5 @@
 /**
- * Array.prototype.concat()
+ * Array.prototype.concat(value0, value1, ..., valueN)
  * 合并两个或多个数组，不会改变现有的方法，返回一个新数组
  */
 function test () {
@@ -11,7 +11,9 @@ function test () {
 };
 
 /**
- * 连接多个数组，如果是稀疏数组，会保留empty
+ * 连接多个数组，如果是稀疏数组，会保留 empty，不会转化成 undefined
+ * 由于返回的是array，因此可以链式调用
+ * 参数如果是数组（准确来说是看[Symbol.isConcatSpreadable]===true），会链接两个数组；参数如果不是数组，会将参数当成一项，加入到新的数组中
  */
 function test1 () {
   console.log('---test1-----------------------------------------');
@@ -21,6 +23,15 @@ function test1 () {
   const arr1_3 = [12, 2, 3, 4];
   const arr1_4 = arr1_1.concat(arr1_2, arr1_3,);
   console.log('arr1_4: ', arr1_4); // [empty, ... , 21, 12, 12, 12, 2, 3, 4]
+
+  const arr1_5 = arr1_1.concat(arr1_2).concat(arr1_3);
+  console.log('arr1_5: ', arr1_5); // [empty, ... , 21, 12, 12, 12, 2, 3, 4]
+
+  const arr1_6 = arr1_2.concat(1);
+  console.log('arr1_6: ', arr1_6); // (4) [21, 12, 12, 1]
+
+  const arr1_7 = arr1_2.concat({ length: 12 });
+  console.log('arr1_7: ', arr1_7); //[21, 12, 12, { length: 12 }]
 };
 
 /**
@@ -60,6 +71,8 @@ function test3 () {
 
 /**
  * 在非数组对象上调用concat()
+ * 如果this不是数组，会将this转化成对象处理，然后以concat参数相同的方式处理
+ * 返回的一定是数组
  */
 function test4 () {
   console.log('---test4-----------------------------------------');

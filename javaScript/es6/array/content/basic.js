@@ -65,6 +65,9 @@ function test3 () {
 
   const arr4 = Array(3); // 效果和使用new是一样的
   console.log('arr4', arr4);
+
+  const arr5 = new Array('1'); // 只有传入的参数为1个，且为数组的时候，才会将入参当为长度而不是数组项的值
+  console.log('arr5', arr5);
 };
 
 test3();

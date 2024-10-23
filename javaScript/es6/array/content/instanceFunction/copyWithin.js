@@ -34,13 +34,14 @@ function test2 () {
   const arr2_1 = new Array(12);
   arr2_1[1] = 1;
   const arr2_2 = arr2_1.copyWithin(1, 10);
-  console.log('arr2_2: ', arr2_2);
+  console.log('arr2_2: ', arr2_2); // [empty, ...]
 };
 
 
 /**
  * 非数组对象上调用copyWithin()
  * 会读取this上的length
+ * 注意返回的不是Array类型的数据（copyWithin()会修改原来的对象，原来是什么类型，调用该方法之后还是什么类型）
  */
 function test3 () {
   console.log('---test3-------------------------------------------');

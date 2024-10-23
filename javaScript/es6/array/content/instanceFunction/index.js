@@ -8,11 +8,11 @@ import test_filter from './filter.js';
 import test_find from './find.js';
 
 
-test_at();
-test_concat();
-test_copyWithin();
+// test_at();
+// test_concat();
+// test_copyWithin();
 test_entries();
-test_every();
-test_fill();
-test_filter();
-test_find();
+// test_every();
+// test_fill();
+// test_filter();
+// test_find();
