@@ -7,6 +7,9 @@ function test () {
 };
 
 /**
+ * 注意该方法和Array.prototype.copyWithin的区别
+ */
+/**
  * 用一个固定值填充一个数组从起始索引到终止索引内的全部元素，返回修改后的数组，不修改原来数组的长度，但会修改数组的内容
  * Array.prototype.fill(value, start, end); [start, end)
  */

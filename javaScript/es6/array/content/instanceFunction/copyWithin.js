@@ -9,7 +9,7 @@ function test () {
  * arr.copyWithin(target, start, end)
  * 浅复制数组的一部分（从[start, end)）到同一数组的另一个位置(target)，会修改原数组
  * 不会修改原数组的长度
- * 为负数的时候，data + arr.length
+ * 为负数的时候，data + arr.length，如果还是 小于0 的话，就当成 0
  */
 function test1 () {
   console.log('---test1-------------------------------------------');

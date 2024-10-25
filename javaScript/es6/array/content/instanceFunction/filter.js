@@ -24,7 +24,7 @@ function test1 () {
 };
 
 /**
- * filter是通用的，期望this有lengthd属性和证书属性
+ * filter是通用的，期望this有length属性和非负整数键属性
  */
 function test2 () {
   console.log('---test2---------------------------------------------');
@@ -36,7 +36,7 @@ function test2 () {
     length: 3
   };
   const arr2_1 = Array.prototype.filter.call(notArray2_1, () => true);
-  console.log('arr2_1: ', arr2_1); // [0, 1s]
+  console.log('arr2_1: ', arr2_1); // [0, 1]
 };
 
 /**
