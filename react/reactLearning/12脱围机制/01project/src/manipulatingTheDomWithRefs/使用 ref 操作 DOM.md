@@ -130,6 +130,8 @@ ref.current
 这里告诉 React 执行完flushSync中的回调的代码后，立即的更新DOM，这样 ref.current 中获取的 DOM 就是最新的
 
 ## 使用 refs 操作 DOM 的最佳实践
+ref 应该在只有必须跳出 React 的时候才使用，例如，例如，访问 React 中没有暴露的浏览器 API 时
+
 注意，手动的修改 DOM 可能会与 React 所做的更改发生冲突
 *应该十分的谨慎更改由 React 管理的 DOM 节点*，如果已经在上面使用了state，那就不要再使用 ref 对其进行操作
 
