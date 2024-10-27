@@ -33,14 +33,18 @@ function test1_1 () {
 
   Array.from(arr1, (el, index) => { // 原始值为empty的时候，在回调函数中，读取的时候，是undefined
     console.log(`arr1[${index}]`, arr1[index]);
-    return el
+    return el;
   });
 
   const arr2 = Array.from(arr1, element => element);
   console.log('arr2: ', arr2); // [undefined, 12 undefined, ...]
 
   const arr3 = new Array("12");
-  console.log('arr3:', arr3); // ['12']
+  console.log('arr3: ', arr3); // ['12']
+
+  const arr4 = new Array(12);
+  const arr5 = Array.from(arr4);
+  console.log('arr5: ', arr5); // [undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined]
 };
 
 /**
