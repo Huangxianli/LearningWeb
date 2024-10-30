@@ -1,59 +1,7 @@
-import { Empty, Table } from 'antd';
+import { Empty, Table, Tooltip, Checkbox } from 'antd';
+import { cols } from './baseTableCoslConfig.js';
+import { useState } from 'react';
 
-
-const cols = [
-  {
-    key: 'name',
-    dataIndex: 'name', // 该值匹配data中的属性
-    title: '名字',
-    fixed: 'left',
-    width: 150,
-    children: [
-      {
-        key: 'nameChildren1',
-        dataIndex: 'nameChildren1',
-        title: '名字1',
-        width: 50, // 注意 width 会受 scroll 影响，不一定会生效
-        fixed: 'left',
-        ellipsis: true, // 由于 width 受 scroll 影响，所以即使设置了为 true 也不一定生效
-      },
-      {
-        key: 'nameChildren2',
-        dataIndex: 'nameChildren2',
-        title: '名字2',
-        width: 150,
-        fixed: 'left',
-        ellipsis: true,
-      }
-    ]
-  },
-  {
-    key: 'age',
-    dataIndex: 'age',
-    title: '年龄',
-    width: 300,
-  },
-  {
-    key: 'address',
-    dataIndex: 'address',
-    title: '地址',
-    width: 100,
-    fixed: 'left',
-  },
-  {
-    key: 'address1',
-    dataIndex: 'address1',
-    title: '地址1',
-  },
-  {
-    key: 'address2',
-    dataIndex: 'address2',
-    title: '地址2',
-    width: 500,
-    fixed: 'right',
-    hidden: true, // 限制是否显示
-  }
-];
 
 let data = [];
 function getAllMinColkey (cols = [], colskey = []) {
@@ -83,10 +31,36 @@ function setData () {
   }
 };
 
-// setData();
+setData();
 
 function BaseTableTest () {
   console.log(cols);
+  const [selectedRowsKey, setSelectedRowsKey] = useState([1]);
+  function getCheckboxProps (row) {
+    return {
+      disabled: row.key === 1,
+    }
+  };
+  function renderCell (checked, record, index, originNode) {
+    return (
+      <>
+        {
+          record.key !== 1 ?
+            <Checkbox checked={checked} ></Checkbox> :
+            <Tooltip title={'因为什么原因禁止选择'}>
+              <Checkbox checked={checked} disabled></Checkbox>
+            </Tooltip>
+        }
+      </>
+    );
+  };
+  function onChange (selectedRowKeys, selectedRows) {
+    setSelectedRowsKey([...selectedRowKeys]);
+  };
+  function onSelectInvert (changeableRowKeys) {
+    const newSelectedRowsKey = changeableRowKeys.filter(item => !selectedRowsKey.includes(item));
+    setSelectedRowsKey(newSelectedRowsKey);
+  };
   return (
     <>
       <Table
@@ -102,7 +76,7 @@ function BaseTableTest () {
         // 最小什么时候出现滚动条，没有设置的话就不会出现滚动条，即使设置的宽度已经超过了，表格容器的宽度，会压缩列的宽度
         scroll={
           {
-            x: true,
+            x: 500,
             // x: 'max-content',
             y: 39 * 6
           }
@@ -120,7 +94,23 @@ function BaseTableTest () {
             </Empty >
           )
         }}
+        rowSelection={{
+          type: 'checkbox',
+          fixed: true,
+          // renderCell: renderCell,
+          getCheckboxProps: getCheckboxProps,
+          // hideSelectAll: true,
+          selectedRowKeys: selectedRowsKey,
+          onChange: onChange,
+          selections: [{
+            key: 'invert', text: '反选', onSelect: onSelectInvert
+          }],
+          defaultSelectedRowKeys: [1]
+        }}
       ></Table >
+      <section>
+        {`已经选择的行的key：${selectedRowsKey.join(',')}`}
+      </section>
     </>
   );
 };
