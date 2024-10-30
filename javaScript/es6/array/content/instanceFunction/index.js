@@ -8,6 +8,11 @@ import test_filter from './filter.js';
 import test_find from './find.js';
 import test_findIndex from './findIndex.js';
 import test_findLast from './findLast.js';
+import test_flat from './flat.js';
+import test_flatMap from './flatMap.js';
+import test_forEach from './forEach.js';
+import test_includes from './includes.js';
+import test_indexOf from './indexOf.js';
 
 /**
  * 1、作用和使用方法
@@ -26,4 +31,9 @@ import test_findLast from './findLast.js';
 // test_filter();
 // test_find();
 // test_findIndex();
-test_findLast();
+// test_findLast();
+// test_flat();
+// test_flatMap();
+// test_forEach();
+// test_includes();
+test_indexOf();

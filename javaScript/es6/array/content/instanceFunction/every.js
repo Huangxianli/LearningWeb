@@ -82,6 +82,7 @@ function test4 () {
  * 第一次调用callback的时候，数组的长度就保存了
  * 如果后续增加了数组项，不会访问超过长度的部分
  * 如果修改没有访问的数组项，会访问新的数组项的值
+ * 如果在遍历途中减少了数组长度，被减少的部分，不会访问（也没有内容给他访问，更像当做empty来处理）
  */
 function test5 () {
   console.log('---test5-------------------------------------------------');
@@ -110,6 +111,18 @@ function test5 () {
   });
   console.log('eleArr2: ', eleArr2); // [0, 1, 3, 4] 删除了2
   console.log('indexArr2: ', indexArr2); // [0, 1, 2, 3] every的index是实时的
+
+  const arr5_3 = [1, 2, 3, 4, 5, 6, 7];
+  const indexArr = [];
+  const isEveryTrue = arr5_3.every((ele, index) => {
+    if (index === 0) {
+      arr5_3.length = 3
+    };
+    indexArr.push(index);
+    return ele > 0;
+  });
+  console.log('isEveryTrue: ', isEveryTrue); // true
+  console.log('indexArr: ', indexArr); // [0, 1, 2]
 };
 
 /**

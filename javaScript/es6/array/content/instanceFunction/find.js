@@ -4,6 +4,7 @@ function test () {
   test2();
   test3();
   test4();
+  test5();
 };
 
 /**
@@ -69,6 +70,36 @@ function test4 () {
   console.log('findData1:', findData1); // undefined
 };
 
+/**
+ * 在遍历的时候删除，或者减小长度
+ */
+function test5 () {
+  console.log('---test5-----------------------------------------------');
+
+  const arr5_1 = [1, 2, 0, 0, 5];
+  const indexArr5_1 = [];
+  const findData5_1 = arr5_1.find((el, index, arr) => {
+    if (index === 0) {
+      delete arr[1];
+    }
+    indexArr5_1.push(index);
+    return arr5_1 < 1
+  });
+  console.log('indexArr5_1: ', indexArr5_1); // [0, 1, 2, 3, 4]
+  console.log('findData5_1: ', findData5_1); // undefined 找到的是删除的部分
+
+  const arr5_2 = [1, 1, 1, 1, 1];
+  const indexArr5_2 = [];
+  const findData5_2 = arr5_2.find((el, index, arr) => {
+    if (index === 0) {
+      arr.length = 3;
+    }
+    indexArr5_2.push(index);
+    return el < 1;
+  });
+  console.log('indexArr5_2: ', indexArr5_2); // [0, 1, 2, 3, 4]
+  console.log('findData5_2: ', findData5_2); // undefined
+};
 
 
 export default test;

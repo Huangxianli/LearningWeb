@@ -7,7 +7,8 @@ function test () {
 
 /**
  * arr.copyWithin(target, start, end)
- * 浅复制数组的一部分（从[start, end)）到同一数组的另一个位置(target)，会修改原数组
+ * 浅复制数组的一部分（从[start, end)）到同一数组的另一个位置(target)
+ * 会修改原数组
  * 不会修改原数组的长度
  * 为负数的时候，data + arr.length，如果还是 小于0 的话，就当成 0
  */
@@ -41,6 +42,7 @@ function test2 () {
 /**
  * 非数组对象上调用copyWithin()
  * 会读取this上的length
+ * 字符串不可以调用该方法，因为该方法会修改自己的值，但是字符串是不可变的
  * 注意返回的不是Array类型的数据（copyWithin()会修改原来的对象，原来是什么类型，调用该方法之后还是什么类型）
  */
 function test3 () {
@@ -59,7 +61,7 @@ function test3 () {
   console.log('arr3_3: ', arr3_3); // {0: 3, 1: 4, 3: 3, 4: 4, 5: 5, length: 5} 非数组是以this的length为主的，并且只会修改需要覆盖的部分
 
   const notArray4 = '123456';
-  // const arr3_4 = Array.prototype.copyWithin.call(notArray4, 0, 3); // 会报错，不兼容string
+  // const arr3_4 = Array.prototype.copyWithin.call(notArray4, 0, 3); // 会报错，不兼容string，因为copyWithin方法会修改原来的对象，但是String类型是不可以修改的，例如 notArray4[0]='0'，这样修改后，notArray4还是“123456”，没有修改成“023456”
 };
 
 

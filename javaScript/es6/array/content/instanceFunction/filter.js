@@ -6,7 +6,7 @@ function test () {
 };
 
 /**
- * 创建给定数组满足条件的一部分的浅拷贝，返回一个数组，不会对稀疏数组项进行访问
+ * 创建给定数组满足条件的一部分的浅拷贝，返回一个数组（注意返回的一定是一个数组），不会对稀疏数组项进行访问
  * Array.prototype.filter(callback, thisObj)
  */
 function test1 () {
