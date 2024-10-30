@@ -42,7 +42,7 @@ flex-direction 决定主轴的方向（也决定了第一个项目开始的地�
 控制项目在一条周线上如果排不开，是否换行
 + nowrap
 + wrap
-+ wrap-reverse 换行 （会使元素在交叉轴上，从交叉轴结束的地方开始排列）
++ wrap-reverse 换行 （会使元素在交叉轴上，从交叉轴结束的地方开始排列）（间接的设置交叉轴的开始和结束方向）
 
 ### flex-flow
 flex-direction flex-wrap的简写 默认值为row nowrap
