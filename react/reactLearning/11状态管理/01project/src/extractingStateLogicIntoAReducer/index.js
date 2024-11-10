@@ -49,6 +49,16 @@ function DataList () {
       type: 'add',
       value: inputValue
     });
+
+    console.log('state-list', list); // 第一次点击的时候是 []
+
+    dispatch({
+      type: 'add',
+      value: ''
+    });
+
+    console.log('state-list', list); // 第一次点击的时候是 []
+
     setInputValue('');
   };
   function deletHandler (key) {
@@ -73,6 +83,7 @@ function DataList () {
   );
 };
 function listReducer (list, action) {
+  console.log('params-list', list);
   switch (action.type) {
     case 'add': {
       const newList = [

@@ -12,7 +12,7 @@ function Container ({ title, children }) {
       <h2>{title}</h2>
       <button onClick={handlerClick}>{isOpen ? '收起' : '展开'}</button>
       <hr></hr>
-      <div className={!isOpen && 'hidden-div'}>
+      <div className={!isOpen ? 'hidden-div' : ''}>
         {children}
       </div>
     </div>
