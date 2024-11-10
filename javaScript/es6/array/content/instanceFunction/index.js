@@ -26,6 +26,15 @@ import test_shift from './shift.js';
 import test_slice from './slice.js';
 import test_some from './some.js';
 import test_sort from './sort.js';
+import test_splice from './splice.js';
+import test_toLocaleString from './toLocaleString.js';
+import test_toReserved from './toReversed.js';
+import test_toSorted from './toSorted.js';
+import test_toSpliced from './toSpliced.js';
+import test_toString from './toString.js';
+import test_unshift from './unshift.js';
+import test_values from './valuse.js';
+import test_with from './with.js';
 
 /**
  * 1、作用和使用方法
@@ -62,4 +71,12 @@ import test_sort from './sort.js';
 // test_shift();
 // test_slice();
 // test_some();
-test_sort();
+// test_sort();
+// test_splice();
+// test_toLocaleString();
+// test_toReserved();
+// test_toSorted();
+// test_toString();
+// test_unshift();
+// test_values();
+test_with();
