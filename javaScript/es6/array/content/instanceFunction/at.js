@@ -12,6 +12,7 @@ function test () {
  * at和下标访问类似
  * 下标访问会调用toString()，转化成字符；at会转化成数字
  * 下标访问负数不是从后面开始查找，也是转化成字符串，查找属性；at传入负数，会从最后开始查找
+ * at 正负超过部分都会返回 undefined
  */
 function test1 () {
   console.log('---test1-----------------------------------------');
@@ -38,11 +39,15 @@ function test1 () {
   const data1_6 = arr1.at(false);
   console.log('data1_6: ', data1_6); // 0
   console.log(arr1[false]); // undefined
+
+  const data1_7 = arr1.at(-15);
+  console.log('data1_7: ', data1_7); // undefined
 };
 
 /**
  * 在非数组对象上调用at
  * at方法读取this的length属性，并计算需要访问的索引值
+ * 超出 length 部分会返回 undefined ，即使是存在该属性
  */
 function test2 () {
   console.log('---test2-----------------------------------------');
@@ -54,10 +59,16 @@ function test2 () {
   const unArray1 = {
     length: 12,
     0: 12,
-    11: 12
+    11: 12,
+    13: 2
   };
   const data2 = Array.prototype.at.call(unArray1, 2);
   console.log('data2: ', data2); // undefined
+
+  const data3 = Array.prototype.at.call(unArray1, 13);
+  const data4 = unArray1[13];
+  console.log('data3: ', data3); // undefined
+  console.log('data4: ', data4); // 2
 };
 
 export default test;

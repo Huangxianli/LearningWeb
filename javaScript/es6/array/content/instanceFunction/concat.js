@@ -13,7 +13,9 @@ function test () {
 /**
  * 连接多个数组，如果是稀疏数组，会保留 empty，不会转化成 undefined
  * 由于返回的是array，因此可以链式调用
- * 参数如果是数组（准确来说是看[Symbol.isConcatSpreadable]===true），会链接两个数组；参数如果不是数组，会将参数当成一项，加入到新的数组中
+ * 参数如果是数组（准确来说是看[Symbol.isConcatSpreadable]===true），会链接两个数组，将该参数在返回的新数组中展开；参数如果不是数组，会将参数当成一项，加入到新的数组中
+ * 
+ * 不会修改原数组
  */
 function test1 () {
   console.log('---test1-----------------------------------------');
@@ -45,7 +47,7 @@ function test2 () {
   // const arr1_2 = 12.concat(arr1_1); // 会报错
 
   const arr1_2 = arr1_1.concat(1, [12, 2, 232, 123]);
-  console.log('arr1_2: ', arr1_2);
+  console.log('arr1_2: ', arr1_2); // [12, 231, 1, 12, 2, 232, 123]
 };
 
 
@@ -61,7 +63,7 @@ function test3 () {
 
   const notArray2 = { 0: 0, 12: 12, length: 13, [Symbol.isConcatSpreadable]: true };
   const arr1_2 = [1].concat(notArray2);
-  console.log('arr1_2: ', arr1_2); // [1, 0, empty, ... , 14]
+  console.log('arr1_2: ', arr1_2); // [1, 0, empty, ... , 12]
 
   const notArray3 = { 1: 1, [Symbol.isConcatSpreadable]: true };
   const arr1_3 = [].concat(notArray3);

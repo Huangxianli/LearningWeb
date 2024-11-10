@@ -45,7 +45,7 @@ import test_with from './with.js';
  */
 
 // test_at();
-// test_concat();
+test_concat();
 // test_copyWithin();
 // test_entries();
 // test_every();
@@ -79,4 +79,4 @@ import test_with from './with.js';
 // test_toString();
 // test_unshift();
 // test_values();
-test_with();
+// test_with();
