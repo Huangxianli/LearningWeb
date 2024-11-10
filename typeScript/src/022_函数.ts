@@ -14,6 +14,8 @@ interface Funciton1 {
   (a1: number, a2: string): string
   // 注意这里用的是 : 而不是 => 
 }
+
+
 let function1: Funciton1 = function (aaa: number, bbb: string): string { // 这里可以不写参数和返回值类型，如果写的话，必须与Function1相同，但是名称可以不同
   return ""
 }
@@ -24,6 +26,16 @@ let function2: Function2 = function () {
   return ""
 }
 function2(1, "");
+
+type Function3 = {
+  (a: string): string,
+  length: number,
+};
+
+let function3: Function3 = function (a) {
+  return a;
+};
+function3.length = 2;
 
 
 /*
@@ -122,6 +134,12 @@ function firstElement<T>(arr: T[]): T | undefined {
 firstElement([1, 2, 3]);
 firstElement<string>(["1", "2", "3"]); // 前面这两种调用方式都是可以的
 // firstElement<string>([1,2,3]) // 这种调用方式会有问题
+
+
+function firstElement4<T>(arr: T[]): T {
+  return arr[0];
+};
+firstElement4([]);
 
 function map_1<Input, Output>(arr: Input[], fun: (a: Input) => Output): Output[] {
   return arr.map(fun);

@@ -14,20 +14,20 @@ const obj1: {
 };
 
 /* const obj2: {
-    a: number
+  a: number
 } = {
-    a: ""
+  a: ""
 }; */
 
 /* const obj3: {
-    a: number
+  a: number 
 } = {
-    a: 123,
-    b: 123
+  a: 123,
+  b: 123
 }; */
 
 
-function fun3(arg1: { name: string; age: number }): undefined {
+function fun3(arg1: { name: string; age: number }): void {
   console.log("My name is: ", arg1.name, ", my age is: ", arg1.age);
 };
 
@@ -79,6 +79,9 @@ type1.prop.name = "huangxianli"; // 这里name属性没有设置readonly，所�
 interface StringArray {
   [index: number]: string | object; // 这里的index只写number 或 string
 }
+const stringArr1: StringArray = [];
+// stringArr1['1'] = 1;
+stringArr1['1'] = '1';
 
 
 /* 
@@ -95,6 +98,7 @@ interface aaa {
 
 interface AddressWithUnit extends BasicAddress, aaa {
   unit: string;
+  // name: number; 和BasicAddress中的name的类型不同就会报错
 }
 
 /* 
@@ -104,7 +108,7 @@ interface AddressWithUnit extends BasicAddress, aaa {
 interface Sister {
   name: string;
 }
-interface Sister {
+interface Sister { // 可以定义相同名称的接口interface
   age: number;
 }
 
@@ -119,6 +123,7 @@ type Sister_1 = {
 /* type Sister_1 = { // 不能定义重复名称的类型别名
   age: number
 } */
+
 
 /* 
 泛型对象类型 

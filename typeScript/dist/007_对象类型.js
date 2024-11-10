@@ -8,15 +8,15 @@ const obj1 = {
     b: ""
 };
 /* const obj2: {
-    a: number
+  a: number
 } = {
-    a: ""
+  a: ""
 }; */
 /* const obj3: {
-    a: number
+  a: number
 } = {
-    a: 123,
-    b: 123
+  a: 123,
+  b: 123
 }; */
 function fun3(arg1) {
     console.log("My name is: ", arg1.name, ", my age is: ", arg1.age);
@@ -31,6 +31,9 @@ let type1 = {
 };
 // type1.prop = { name: "uang", age: 12 }; // 这里由于prop是readonly所以不能修改
 type1.prop.name = "huangxianli"; // 这里name属性没有设置readonly，所以可以修改
+const stringArr1 = [];
+// stringArr1['1'] = 1;
+stringArr1['1'] = '1';
 const sister = {
     name: "hangxianli",
     age: 12
