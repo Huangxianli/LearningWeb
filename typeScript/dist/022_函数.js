@@ -14,6 +14,10 @@ let function2 = function () {
     return "";
 };
 function2(1, "");
+let function3 = function (a) {
+    return a;
+};
+function3.length = 2;
 let canIndex1 = {
     0: false,
     "nihao": false,
@@ -56,6 +60,11 @@ function firstElement(arr) {
 firstElement([1, 2, 3]);
 firstElement(["1", "2", "3"]); // 前面这两种调用方式都是可以的
 // firstElement<string>([1,2,3]) // 这种调用方式会有问题
+function firstElement4(arr) {
+    return arr[0];
+}
+;
+firstElement4([]);
 function map_1(arr, fun) {
     return arr.map(fun);
 }
