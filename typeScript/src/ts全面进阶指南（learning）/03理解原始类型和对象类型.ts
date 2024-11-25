@@ -62,8 +62,17 @@ function test1_3(): void {
   };
 
   function test1_3_2(): void {
-    return undefined;
+    return undefined; // undefined 可以赋值给 void
   };
+
+  function test1_3_3(): undefined {
+    return; // 按理来说，直接 return，但是 return 后面没有内容，应该是被推导成 void 的，void 应该是不能赋值给 udefined 的 这里为什么可以？？？
+  }
+
+  let test1_3_4: undefined = undefined;
+  let test1_3_5: void = test1_3_4; // undefined 可以被赋值给 void
+  let test1_3_6: undefined;
+  test1_3_6 = void 0; // 很奇怪，这里也没有报错
 };
 
 /**
@@ -169,6 +178,7 @@ function test4(): void {
  * Object
  * 在 js 中所有的类型沿着原型链最终都是指向 Object
  * ts 中的表现就为 Object 包含了所有的类型（除去undefined 和 null）
+ * undefined、 null 和 void 0 只在 strictNullcheck 为 false 的时候才可以赋值给 Object 类型的元素
  * 
  * 在任何情况下，都不使用这种装箱类型 Object Number ...
  * 
