@@ -165,6 +165,9 @@ function test3_3(): void {
 
 /**
  * Object object {}
+ * 区分这三者
+ * Object 和 {} 都表示除 undefined、null 和 void 0 之外的任何类型，但是 {} 类型不可以进行属性操作，即使是赋值了
+ * object 表示除了 undefined、undefined 和 void 0 之外的任何原始类型
  */
 function test4(): void {
   console.log('---test4---------------------------------------------');
@@ -177,7 +180,7 @@ function test4(): void {
 /**
  * Object
  * 在 js 中所有的类型沿着原型链最终都是指向 Object
- * ts 中的表现就为 Object 包含了所有的类型（除去undefined 和 null）
+ * ts 中的表现就为 Object 包含了所有的类型（除去 undefined、null 和 void 0）
  * undefined、 null 和 void 0 只在 strictNullcheck 为 false 的时候才可以赋值给 Object 类型的元素
  * 
  * 在任何情况下，都不使用这种装箱类型 Object Number ...
@@ -199,7 +202,7 @@ function test4_1(): void {
 
 /**
  * object
- * 代表所有非原始类型的类型，即数组、对象与函数类型这些
+ * 代表除去 undefined、null、void 0 所有非原始类型的类型，即数组、对象与函数类型这些
  */
 function test4_2(): void {
   console.log('---test4_2---------------------------------------------');
@@ -212,7 +215,8 @@ function test4_2(): void {
 /**
  * {}
  * 内部无属性的空对象
- * 无法进行属性的赋值操作
+ * 除去 undefined、null、void 0 的任何类型
+ * 但是无法进行属性的赋值操作，即使是已经进行了赋值
  * 
  * 避免使用它
  */
@@ -229,6 +233,7 @@ function test4_3(): void {
   // const object5: {} = null;
 
   // object1.name = 12;
+  // object3();
 
 };
 
