@@ -202,7 +202,7 @@ function test4_1(): void {
 
 /**
  * object
- * 代表除去 undefined、null、void 0 所有非原始类型的类型，即数组、对象与函数类型这些
+ * 确保是引用类型（object 也要排除 undefined、null、void 0）
  */
 function test4_2(): void {
   console.log('---test4_2---------------------------------------------');
@@ -210,6 +210,8 @@ function test4_2(): void {
   const object1: object = {};
   // const object2: object = null;
   const object3: object = function () { };
+  const object4: object = {};
+  // const object5: object = '';
 };
 
 /**
