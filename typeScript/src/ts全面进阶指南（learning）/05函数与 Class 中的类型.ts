@@ -2,6 +2,7 @@ function test(): void {
   console.log('---05函数与 Class 中的类型---------------------------------------------');
 
   test1();
+  test2();
 };
 
 /**
@@ -11,6 +12,9 @@ function test1(): void {
   console.log('---test1---------------------------------------------');
 
   test1_1();
+  test1_2();
+  test1_3();
+  test1_4();
 };
 
 /**
@@ -92,4 +96,184 @@ function test1_4(): void {
     }
   };
   const b = test1_4_2(1); // b 的类型准确的推导成了 string
-}; 
+};
+
+/**
+ * Class
+ */
+function test2(): void {
+  console.log('---test2---------------------------------------------');
+
+  test2_1();
+  test2_2();
+  test2_3();
+  test2_4();
+};
+
+/**
+ * 声明
+ */
+function test2_1(): void {
+  console.log('---test2_1---------------------------------------------');
+
+  class A {
+    name1: string = '';
+    constructor(name: string) {
+    };
+
+    get name2(): string {
+      return this.name1;
+    };
+
+    // set name2(name: string): void { // set 不允许设置返回类型即使是 void 也不行
+    set name2(name: string) {
+      this.name1 = name;
+    };
+  };
+
+  const B = class {
+    constructor() { };
+  };
+};
+
+/**
+ * 修饰符
+ * public、private、protected
+ * readonly 
+ */
+function test2_2(): void {
+  console.log('---test2_2---------------------------------------------');
+
+  test2_2_1();
+  test2_2_2();
+  test2_2_3();
+  test2_2_4();
+};
+
+/**
+ * public 代表着在 类 类的实例 子类中都能访问
+ */
+function test2_2_1(): void {
+  console.log('---test2_2——1---------------------------------------------');
+
+  class A {
+    public name1: string = '';
+    constructor(name: string) {
+      this.name1 = '';
+    };
+    setName1(name: string) {
+      this.name1 = name;
+    };
+  };
+  class B extends A {
+    constructor(name: string) {
+      super(name);
+      this.name1;
+    }
+  };
+  let a = new A('');
+  a.name1;
+};
+
+/**
+ * private 表示只能在当前类的内部访问
+ */
+function test2_2_2(): void {
+  console.log('---test2_2_2---------------------------------------------');
+
+  class A {
+    private name1: string = '';
+    constructor() {
+      this.name1 = '';
+    };
+
+    setName1(name: string): void {
+      this.name1 = name;
+    }
+  };
+
+  class B extends A {
+    constructor() {
+      super();
+      // this.name1; // 父的私有属性不允许在子类中访问
+    };
+  };
+
+  const a = new A();
+  // a.name1; // name1 是 A 的私有属性，不允许在实例上访问
+};
+
+/**
+ * protected 只允许在类和子类中访问
+ */
+function test2_2_3(): void {
+  console.log('---test2_2_3---------------------------------------------');
+
+  class A {
+    protected name1: string = '';
+    constructor() { };
+  };
+  class B extends A {
+    constructor() {
+      super();
+      this.name1;
+    }
+  };
+  const a1 = new A();
+  // a1.name1; // protected 只允许在类和子类上访问
+  const b1 = new B();
+  // b1.name1; // 继承了 protected
+
+};
+
+/**
+ * 实例属性的简略写法
+ */
+function test2_2_4(): void {
+  console.log('---test2_2_4---------------------------------------------');
+
+  class A {
+    constructor(public name1: string) { // 注意这里加了 修饰符之后会自动的 this.name1 = name1;
+      let b = 1 + 1;
+    };
+  };
+
+  const a1 = new A('a1');
+  a1.name1; // a1
+};
+
+/**
+ * static
+ */
+function test2_3(): void {
+  console.log('---test2_3---------------------------------------------');
+
+  // static name1: string = ''; 
+  class A {
+    public static name1: string = '';
+    static getClassName(): string {
+      return 'A';
+    };
+  };
+  A.getClassName();
+};
+
+/**
+ * 抽象类 一个抽象方法描述了这一方法在实际实现中的结构
+ */
+function test2_4(): void {
+  console.log('---test2_4---------------------------------------------');
+
+  abstract class A {
+    abstract name1: string;
+    constructor() { };
+    abstract getName1(): string;
+  };
+
+  class A1 implements A {
+    name1 = '';
+    getName1(): string {
+      return this.name1;
+    };
+  }
+};

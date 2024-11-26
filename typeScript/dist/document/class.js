@@ -1,5 +1,5 @@
 "use strict";
-function test1() {
+function test11() {
     class Father {
         constructor(name) {
             this.name = name ?? '';
@@ -26,7 +26,7 @@ test1();
  * 被标记为private的时候，只能在声明它的类内访问
  * 被标记为protected的时候，允许声明它的类和该类的派生类中访问
  */
-function test2() {
+function test21() {
     var _Father_name;
     class Father {
         constructor() {
