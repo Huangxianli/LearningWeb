@@ -277,3 +277,5 @@ function test2_4(): void {
     };
   }
 };
+
+export default test;
