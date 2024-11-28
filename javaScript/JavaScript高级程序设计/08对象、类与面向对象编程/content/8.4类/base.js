@@ -3,6 +3,7 @@
  * 那是否受限于函数作用域呢？ 没有变量提升，在函数中定义的类在函数外应该是不能访问的
  */
 function test1 () {
+  console.log('---test1------------------------------------------');
   {
     // console.log(['class Test1', Test1); // ReferenceError: Cannot access 'Test1' before initialization
     // Test1是类没有变量提升
@@ -17,6 +18,7 @@ function test1 () {
 test1();
 
 function test2 () {
+  console.log('---test2------------------------------------------');
   function test2_1 () {
     class Test2 { };
   };
@@ -37,6 +39,8 @@ test2();
  */
 
 function test3 () {
+  console.log('---test3------------------------------------------');
+
   const Test3_1 = class Test3_2 {
     constructor() {
       console.log('Test3_1.name', Test3_1.name);
@@ -69,19 +73,21 @@ test3();
  * 5、构造函数中没有return，返回刚刚创建的新对象；有return，就返回return的对象
  */
 function test4 () {
+  console.log('---test4------------------------------------------');
+
   function Test4_1 () {
     this.name = 'Test4_1';
   };
   Test4_1.prototype.name = 'Test4_1.prototype';
   const test4_1_1 = new Test4_1();
-  console.log('test4_1_1', test4_1_1); // test4_1_1 {name: 'huang'}
+  console.log('test4_1_1', test4_1_1); // test4_1_1 {name: 'Test4_1'}
   // 这里可以证明是构造函数内的this指向了新对象
   console.log(Object.getPrototypeOf(test4_1_1)); // {name: 'Test4_1.prototype'} 
   // 这里可以证明是将新对象的[[Prototype]]指向fun的prototype属性
 
   function Test4_2 () {
     this.name = 'Test4_2';
-    return {};
+    return {}; // 注意这里返回一个自身创建的对象，而不是new时自动创建的对象（指向this）
   };
   Test4_2.prototype.name = 'Test4_2.prototype';
   const test4_2_1 = new Test4_2();
@@ -94,11 +100,13 @@ function test4 () {
 test4();
 
 /**
- * instanceof 操作符的原理
+ * instanceof 操作符的原理（对于这个还是存疑的）
  * a instanceof A a沿着[[Prototype]]一直查找，如果找到 A.prototype 就返回true
- * 其实 a instanceof A 内部是 A[Symbol.hasInstance](a) 如果该方法返回的是false，即使满足上面的条件沿着a[[Prototype]]查找到了A.prototype,也会返回false
+ * 其实 a instanceof A 内部是 A[Symbol.hasInstance](a)（注意 Function,property[Symbol.hasInstance] 是不可覆写的） 如果该方法返回的是false，即使满足上面的条件沿着a[[Prototype]]查找到了A.prototype,也会返回false
  */
 function test5 () {
+  console.log('---test5------------------------------------------');
+
   function test5_1 () { };
   const test5_1_1 = {};
   Object.setPrototypeOf(test5_1_1, test5_1.prototype);
@@ -108,6 +116,12 @@ function test5 () {
   Object.setPrototypeOf(test5_1.prototype, test5_2.prototype);
   console.log(test5_1_1 instanceof test5_2); // true
   // test5_1_1[[Proptotype]] -> test5_1.proptotype    test5_1.prototype[[Prototype]] -> test5_2.prototype
+
+  test5_1.prototype[Symbol.hasInstance] = function () {
+    return false;
+  };
+  console.log(test5_1_1 instanceof test5_1); // true 这里就很奇怪
+
 };
 test5();
 
@@ -116,6 +130,8 @@ test5();
  */
 
 function test6 () {
+  console.log('---test6------------------------------------------');
+
   class Test6_1 { };
   console.log(typeof Test6_1); // 'function'
 };
@@ -126,6 +142,8 @@ test6();
  * 如何获取到类中constructor方法？？？
  */
 function test7 () {
+  console.log('---test7------------------------------------------');
+
   class Test7_1 {
     constructor() {
       console.log('constructor');
@@ -142,6 +160,8 @@ test7();
  * 无法直接在类里面向类的prototype增加属性（除了方法），可以通过访问器属性添加
  */
 function test8 () {
+  console.log('---test8------------------------------------------');
+
   class Test8_1 {
     name; // 这种写法是定义实例属性
   }
@@ -160,6 +180,8 @@ test8();
  * 访问器属性，可以在类的prototype上添加属性
  */
 function test9 () {
+  console.log('---test9------------------------------------------');
+
   class Test9_1 {
     constructor() {
       // 不能在构造函数中使访问器属性
@@ -185,6 +207,8 @@ test9();
  * 静态成员中的方法指向的是类本身
  */
 function test10 () {
+  console.log('---test10------------------------------------------');
+
   class Test10_1 {
     static testFun () { };
     static testFun () { };
@@ -204,6 +228,8 @@ test10();
  *  --- 不行
  */
 function test11 () {
+  console.log('---test11------------------------------------------');
+
   function test11_1 () { };
   function test11_2 () { };
   // test11_2 extends test11_1 { }; // 这里会报错
@@ -242,6 +268,8 @@ test11();
  * --- 可以访问到，因为在这里super指向的是 父.prototype ，继承的时候，父.prototype[[Prototype]] 指向 祖父.prototype，所以即使在super在父.prototype上找不到，通过[[prototype]]也可以找到
  */
 function test12 () {
+  console.log('---test12------------------------------------------');
+
   class Test12_1 {
     retrurnName () {
       return 'Test12_1';
@@ -271,6 +299,8 @@ test12();
  * 扩展类中如果显示的写了constructor方法，就要调用spuer方法，或者手动的返回一个对象，否则实例化的时候会报错
  */
 function test13 () {
+  console.log('---test13------------------------------------------');
+
   class Test13_1 {
     proFuncName () {
       return 'Test13_1';
