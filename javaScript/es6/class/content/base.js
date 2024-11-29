@@ -71,11 +71,30 @@ function test1 () {
   console.log(Object.getOwnPropertyNames(Test1_1.prototype)); // ['constructor', 'protFun']
   console.log(Test1_1.prototype.constructor); // class Test1_1 { constructor() { }; protFun () { }; static staticFun () { }; };
   // 这里的constructor指向的是类
+
+
+  let a = {};
+  class Test1_2 {
+    constructor() {
+      return a;
+    };
+  };
+  const test1_1_1 = new Test1_2;
+  const test1_1_2 = new Test1_2.prototype.constructor;
+  console.log(test1_1_1 === a); // true
+  console.log(test1_1_1 === test1_1_2); // true
+
+  const test1_1_3 = new Test1_2.constructor;
+  console.log(a === test1_1_3); // false
+  console.log(test1_1_3 === test1_1_1); // false 
+
+  // 这样分析来，类中的 costructor 其实就是是定义在类的原型上的
 };
 test1();
 
 /**
- * 类中的方法都是不可枚举的，包括实例方法和静态方法
+ * 类中的方法都是不可枚举的，包括原型方法和静态方法
+ * 但是如果是在类外部手动添加的是可以枚举的
  */
 function test2 () {
   console.log('----test2--------------------------------');
@@ -87,6 +106,12 @@ function test2 () {
   console.log(Object.keys(Test2_1)); // []
   console.log(Object.getOwnPropertyNames(Test2_1.prototype)); // ['constructor', 'fun']
   console.log(Object.keys(Test2_1.prototype)); // []
+
+  Test2_1.prototype.fun1 = function () { };
+  Test2_1.staticFun1 = function () { };
+
+  console.log(Object.keys(Test2_1)); // ['staticFun1']
+  console.log(Object.keys(Test2_1.prototype)); // ['fun1']
 };
 test2();
 
@@ -123,7 +148,65 @@ function test4 () {
   console.log(Object.getOwnPropertyNames(test4_1_1)); // []
   console.log(Object.getOwnPropertyNames(Test4_1.prototype)); // ['constructor', 'testName']
   // 由此可以看出，getter和setter函数设置的属性是绑定在类的prototype上的
+
+  class Test4_2 {
+    constructor() {
+      this.test1_ = [];
+    };
+    get test1 () {
+      return this.test1_;
+    };
+    set test1 (newValue) {
+      this.test1_ = newValue;
+    };
+  };
+
+  const test4_2_1 = new Test4_2;
+  const test4_2_2 = new Test4_2;
+  console.log(test4_2_1.test1); // []
+  console.log(test4_2_2.test1); // []
+  test4_2_1.test1.push(1);
+  console.log(test4_2_1.test1); // [1]
+  console.log(test4_2_2.test1); // []
+
+  console.log(Object.keys(test4_2_1))
+  test4_2_1.test1 = 1; // 由于 test1 其实是一个访问器属性，所以不会在 test4_2_1 上新建 test 属性，而是访问 test1 本来的 set
+  console.log(test4_2_1.test1); // 1
+  console.log(test4_2_2.test1); // []
+  console.log(Object.keys(test4_2_1)); // ['test1_'] 
+
+  // 从这个例子来看，虽然访问器属性是存在于类的原型上的，但是不是作为数据属性存储，而是作为访问器属性存储的，同时访问器属性中的 this 又是指向实例的，所以虽然读取的是原型上的属性，但是不会同步修改，因为实际上读的还是实例属性
+
+  let a = { name: '' };
+  let b = Object.setPrototypeOf({}, a);
+  console.log(Object.keys(b)); // []
+  b.name = 12;
+  console.log(Object.keys(b)); // ['name']
+
+  Object.defineProperty(a, '_name', {
+    configurable: false,
+    enumerable: false,
+    writable: true,
+    value: undefined,
+  })
+  Object.defineProperty(a, 'name', {
+    configurable: true,
+    enumerable: true,
+    get () {
+      return a._name;
+    },
+    set (newValue) {
+      a._name = newValue;
+    }
+  });
+  let c = Object.setPrototypeOf({}, a);
+  console.log(Object.keys(c)); // [];
+  c.name;
+  c.name = 12;
+  console.log(Object.keys(c)); // []
+  // 在这里可以看出，对象中不存在的属性 x，如果对象的原型中存在，那么：如果 x 是数据属性的时候，如果使用 对象.x = 进行赋值的时候，会将该属性在该对象创建一次然后赋值；如果 x 是访问器属性，那么在重新赋值的时候，会调调用该属性的 set 函数，也就是说，不会额外的在该对象上增加 x 属性
 };
+
 test4()
 
 /**
@@ -159,6 +242,7 @@ function test5 () {
 };
 test5();
 
+// 静态属性也是绑定在类本身上的
 function test6 () {
   console.log('----test6--------------------------------');
   class Test6_1 {
@@ -169,22 +253,24 @@ function test6 () {
 test6();
 
 /**
- * 类的私有属性只能在内内部访问，在内的外部访问不到，遍历不到
+ * 类的私有属性只能在类内部访问，在内的外部访问不到，遍历不到,即使是使用 Object.getOwnPropertyNames() 也获取不到
  * 如果在内部调用不存在的私有属性会报错
+ * 私有属性是绑定在实例上的
  */
 function test7 () {
   console.log('----test7--------------------------------');
   class Test7_1 {
-    #provide1 = 12;
+    #private1 = 12;
     static #provide2 = 12;
   };
   const test7_1_1 = new Test7_1();
   console.log(Object.getOwnPropertyNames(test7_1_1)); // []
   console.log(Object.getOwnPropertyNames(Test7_1)); //  ['length', 'name', 'prototype']
+  console.log(Object.getOwnPropertyNames(Test7_1.prototype)); // ['constructor']
 
   class Test7_2 {
     getName () {
-      // return this.#name; // 会报错
+      // return this.#name; // 会报错 //  Uncaught SyntaxError: Private field '#name' must be declared in an enclosing class 
     };
   };
 };
@@ -192,33 +278,40 @@ test7();
 
 /**
  * （this的指向取决于调用函数的方式，讨论普通的调用方式）在constructor中，this是指向实例的；在类的prototype方法中，this指向实例；在静态方法中，this指向的类本身
- * 私有方法和属性只可以在类内部调用；
- * 普通私有属性是绑定在类的prototype上的，静态私有属性是绑定在类本身上的，调用这些私有属性和方法要遵循这些this；
+ * 私有方法和属性只可以在类内部调用；注意，私有属性和私有方法都是绑定在实例本身上
+ * 普通私有属性是绑定在实例本身上，静态私有属性是绑定在类本身上的，调用这些私有属性和方法要遵循这些this；
  * 注意，普通私有属性和方法，不能类.prototype调用，即使是在类的内部；在constructor函数中，可以直接this.普通私有属性和方法的调用
  */
 function test8 () {
   console.log('----test8--------------------------------');
   class Test8_1 {
-    #provide1 = 'provide1';
+    #private1 = 'private1';
+    #private2 () { };
     constructor() {
-      console.log('constructor：', this.#provide1);
+      console.log('constructor：', this.#private1);
     };
     prototypeFun1 () {
-      console.log('prototypeFun1：', this.#provide1);
+      console.log('prototypeFun1：', this.#private1);
+    };
+    prototypeFun2 (obj) {
+      obj.#private2;
     };
     static staticFun () {
-      console.log('StaticFun：', Test8_1.prototype.#provide1);
-      // console.log('StaticFun：', this.#provide1); // 在静态方法中直接调用非静态私有属性会报错
+      console.log('StaticFun：', Test8_1.prototype.#private1);
+      // console.log('StaticFun：', this.#private1); // 在静态方法中直接调用非静态私有属性会报错
     }
     static staticFun1 (obj) {
-      console.log('staticFun1', obj.#provide1);
-      // console.log(Object.getPrototypeOf(obj).#provide1); // 这种方法也不能访问，会报错
+      console.log('staticFun1', obj.#private1);
+      // console.log(Object.getPrototypeOf(obj).#private1); // 这种方法也不能访问，会报错
     }
   };
-  const test8_1_1 = new Test8_1(); // constructor： provide1 这里有点疑问，为什么在constructor中可以通过this.访问到私有属性
-  test8_1_1.prototypeFun1(); // prototypeFun1： provide1
-  // Test8_1.staticFun(); // TypeError: Cannot read private member #provide1 from an object whose class did not declare it
-  Test8_1.staticFun1(test8_1_1); // staticFun1 provide1
+  const test8_1_1 = new Test8_1(); // constructor： private1
+  test8_1_1.prototypeFun1(); // prototypeFun1： private1
+  // Test8_1.staticFun(); // TypeError: Cannot read private member #private1 from an object whose class did not declare it 说明 私有属性不是绑定在类的 Prototype 上的
+  Test8_1.staticFun1(test8_1_1); // staticFun1 private1 // 结合上一个输出报错可以看出，私有属性是绑定在 实例本身 上的
+  // test8_1_1.prototypeFun2(Test8_1); // 报错 
+  // test8_1_1.prototypeFun2(Test8_1.prototype); // 报错 
+  test8_1_1.prototypeFun2(test8_1_1); // 结合前面两个的报错，可以看出，静态方法是也是绑定在实例上的，不是绑定在原型上
 
   class Test8_2 {
     static #staticProvide1 = 'staticProvide1';

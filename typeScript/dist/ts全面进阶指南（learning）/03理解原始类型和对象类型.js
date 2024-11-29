@@ -148,7 +148,7 @@ function test3_3() {
  * Object object {}
  * 区分这三者
  * Object 和 {} 都表示除 undefined、null 和 void 0 之外的任何类型，但是 {} 类型不可以进行属性操作，即使是赋值了
- * object 表示除了 undefined、undefined 和 void 0 之外的任何原始类型
+ * object 表示除了 undefined、undefined 和 void 0 之外的任何非原始类型
  */
 function test4() {
     console.log('---test4---------------------------------------------');

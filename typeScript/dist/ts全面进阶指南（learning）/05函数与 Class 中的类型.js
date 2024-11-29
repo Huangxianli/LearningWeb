@@ -1,4 +1,3 @@
-"use strict";
 function test() {
     console.log('---05函数与 Class 中的类型---------------------------------------------');
     test1();
@@ -279,3 +278,4 @@ function test2_4() {
     }
 }
 ;
+export default test;
