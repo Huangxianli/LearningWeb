@@ -66,14 +66,16 @@ function test4 () {
   };
   class Test4_2 extends Test4_1 { };
   console.log(Object.getOwnPropertyNames(Test4_2)); // ['length', 'name', 'prototype']
-  console.log(Object.getOwnPropertyNames(Test4_1)); // ['length', 'name', 'prototype', 'staticProperty1']
+  console.log(Object.getOwnPropertyNames(Test4_1)); // ['length', 'name', 'prototype', 'staticProperty1', 'staticProperty1']
   // 从这里可以看出，静态属性和方法的继承，如果是在子上只读没有设置值的话，其实是沿着原型链去查找的
+  console.log(Object.keys(Test4_1)); // ['staticProperty1'] // 属性可枚举，方法不可枚举
+  console.log(Object.keys(Test4_2)); // []
+
   Test4_2.staticProperty1 = 2;
   console.log(Test4_1.staticProperty1); // 1
   console.log(Test4_2.staticProperty1); // 2
-  console.log(Object.keys(Test4_1)); // ['staticProperty1'] // 属性可枚举，方法不可枚举
-  console.log(Object.keys(Test4_2)); // ['staticProperty1']
-  // 从这里可以看出读值是原型链找，但是设置值的话，就是给点前面的对象添加属性
+
+  // 从这里可以看出读值是原型链找，但是设置值的话（如果属性是数据属性而不是访问器属性），就是给点前面的对象添加属性
 };
 test4();
 
