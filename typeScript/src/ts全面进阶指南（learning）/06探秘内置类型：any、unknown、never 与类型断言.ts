@@ -23,8 +23,9 @@ function test1(): void {
  * 
  * any 类型的变量可以拥有任意类型的值
  * 标记为 具体类型 的变量也可以接受 any 类型的值
- * （兼容所有类型且被所有类型兼容，要除去 never）
+ * （兼容所有类型且被所有类型兼容，要除去 never，注意 never 类型只能接受 never 类型的赋值，但是 never 类型可以赋值给其他的类型）
  */
+declare let val5: never;
 function test1_1(): void {
   console.log('---test1_1---------------------------------------------');
 
@@ -37,13 +38,19 @@ function test1_1(): void {
 
   let val4: unknown;
   val2 = val4;
+
+
+  let val6: any;
+  val6 = val5;
+  // val5 = val6;
 };
 
 /**
  * unknown：在后面的某一刻可能会知道是什么类型
- * unknown 类型可以接受其他所有类型（要除去 never）
+ * unknown 类型可以接受其他所有类型
  * 只有 unknown 和 any 可以接受 unknown 类型
  */
+declare let test1_2_val4: never;
 function test1_2(): void {
   console.log('---test1_2---------------------------------------------');
 
@@ -53,6 +60,7 @@ function test1_2(): void {
   val1 = ''; // unknown 可以接受任何类型
 
   let val3: any = val1;
+  val1 = test1_2_val4;
 };
 
 /**

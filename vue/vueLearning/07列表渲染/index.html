@@ -21,7 +21,7 @@
 
     /**
      * v-for为什么不推荐与v-if一起使用
-     * v-for的优先级与v-if要高，两个同时出现的时候，无论是什情况都会先执行v-for然后再判断是渲染
+     * v-for的优先级与v-if要高，两个同时出现的时候，无论是什情况都会先执行v-for然后再每次迭代中项中判断该项是否渲染
      * 1、循环列表根据某一属性来判断是否显示的时候，会遍历所有的数据，在判断是否要渲染，而且如果是组件里的模板重新渲染但是列表数据没有变的话，又会导致重新遍历所有的数据，可以提取computed再v-for，
      * 1.1 将逻辑与显示分开，
      * 1.2 如果组件内部触发重新渲染但不是数据改变的时候，渲染时，无需重新遍历所有列表数据
@@ -157,12 +157,45 @@
     };
 
 
+    const ChildCompoenent4 = {
+      beforeCreate () {
+        console.log('ChildCompoenent4-beforeCreate');
+      },
+      template: `
+        <div>
+          12312
+        </div>`,
+    };
+
+    const ChildComponent3 = {
+      data: vm => ({
+        list: [
+          { id: 0 },
+          { id: 1 },
+          { id: 2 },
+          { id: 3 },
+          { id: 4 },
+          { id: 5 },
+        ]
+      }),
+      components: {
+        ChildCompoenent4,
+      },
+      template: `
+        <div>
+          <ChildCompoenent4 v-for="item in list" v-if="item.id % 2 === 0" :key="item.id"/>
+        </div>
+      `,
+    };
+
+
     new Vue({
       el: '#root',
       data: vm => ({}),
       components: {
         ChildComponent1,
-        ChildComponent2
+        ChildComponent2,
+        ChildComponent3
       },
       template:
         `
@@ -170,6 +203,8 @@
           <ChildComponent1 />
           <hr />
           <ChildComponent2 />
+          <hr />
+          <ChildComponent3 />
         </div>
         `
       ,

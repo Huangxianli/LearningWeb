@@ -16,6 +16,8 @@
     /**
      * 所有的模板都是合法的HTML
      * Vue会将模板编译成虚拟DOM渲染函数
+     * 
+     * 虽然 Object.defineProperty 可以设置 Symbol 类型的键值，但是 vue2 中的响应式针对的是 string 类型的键值，Symbol 类型的键值不会加入到 vue2 的响应式系统中
      */
     Math.Symbol1 = Symbol.for('symbol1');
     const ChildComponent1 = {
@@ -49,6 +51,7 @@
       },
       methods: {
         changeData () {
+          console.log("changeData，this.data1[Symbol.for('symbol1')]：", this.data1[Math.Symbol1]);
           this.data1[Symbol.for('symbol1')] = Math.random();
           console.log("changeData，this.data1[Symbol.for('symbol1')]：", this.data1[Math.Symbol1]); // 注意这里修改成功了，但是没有驱动视图的更新
         },
@@ -78,12 +81,19 @@
       },
       methods: {
         changeData1 () {
-          this.data1.name = 1; // 增加新属性，这里向data1中添加属性，成功但是视图没有被驱动修改
-          this.data1 = 12; // 这里修改data1的值，会驱动视图的更新1
+          this.data1.name = {}; // 增加新属性，这里向data1中添加属性，成功但是视图没有被驱动修改
+          this.$set(this.data1, 'name', {}); // 添加新的属性要改成这种方式才会驱动视图的改变，但是如果和上面的语句同时出现，则当前还是不会驱动视图的修改
+          this.data1.name = {};
+          console.log(this.data1.name); // 没有 __ob__ 属性，如果是会驱动视图更新会有 __ob__ 属性
+          // 由上面4个的表现可以看出，this.$set() 如果设置的是已经存在 非响应式 的属性，则后续也不会驱动视图的更新
+
+          this.data1 = 12; // 这里修改data1的值，会驱动视图的更新
         },
         changeData2 () {
           this.data2.set(1, Math.random());  // 修改map，这里是修改成功的，但是视图没有驱动修改
           console.log(this.data2.get(1));
+
+          // Object.defineProperty() 第一个参数只能接收 Object 类型的（函数，数组也算对象类型），不接受 Set Map，第二个参数只接受 Symbol 和 String 和 Number 类型的
         },
       },
     });

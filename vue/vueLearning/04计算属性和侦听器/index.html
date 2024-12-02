@@ -75,12 +75,13 @@
     /**
      * 侦听器，当数据变化时执行异步或者是开销较大的操作使用这个最有用
      */
+    const symbol1 = Symbol();
     const ChildComponent2 = {
       data: vm => ({
         clicks: 0,
         symbol1: Symbol(),
         testSymbol: {
-          [this.symbol1]: 1
+          [symbol1]: 1
         },
         testAddNewProperty: {
         },
@@ -110,9 +111,10 @@
         // unWatch1();
 
         this.$watch(
-          () => this.testSymbol[this.symbol1], // 修改对象中Symbol key对应的value，不会进入watch的回调
+          () => this.testSymbol[symbol1], // 修改对象中Symbol key对应的value，不会进入watch的回调
           () => {
-            console.log('修改Symbol key对应的值进入了watch的回调， this.testSymbol[this.symbol1]')
+            console.log('修改Symbol key对应的值进入了watch的回调， this.testSymbol[symbol1]');
+            console.log('this.testSymbol[symbol1]', this.testSymbol[symbol1]);
           },
           { deep: true, immediate: true }
         );
@@ -127,7 +129,7 @@
       methods: {
         clickBtn () {
           this.clicks++;
-          this.testSymbol[this.symbol1] = Math.random();
+          this.testSymbol[symbol1] = Math.random();
           this.testAddNewProperty[this.clicks] = Math.random();
         },
       },
