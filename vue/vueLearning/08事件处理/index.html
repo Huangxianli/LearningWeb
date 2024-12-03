@@ -42,6 +42,7 @@
             <!--注意模板表达式中，只能用表达式，if判断都不能用；强烈不建议在模板处理事件的逻辑-->
             <button>点击按钮</button>
             <div>点击了非按钮{{clicks1}}次</div>
+            <!-- 点击里面的元素，或触发事件冒泡，冒泡到父元素，然后触发父元素的 click 事件 -->
           </div>
         </div>
         `
@@ -62,11 +63,11 @@
 
     /**
      * 事件修饰符
-     * .stop
-     * .prevent
-     * .capture
-     * .self
-     * .once
+     * .stop // 停止冒泡
+     * .prevent // 取消默认事件
+     * .capture // 事件捕获 根节点触发的事件，可以在内部的元素上触发
+     * .self // 自己触发的
+     * .once // 只会触发一次
      * .passive
     */
     const ChildComponent2 = {
