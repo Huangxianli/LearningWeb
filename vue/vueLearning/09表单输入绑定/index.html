@@ -34,6 +34,7 @@
         radio: '',
         vCheckbox1: false,
         vCheckbox2: [],
+        vCheckbox3: [],
         vSelect1: [],
         select1: [],
         vSelect2: '',
@@ -58,6 +59,9 @@
             <input id="radio1" type="radio" v-model="vRadio" value="v-radio1" />
             <label for="radio2">v-radio2</label>
             <input id="radio2" type="radio" v-model="vRadio" value="v-radio2" />
+            <!-- radio 如果不传 value 选中了就是 undefined -->
+            <label for="radio3">v-radio3</label>
+            <input id="radio3" type="radio" v-model="vRadio" />
             <div>input[type="radio"]绑定的v-model值：{{vRadio}}</div>
            
             <!-- 绑定的checked属性（value属性本身就用来表示当个radio对应的值）和change事件 -->
@@ -69,6 +73,7 @@
             <br />
 
             <!-- input[type="checkbox"] -->
+            <!-- 具体是怎样的其实是根据 v-model 绑定的 Array 还是 Boolean -->
             <!-- 单个复选框 v-model是boolean值-->
             <label for="vCheckbox1">vCheckBox1_1</lable>
             <input id="vCheckbox1" value="vCheckbox1" v-model="vCheckbox1" type="checkbox" />
@@ -84,6 +89,12 @@
             <label for="vCheckbox2_4">vCheckbox2_4</lable>
             <input id="vCheckbox2_4" value="vCheckbox2_4" v-model="vCheckbox2" type="checkbox" />
             <div>input[type="checkbox"] v-model：{{vCheckbox2}}</div>
+
+            <!-- 单个复选框 但是传的 v-model 的 初始值是一个 [] 的时候-->
+            <label for="vCheckbox3">vCheckBox3_1</lable>
+            <input id="vCheckbox3" value="vCheckbox3" v-model="vCheckbox3" type="checkbox" />
+            <div>input[type="checkbox"] v-model：{{vCheckbox3}}</div>
+
             <br />
 
 

@@ -126,7 +126,9 @@ function test3_3() {
   };
 
   type NumberKeyValueType = NumberRecord['12']; // number
-  type SymbolKeyValueType = NumberRecord[symbol]; // string
+  type SymbolKeyValueType = NumberRecord[symbol]; // string 像这种 [] 里面是直接的一个类型，就要 Number 里面是直接定义了 [key: 类型]：类型 才可以
+
+  type AllValueType = NumberRecord[keyof NumberRecord]; // string | number
 };
 
 /**
