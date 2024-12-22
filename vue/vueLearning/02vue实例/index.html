@@ -113,7 +113,7 @@
     function changeData () {
       setTimeout(() => {
         data1.a = 12;
-        data1.b[symbol1] = 12;
+        data1.b[symbol1] = 12; // 这里视图更新了的原因是因为，其他的属性一起修改了，视图的更新是其他的属性触发的，只是在更新视图的时候，读取到了最新的这个属性的值，如果单独的只更新这个属性，是不会触发视图的更新的
         data1.c.c1 = 12;
         // 注意这里不会中断data1.c的响应式
         data1.c = {}
@@ -123,8 +123,14 @@
         console.log(JSON.parse(JSON.stringify(vm.$data))); // 注意这种写法会将以Symbol类型作为key或者value的属性丢失掉，同时map和set都会变成“{}”，并不能还原到原来的对象，和官网的说法有差异 https://v2.cn.vuejs.org/v2/api/#data
       }, 1000);
     };
-    changeData();
+    // changeData();
 
+    function changeDataB () {
+      setTimeout(() => {
+        data1.b[symbol1] = 13;
+      }, 1000);
+    };
+    changeDataB();
   </script>
 </body>
 
