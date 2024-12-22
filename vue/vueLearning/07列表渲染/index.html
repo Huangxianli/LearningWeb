@@ -13,24 +13,25 @@
   <script>
 
     /**
-     * 在vue中，如果是v-for渲染的元素是，其中的顺序该变了，vue不会移动DOM元素，而是就地的更新每个元素，确保他们在每个位置上正确渲染就可以了
-     * 虽然高效，但是现在在了不依赖临时DOM状态（前面的表单切换但是输入）和不依赖子组件状态是才有效
-     * 其他的时候要加个key，让vue能够更好的重用和重新排序现有元素
-     * key请使用字符串或者数字类型
+     * 在 vue2 中，如果是 v-for 渲染的元素，其中的顺序该变了，vue2 不会移动 DOM 元素，而是就地的更新每个元素，确保他们在每个位置上正确渲染就可以了
+     * 虽然高效，但是在了不依赖临时 DOM 状态（前面的表单切换但是输入）和不依赖子组件状态是才有效
+     * 其他的时候要加个 key，让 vue 能够更好的重用和重新排序现有元素
+     * key 请使用字符串或者数字类型
     */
 
     /**
-     * v-for为什么不推荐与v-if一起使用
-     * v-for的优先级与v-if要高，两个同时出现的时候，无论是什情况都会先执行v-for然后再每次迭代中项中判断该项是否渲染
-     * 1、循环列表根据某一属性来判断是否显示的时候，会遍历所有的数据，在判断是否要渲染，而且如果是组件里的模板重新渲染但是列表数据没有变的话，又会导致重新遍历所有的数据，可以提取computed再v-for，
+     * v-for 为什么不推荐与 v-if 一起使用
+     * v-for 的优先级与 v-if 要高，两个同时出现的时候，无论是什情况都会先执行 v-for 然后再每次迭代中项中判断该项是否渲染（注意，如果是 v-if 为 false，则不会渲染）
+     * 1、循环列表根据某一属性来判断是否显示的时候，会遍历所有的数据，再判断是否要渲染，而且如果是组件里的模板重新渲染但是列表数据没有变的话，又会导致重新遍历所有的数据，可以先将要渲染的内容提取成一个 computed 再 v-for，
      * 1.1 将逻辑与显示分开，
      * 1.2 如果组件内部触发重新渲染但不是数据改变的时候，渲染时，无需重新遍历所有列表数据
      * 1.3 组件内触渲染的时候，是全部重新渲染，还是说会复用一些没有变的？？？
-     * 2、判断整个列表是否要显示，应该将v-if放在v-for的外面判断，这样只有显示的时候才会去执行v-for
+     * 2、判断整个列表是否要显示，应该将 v-if 放在 v-for 的外面判断，这样只有显示的时候才会去执行 v-for
     */
+
     /**
      * v-for 遍历数组
-     * 数组中，push、pop、shift、unshift、splice、sort、reverse才能触发视图的更新
+     * 数组中，push、pop、shift、unshift、splice、sort、reverse 才能触发视图的更新
     */
     const ChildComponent1 = {
       props: {
@@ -44,6 +45,16 @@
           { [Symbol.for('for1')]: 5, only: Symbol(), id: 1233, eventName: '事件5', isDown: false }
         ]
       }),
+      computed: {},
+      watch: {},
+      beforeCreate () {
+        Math.Symbol1 = Symbol.for('for1');
+      },
+      methods: {
+        console1 () {
+          console.log('执行了console1'); // 只执行了两次
+        },
+      },
       template:
         `
         <div>
@@ -64,23 +75,12 @@
         </div>
         `
       ,
-      beforeCreate () {
-        Math.Symbol1 = Symbol.for('for1');
-      },
-      computed: {
-      },
-      methods: {
-        console1 () {
-          console.log('执行了console1'); // 只执行了两次
-        },
-      },
-      watch: {
-      },
+
     }
 
     /**
-     * v-for遍历对象和Object.keys()实现一样，无法保证遍历的顺序，无法获取到key为Symbol值的value
-     * 遍历value为Map或者Set
+     * v-for 遍历对象和 Object.keys() 实现一样，无法保证遍历的顺序，无法获取到 key 为 Symbol 值的 value
+     * 会遍历 value 为 Map 或者 Set
     */
     const ChildComponent2 = {
       props: {
@@ -111,6 +111,9 @@
         listObj4: new Map([[1, 1], [2, 2]]),
         listObj5: new Set([1, 2, 3, 4])
       }),
+      computed: {},
+      watch: {},
+      methods: {},
       template:
         `
         <div>
@@ -148,18 +151,12 @@
         </div>
         `
       ,
-      computed: {
-      },
-      methods: {
-      },
-      watch: {
-      },
     };
 
 
     const ChildCompoenent4 = {
       beforeCreate () {
-        console.log('ChildCompoenent4-beforeCreate');
+        console.log('ChildCompoenent4-beforeCreate'); // 只会打印3次
       },
       template: `
         <div>
@@ -168,6 +165,9 @@
     };
 
     const ChildComponent3 = {
+      components: {
+        ChildCompoenent4,
+      },
       data: vm => ({
         list: [
           { id: 0 },
@@ -178,9 +178,6 @@
           { id: 5 },
         ]
       }),
-      components: {
-        ChildCompoenent4,
-      },
       template: `
         <div>
           <ChildCompoenent4 v-for="item in list" v-if="item.id % 2 === 0" :key="item.id"/>
