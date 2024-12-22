@@ -34,26 +34,12 @@
       data: vm => ({
         isActive: false,
       }),
-      template:
-        `
-        <div>
-          <div>ChildComponent1</div>
-          <button @click="changeActive">点击切换状态</button>
-          <div class="h100" :class="{active: isActive}">
-            <span>状态{{state}}</span>
-          </div>
-          <div :class="['h100', activClass]">
-            <span>状态</span>
-           </div>
-        </div>
-        `
-      ,
       computed: {
         state () {
           return this.isActive ? '激活' : '失活';
         },
         activClass () {
-          return this.isActive ? 'active' : '';
+          return this.isActive ? 'active' : ''; // 传入 "" 就相当与没有设置类名，传 undefined 也是可以的
         },
       },
       methods: {
@@ -61,6 +47,19 @@
           this.isActive = !this.isActive;
         }
       },
+      template:
+        `
+        <div>
+          <div>ChildComponent1</div>
+          <button @click="changeActive">点击切换状态</button>
+          <div class="h100" :class="{active: isActive}">
+            <span>当前状态：{{state}}</span>
+          </div>
+          <div :class="['h100', activClass]">
+           </div>
+        </div>
+        `
+      ,
     };
 
     /**
@@ -73,18 +72,14 @@
       data: vm => ({
         isActive: false,
       }),
-      template:
-        `
-        <div>
-          <div>ChildComponent2</div>
-          <button @click="changeState">点击切换状态</button>
-          <div :style="{'height': '100px', 'background-color': bgc}"></div>
-        </div>
-        `
-      ,
       computed: {
         bgc () {
           return this.isActive ? 'green' : 'yellow'
+        },
+        height () {
+          return {
+            height: '100px',
+          };
         },
       },
       methods: {
@@ -92,6 +87,17 @@
           this.isActive = !this.isActive;
         },
       },
+      template:
+        `
+        <div>
+          <div>ChildComponent2</div>
+          <button @click="changeState">点击切换状态</button>
+          <div :style="{'height': '100px', 'background-color': bgc}"></div>
+          <br />
+          <div v-bind:style="[height, {'background-color': 'red'}]"></div>
+        </div>
+        `
+      ,
     };
 
 
