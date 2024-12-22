@@ -20,8 +20,26 @@
       },
       template: `<span>这里是子组件，formFatrher：{{formFather}}，childData1：{{childData1}}</span>`,
     };
+
+    const ChildCompoent2 = {
+      data () {
+        return {
+          child2Data1: 1,
+        }
+      },
+      mounted () {
+        setTimeout(() => {
+          this.child2Data1 = {};
+        }, 5000);
+      },
+      template: `
+        <div>
+          <span>这里是子组件2，child2Data1：{{child2Data1}}</span>
+        </div>
+      `,
+    };
     const symbol1 = Symbol.for('symbol1');
-    const data1 = {
+    let data1 = {
       a: 1,
       b: {
         [symbol1]: 'symbol1'
@@ -30,33 +48,82 @@
         c1: 1,
         c2: Symbol(),
       },
+      d: {
+        d1: new Map([
+          ['a', 1],
+          ['b', 2],
+        ]),
+        d2: new Set([1, 2, 3]),
+      },
+      e: symbol1
     };
     console.log(data1);
+
     const vm = new Vue({
       el: '#root', // el确定了vue最终要挂载的地方
       data: data1, // new实例的时候，会将data1对象中的property加入到响应式系统中，当property对应的内容发生改变的时候，视图会自动更新
       components: {
         'child-compoent1': childCompoent1,
+        ChildCompoent2,
       },
       template: // 使用了template的话，template的内容会覆盖el对应的元素
         `
         <div>
-          <span>这里是父的data a：{{a}}，symbol1：{{b}}，c：{{c}}</span>
+          <span>这里是父的data
+            <br />
+            a：{{a}}，
+            <br />
+            b：{{b}}，
+            <br />
+            b[symbol1]: {{b[e]}}
+            <br />
+            c：{{c}}，
+            <br />
+            c.c2：{{c.c2}}
+            <br />
+            d：{{d}}
+            <br />
+            d.d1: {{d.d1}}
+            <br />
+            d.d2: {{d.d2}}
+            </span>
           <br/>
           <child-compoent1 formFather="123"/>
+          <br />
+          <ChildCompoent2 />
         </div>
         `,
+      // 注意 b 只会显示 {}，b 里面的内容不会显示，因为 b 里面的属性都是 Symbol 类型的属性，c 中不会显示 c.c2 的内容，连属性 c2 都不会显示，因为 c.c2 对应的值是一个 Symbol 类型的值，但是如果单独的将 c.c2 拎出来，就会显示 c.c2 的值；d 中 d1 和 d2 会显示成 {}，但是单独拎出来显示的是 [Object Map] [Obeject Set]
+      /* 
+        这里是父的data
+        a：1，
+        b：{}，
+        c：{ "c1": 1 }，
+        c.c2：Symbol()
+        d：{ "d1": {}, "d2": {} }
+        d.d1: [object Map]
+        d.d2: [object Set]
+       */
     });
+
     // 注意这里两个对象是完全一样
     console.log('data1 === vm.$data: ', data1 === vm.$data); // data1 === vm.$data:  true
     console.log('vm.$data: ', vm.$data); // 在浏览器打印中可以看到 __ob__ get set
 
-    setTimeout(() => {
-      data1.a = 12;
-      data1.b[symbol1] = 12;
-      data1.c.c1 = 12;
-      console.log(JSON.parse(JSON.stringify(vm.$data))); // 注意这种写法会将以Symbol类型作为key或者value的属性丢失掉，同时map和set都会变成“{}”，并不能还原到原来的对象，和官网的说法有差异 https://v2.cn.vuejs.org/v2/api/#data
-    }, 1000);
+    function changeData () {
+      setTimeout(() => {
+        data1.a = 12;
+        data1.b[symbol1] = 12;
+        data1.c.c1 = 12;
+        // 注意这里不会中断data1.c的响应式
+        data1.c = {}
+        // 从下面这一步开始就已经中断了 data1 的响应式
+        data1 = {};
+        data1.a = 0;
+        console.log(JSON.parse(JSON.stringify(vm.$data))); // 注意这种写法会将以Symbol类型作为key或者value的属性丢失掉，同时map和set都会变成“{}”，并不能还原到原来的对象，和官网的说法有差异 https://v2.cn.vuejs.org/v2/api/#data
+      }, 1000);
+    };
+    changeData();
 
   </script>
 </body>
