@@ -26,6 +26,25 @@
           [Math.Symbol1]: '1'
         }
       }),
+      computed: {
+        computed1 () {
+          console.log("computed1，Math.Symbol1 = Symbol.for('symbol1')：", Math.Symbol1 === Symbol.for('symbol1'));
+          console.log('改变了'); // 这里也只会在第一次进来的时候触发，点击按钮修改后就不会触发了
+          return this.data1[Symbol.for('symbol1')];
+        },
+      },
+      beforeCreate () {
+        Math.Symbol1 = Symbol.for('symbol1'); // 这里这么做的原因是 模板表达式中有一个全局变量的白名单Symbol没有在里面，无法访问
+        console.log("beforeCreate，Math.Symbol1 = Symbol.for('symbol1')：", Math.Symbol1 === Symbol.for('symbol1'));
+      },
+      methods: {
+        changeData () {
+          console.log("changeData，this.data1[Symbol.for('symbol1')]：", this.data1[Math.Symbol1]);
+          this.data1[Symbol.for('symbol1')] = Math.random();
+          console.log("changeData，this.data1[Symbol.for('symbol1')]：", this.data1[Math.Symbol1]); // 注意这里修改成功了，但是没有驱动视图的更新
+          console.log(this.data1[Symbol.for('symbol1')] === this.data1[Math.Symbol1]);
+        },
+      },
       template:
         `
         <div>
@@ -34,28 +53,11 @@
             <span>这里是子组件，测试以symbol为key的内容是否进行了响应式</span>
             <button @click="changeData">点击修改对象中以symbol类型值为key的值</button>
             <span>data1[symbol.for('symbol1')]：{{data1[Math.Symbol1]}}</span>
+            <br />
             {{computed1}}
           </div>
         </div>
       `,
-      beforeCreate () {
-        Math.Symbol1 = Symbol.for('symbol1'); // 这里这么做的原因是 模板表达式中有一个全局变量的白名单Symbol没有在里面，无法访问
-        console.log("beforeCreate，Math.Symbol1 = Symbol.for('symbol1')：", Math.Symbol1 === Symbol.for('symbol1'));
-      },
-      computed: {
-        computed1 () {
-          console.log("computed1，Math.Symbol1 = Symbol.for('symbol1')：", Math.Symbol1 === Symbol.for('symbol1'));
-          console.log('改变了'); // 这里也只会在第一次进来的时候触发，点击按钮修改后就不会触发了
-          return this.data1[Symbol.for('symbol1')];
-        },
-      },
-      methods: {
-        changeData () {
-          console.log("changeData，this.data1[Symbol.for('symbol1')]：", this.data1[Math.Symbol1]);
-          this.data1[Symbol.for('symbol1')] = Math.random();
-          console.log("changeData，this.data1[Symbol.for('symbol1')]：", this.data1[Math.Symbol1]); // 注意这里修改成功了，但是没有驱动视图的更新
-        },
-      },
     };
 
     const vm = new Vue({
@@ -64,6 +66,33 @@
         data1: {},
         data2: new Map([[1, 1], [2, 2]]),
       }),
+      components: {
+        ChildComponent1: ChildComponent1
+      },
+      methods: {
+        changeData1 () {
+          // 只看第一次点击触发的情况
+          this.data1.name = {}; // 增加新属性，这里向data1中添加属性，成功但是视图没有被驱动修改
+          this.$set(this.data1, 'name', {}); // 添加新的属性要改成这种方式才会驱动视图的改变，但是如果和上面的语句同时出现，则当前还是不会驱动视图的修改 或者是 this.data1 = {name: {}}
+          // this.data1 = { name: {} }
+          // 也要注意，如果是先 1 后 2， 这样的话，即使是使用 2 $set()，也不会触发视图的更新
+          console.log(this.data1.name); // 由于先 1 后 2，所以 没有 __ob__ 属性，如果是会驱动视图更新会有 __ob__ 属性
+
+          this.data1 = { name: {} };
+          this.data1.name = {};
+          console.log(this.data1.name); // 有 __ob__ 属性，会驱动视图更新
+          // 由上面4个的表现可以看出，this.$set() 如果设置的是已经存在 非响应式 的属性，则后续也不会驱动视图的更新
+
+          // this.data1 = 12; // 这里修改data1的值，会驱动视图的更新
+        },
+
+        changeData2 () {
+          this.data2.set(1, Math.random());  // 修改map，这里是修改成功的，但是视图没有驱动修改
+          console.log(this.data2.get(1));
+
+          // Object.defineProperty() 第一个参数只能接收 Object 类型的（函数，数组也算对象类型），不接受 Set Map，第二个参数只接受 Symbol 和 String 和 Number 类型的
+        },
+      },
       template:
         `
         <div>
@@ -76,26 +105,6 @@
           <ChildComponent1 />
         </div>
         `,
-      components: {
-        ChildComponent1: ChildComponent1
-      },
-      methods: {
-        changeData1 () {
-          this.data1.name = {}; // 增加新属性，这里向data1中添加属性，成功但是视图没有被驱动修改
-          this.$set(this.data1, 'name', {}); // 添加新的属性要改成这种方式才会驱动视图的改变，但是如果和上面的语句同时出现，则当前还是不会驱动视图的修改
-          this.data1.name = {};
-          console.log(this.data1.name); // 没有 __ob__ 属性，如果是会驱动视图更新会有 __ob__ 属性
-          // 由上面4个的表现可以看出，this.$set() 如果设置的是已经存在 非响应式 的属性，则后续也不会驱动视图的更新
-
-          this.data1 = 12; // 这里修改data1的值，会驱动视图的更新
-        },
-        changeData2 () {
-          this.data2.set(1, Math.random());  // 修改map，这里是修改成功的，但是视图没有驱动修改
-          console.log(this.data2.get(1));
-
-          // Object.defineProperty() 第一个参数只能接收 Object 类型的（函数，数组也算对象类型），不接受 Set Map，第二个参数只接受 Symbol 和 String 和 Number 类型的
-        },
-      },
     });
 
 
