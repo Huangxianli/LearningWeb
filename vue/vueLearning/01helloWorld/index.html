@@ -11,10 +11,58 @@
   <div id="root"></div>
   <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
   <script>
-    const vm = new Vue({ // 创建一个Vue实例
-      el: '#root', // 有el属性的话，会在html中查找后面的内容，将生成的vue实例将挂载到对应DOM上
-      template: `<div>Hello World</div>`, // 声明了template的话，该模板会 替换 挂载的元素，挂载的元素都将被忽略，除非模板内容有分发插槽
-    });
+    /**
+     * el 或者 $mount() 决定了 目标 DOM
+     * template 和 render 决定了生成的内容是替换掉目标 DOM 还是插入到目标 DOM 中
+     */
+
+    // 如果没有 el 属性，需要使用 $mount() 方法指定需要挂载的地方
+    const vm = new Vue({
+      template: '<div>Hello World</div>',
+    }).$mount('#root');
+
+
+
+    /*
+        // 如果有 template 的话，将 template 转化成 render 函数，生成的内容会替换掉 el 指定的 dom
+        const vm = new Vue({ // 创建一个Vue实例
+          el: '#root', // 有el属性的话，会在html中查找对应的内容，将生成的vue实例将挂载到对应DOM上
+          template: `<div>Hello World</div>`, // 声明了 template 的话，该模板会 替换 挂载的元素，挂载的元素都将被忽略，除非模板内容有分发插槽
+        });
+     */
+
+    /*
+        // 有 render 函数的话，会将 render 函数生成的内容替换掉 el 指定的 dom
+        const vm = new Vue({
+          el: '#root',
+          render: h => h(
+            'div',
+            'Hello World'
+          )
+        });
+     */
+
+    /*
+      // 即使 render 函数中传入的是空，也会将 el 指定的 dom 替换掉
+      const vm = new Vue({
+        el: '#root',
+        render: h => h()
+      });
+    */
+
+    /*
+        // 如果没有传入 templat 或者 render 函数的时候，就不会替换掉 el 指定的 dom
+        const vm = new Vue({
+          el: '#root',
+          created () {
+            console.log('created');
+          },
+          mounted () {
+            // 注意这里执行了，说明挂载了
+            console.log('mounted');
+          },
+        });
+     */
   </script>
 
 </body>
