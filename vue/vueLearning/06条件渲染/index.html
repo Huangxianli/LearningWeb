@@ -25,6 +25,19 @@
         isActive: true,
         showInputOne: true,
       }),
+      computed: {
+      },
+      watch: {
+      },
+      methods: {
+        changeActive () {
+          this.isActive = !this.isActive;
+        },
+
+        changeInputShow () {
+          this.showInputOne = !this.showInputOne;
+        },
+      },
       template:
         `
         <div>
@@ -36,8 +49,9 @@
           <div :style="{height: '10px', backgroundColor: 'green'}"></div>
           <div v-if="isActive" :style="{'height': '100px', backgroundColor: 'red'}"></div>
           <div :style="{heigh: '20px',backgroundColor: 'yellow'}"></div>
+          <br />
           <button @click="changeInputShow">点击切换input</button>
-          <!-- 没有加key的时候，其实只是切换了placeholder的值，复用了以前的input，可以看输入了内容，但是切换后内容没有消失-->
+          <!-- 没有加key的时候，其实只是切换了 placeholder 的值，复用了以前的 input ，可以看输入了内容，但是切换后内容没有消失-->
           <template v-if="showInputOne"> 
             <input  key="1" placeholder="第一个inoput" />
           </template>
@@ -47,49 +61,37 @@
         </div>
         `
       ,
-      computed: {
-      },
-      methods: {
-        changeActive () {
-          this.isActive = !this.isActive;
-        },
-        changeInputShow () {
-          this.showInputOne = !this.showInputOne;
-        },
-      },
-      watch: {
-      },
     }
 
 
     /**
-     * v-show也用于条件渲染一块内容，开始不管是为真还是为嫁，都会渲染，然后根据值来进行简单的css切换
+     * v-show也用于条件渲染一块内容，开始不管是为真还是为假，都会渲染，然后根据值来进行简单的css切换
     */
     const ChildComponent2 = {
       props: {
       },
       data: vm => ({
       }),
+      computed: {
+      },
+      watch: {
+      },
+      methods: {
+      },
       template:
         `
         <div>
         </div>
         `
       ,
-      computed: {
-      },
-      methods: {
-      },
-      watch: {
-      },
     }
 
     new Vue({
       el: '#root',
-      data: vm => ({}),
       components: {
         ChildComponent1,
       },
+      data: vm => ({}),
       template:
         `
         <div>
