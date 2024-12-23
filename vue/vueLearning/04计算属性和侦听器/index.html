@@ -18,6 +18,39 @@
      * 函数只要调用了就会执行
      */
     const ChildComponent1 = {
+      data: vm => ({
+        inputValue: '',
+        word: '',
+        clicks: 0
+      }),
+      computed: {
+        reverseWord () {
+          console.log('reverseWord 发生了变化'); // 如果word的值没有发生改变，无论访问多少次的reverseWord()，都只会执行一次
+          return this.word.split('').reverse().join('');
+        },
+        // reserseWord: {
+        //   get: () => ({}),
+        //   set: (value) => { },
+        // }
+      },
+      methods: {
+        clickBtn () {
+          this.clicks++; // 这一步会触发当前组件的重新渲染，如果 computed 中 reverseWord 依赖的响应式数据没有改变就不会重新执行，但是 reverseWordFun 一定会重新执行
+        },
+
+        inputChange (e) {
+          this.inputValue = e.target.value;
+        },
+
+        getWord () {
+          this.word = this.inputValue.trim();
+        },
+
+        reverseWordFun () { // 方法的话，只要是调用方法，就会重新执行该函数
+          console.log('执行了reverseWordFun');
+          return this.word.split('').reverse().join('');
+        }
+      },
       template:
         `
         <div>
@@ -28,47 +61,17 @@
           <label for="wordInput">请输入要反转的单词</label><input id="wordInput" @input="inputChange"/>
           <button @click="getWord">反转单词</button>
           <br/>
-          <span>反转后的单词：{{reverseWord}}</span>
-          <span>反转后的单词：{{reverseWord}}</span>
-          <span>反转后的单词：{{reverseWord}}</span>
-          <span>反转后的单词：{{reverseWord}}</span>
-          <span>反转后的单词：{{reverseWordFun()}}</span>
-          <span>反转后的单词：{{reverseWordFun()}}</span>
-          <span>反转后的单词：{{reverseWordFun()}}</span>
-          <span>反转后的单词：{{reverseWordFun()}}</span>
+          <span>反转后的单词：{{reverseWord}}</span><br />
+          <span>反转后的单词：{{reverseWord}}</span><br />
+          <span>反转后的单词：{{reverseWord}}</span><br />
+          <span>反转后的单词：{{reverseWord}}</span><br />
+          <span>反转后的单词：{{reverseWordFun()}}</span><br />
+          <span>反转后的单词：{{reverseWordFun()}}</span><br />
+          <span>反转后的单词：{{reverseWordFun()}}</span><br />
+          <span>反转后的单词：{{reverseWordFun()}}</span><br />
         </div>
         `
       ,
-      data: vm => ({
-        inputValue: '',
-        word: '',
-        clicks: 0
-      }),
-      computed: {
-        reverseWord () {
-          console.log('reverseWord 发生了变化'); // 如果word的值没有发生改变，无论访问多少次的reverseWord()，都只会执行一次
-          return this.word.split().reverse().join();
-        },
-        // reserseWord: {
-        //   get: () => ({}),
-        //   set: () => { },
-        // }
-      },
-      methods: {
-        clickBtn () {
-          this.clicks++; // 这一步会触发当前组件的重新渲染，如果reverseWord 如果依赖的响应式数据没有改变就不会重新执行，但是reverseWordFun一定会重新执行
-        },
-        inputChange (e) {
-          this.inputValue = e.target.value;
-        },
-        getWord () {
-          this.word = this.inputValue.trim();
-        },
-        reverseWordFun () { // 方法的话，只要是调用方法，就会重新执行该函数
-          console.log('执行了reverseWordFun');
-          return this.word.split().reverse().join();
-        }
-      },
     };
 
 
@@ -83,19 +86,28 @@
         testSymbol: {
           [symbol1]: 1
         },
-        testAddNewProperty: {
-        },
+        testAddNewProperty: {},
       }),
-      template:
-        `
-        <div>
-          <div>ChildCompoent2</div>
-          <button @click="clickBtn">点击</button>
-          <span>点击次数{{clicks}}</span>
-        </div>
-      `
-      ,
       computed: {},
+      watch: {
+        // clicks (newData, oldData) {
+        //   console.log('进入了watch clicks');
+        //   // ...doSomething
+        // },
+
+        // clicks: {
+        //   handler (newValue, oldValue) { },
+        //   deep: true,
+        //   immediate: true,
+        // }
+
+        // 'a.b.c': {
+        //   handler (newValue, oldValue) { },
+        //   deep: true,
+        //   immediate: true,
+        // }
+
+      },
       created () {
         // this.$watch(
         //   'clicks',
@@ -133,24 +145,24 @@
           this.testAddNewProperty[this.clicks] = Math.random();
         },
       },
-      watch: {
-        // clicks (newData, oldData) {
-        //   console.log('进入了watch clicks');
-        //   // ...doSomething
-        // },
-
-        // clicks: {
-        //   handler (newValue, oldValue) { },
-        //   deep: true,
-        //   immediate: true,
-        // }
-
-      },
+      template:
+        `
+        <div>
+          <div>ChildCompoent2</div>
+          <button @click="clickBtn">点击</button>
+          <span>点击次数{{clicks}}</span>
+        </div>
+      `
+      ,
     };
 
 
     new Vue({
       el: '#root',
+      components: {
+        ChildComponent1,
+        ChildComponent2
+      },
       template:
         `
         <div>
@@ -159,10 +171,6 @@
           <ChildComponent2/>
         </div>
       `,
-      components: {
-        ChildComponent1,
-        ChildComponent2
-      },
     });
   </script>
 </body>
