@@ -13,16 +13,16 @@
   <script>
 
     /**
-     * 注意v-model其实是一个事件和一个property的语法糖
+     * 注意 v-model 其实是一个事件和一个 property 的语法糖
      * <input />
-     *  type为text，使用的是 value property 和 input 事件
-     *  type为radio，使用的是 checked property 和 change 事件
-     *  type为checkbox，使用的是 checked property 和 change 事件
+     *  type 为 text，使用的是 value property 和 input 事件
+     *  type 为 radio，使用的是 checked property 和 change 事件
+     *  type 为 checkbox，使用的是 checked property 和 change 事件
      * 
-     * <select></select> value property 和 change 事件 注意原生的select没有value属性
-     * 我可以通过修改v-model绑定的变量，控制选择，这和是怎么实现的？？？
+     * <select></select> value property 和 change 事件 注意原生的 select 没有 value 属性
+     * 我可以通过修改 v-model 绑定的变量，控制选择，这个是怎么实现的？？？
      * 
-     * <textarea /> 使用的是 value property和 input 事件
+     * <textarea /> 使用的是 value property 和 input 事件
     */
     const ChildComponent1 = {
       props: {
@@ -39,6 +39,21 @@
         select1: [],
         vSelect2: '',
       }),
+      computed: {},
+      watch: {},
+      methods: {
+        text2Input (event) {
+          this.text2 = event.target.value;
+        },
+
+        radioChange (event) {
+          this.radio = event.target.value;
+        },
+
+        selectChange (event) {
+          this.select1 = [...event.target.selectedOptions].map(option => option.value);
+        },
+      },
       template:
         `
         <div>
@@ -119,30 +134,15 @@
         </div>
         `
       ,
-      computed: {
-      },
-      methods: {
-        text2Input (event) {
-          this.text2 = event.target.value;
-        },
-        radioChange (event) {
-          this.radio = event.target.value;
-        },
-        selectChange (event) {
-          this.select1 = [...event.target.selectedOptions].map(option => option.value);
-        },
-      },
-      watch: {
-      },
     };
 
 
     new Vue({
       el: '#root',
-      data: vm => ({}),
       components: {
         ChildComponent1,
       },
+      data: vm => ({}),
       template:
         `
         <div>
