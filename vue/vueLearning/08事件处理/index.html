@@ -23,12 +23,22 @@
         clicks: 0,
         clicks1: 0,
       }),
+      computed: {},
+      watch: {},
+      methods: {
+        clickDiv (event) { // 默认的参数是原生的 DOM 事件对象
+          debugger
+          if (Object.values(event.target.dataset).includes('data-1')) {
+            this.clicks++; // 注意在这里写的方法调用vue的内容要加this
+          }
+        }
+      },
       template:
         `
         <div>
           <div>ChildComponent1</div>
           <div 
-            style="height: 100px; backgroundColor: red"
+            style="height: 100px; background-color: red"
             @click="clickDiv"
             >
             <button data-1="data-1">事件处理方法</button>
@@ -47,18 +57,6 @@
         </div>
         `
       ,
-      computed: {
-      },
-      methods: {
-        clickDiv (event) { // 默认的参数是原生的DOM事件对象
-          debugger
-          if (Object.values(event.target.dataset).includes('data-1')) {
-            this.clicks++; // 注意在这里写的方法调用vue的内容要加this
-          }
-        }
-      },
-      watch: {
-      },
     };
 
     /**
@@ -75,28 +73,24 @@
       },
       data: vm => ({
       }),
+      computed: {},
+      watch: {},
+      methods: {},
       template:
         `
         <div>
         </div>
         `
       ,
-      computed: {
-      },
-      methods: {
-      },
-      watch: {
-      },
     }
-
 
 
     new Vue({
       el: '#root',
-      data: vm => ({}),
       components: {
         ChildComponent1,
       },
+      data: vm => ({}),
       template:
         `
         <div>
