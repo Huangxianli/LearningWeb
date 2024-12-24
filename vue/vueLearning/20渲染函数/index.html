@@ -131,6 +131,7 @@
               'div',
               'ChildComponent4'
             ),
+            // 这里是定义作用域擦超 default1
             this.$scopedSlots.default1({
               info: this.$props.info
             }),
@@ -175,7 +176,8 @@
             createElement(
               ChildComponent3,
               {
-                // 注意是直接卸载这个上面
+                // ChildComponent3里面有一个叫default1的插槽
+                // 注意是直接写在这个上面
                 scopedSlots: {
                   default1: (props) => {
                     return createElement('div', props.a + props.b)
