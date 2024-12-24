@@ -8,39 +8,51 @@
 </head>
 
 <body>
+  <!-- checkbox 主要是利用其 checked 属性和 change 事件 -->
   <label>
-    <input type="checkbox" id="inputCheckBox1">
+    <input type="checkbox" id="inputCheckBox1" />
     选项
   </label>
 
   <script type="text/javascript">
     let CheckBox = document.getElementById('inputCheckBox1');
     // 注意 input[type='checkbox']是通过checked来获取是否选中了的
-    let CheckBoxProxy = new Proxy(CheckBox, {
-      get: function (target, propKey, receiver) {
-        console.log(`getting ${propKey}!`);
-        return Reflect.get(target, propKey, receiver);
-      },
-      set: function (target, propKey, value, receiver) {
-        // if (propKey === 'checked') {
-        //   // 该属性要手动设置，不能使用下面的值，会报错
-        //   target.checked = value;
-        //   const event = new Event('change', { bubbles: true });
-        //   target.dispatchEvent(event);
-        //   return true;
-        // }
-        return Reflect.set(target, propKey, value, receiver);
-      }
-    })
-    CheckBoxProxy.checked = true;
-    CheckBoxProxy.q = 1;
+    // let CheckBoxProxy = new Proxy(CheckBox, {
+    //   get: function (target, propKey, receiver) {
+    //     console.log(`getting ${propKey}!`);
+    //     return Reflect.get(target, propKey, receiver);
+    //   },
+    //   set: function (target, propKey, value, receiver) {
+    //     // if (propKey === 'checked') {
+    //     //   // 该属性要手动设置，不能使用下面的值，会报错
+    //     //   target.checked = value;
+    //     //   const event = new Event('change', { bubbles: true });
+    //     //   target.dispatchEvent(event);
+    //     //   return true;
+    //     // }
+    //     return Reflect.set(target, propKey, value, receiver);
+    //   }
+    // })
+    // CheckBoxProxy.checked = true;
+    // CheckBoxProxy.q = 1;
 
 
 
     // CheckBox.select(); // tab选中，不是勾选
     // CheckBox.onChange = () => {
+    //   debugger
     //   console.log('change');
     // };
+    // 
+    setTimeout(() => {
+      CheckBox.checked = true;
+      // 注意这种通过直接设置 checked 属性来设置选中状态的方式，不会触发 change 事件，所以在 change 事件的回调中，设置 checked 属性，不会陷入死循环
+    }, 5000);
+    CheckBox.addEventListener('change', (e) => {
+      debugger
+      e.target.checked = false; // 这种写法不用当心进入死循环
+      console.log('change');
+    });
     // CheckBox.addEventListener('input', () => {
     //   console.log('input');
     // });
