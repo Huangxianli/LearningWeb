@@ -15,16 +15,11 @@
      * 匿名插槽及其默认内容
     */
     const ChildComponent1 = {
-      props: {
-      },
-      data: vm => ({
-      }),
-      computed: {
-      },
-      methods: {
-      },
-      watch: {
-      },
+      props: {},
+      data: vm => ({}),
+      computed: {},
+      watch: {},
+      methods: {},
       template:
         `
         <div>
@@ -43,16 +38,11 @@
      * v-slot要使用在<template>上，只有一种情况例外
     */
     const ChildComponent2 = {
-      props: {
-      },
-      data: vm => ({
-      }),
-      computed: {
-      },
-      methods: {
-      },
-      watch: {
-      },
+      props: {},
+      data: vm => ({}),
+      computed: {},
+      watch: {},
+      methods: {},
       template:
         `
         <div>
@@ -88,17 +78,14 @@
           age: 12,
         },
       }),
+      computed: {},
+      watch: {},
       mounted () {
         setTimeout(() => {
           this.userInfo = {};
         }, 1000); // 这里会触发重新渲染，作用域插槽会获取最新的值
       },
-      computed: {
-      },
-      methods: {
-      },
-      watch: {
-      },
+      methods: {},
       template:
         `
         <div>
@@ -127,17 +114,70 @@
         `,
     }
 
+    // render 函数中定义插槽
+    const ChildComponent5 = {
+      render (h) {
+        return h(
+          'div',
+          [
+            '123',
+            h('br'),
+            this.$slots.header ? this.$slots.header : 'header 插槽默认内容',
+            h('br'),
+            this.$slots.default ? this.$slots.default : 'default 插槽默认内容',
+            h('br'),
+            this.$scopedSlots.footer ? this.$scopedSlots.footer({ data: 123 }) : 'footer 作用域插槽的默认内容'
+          ]
+        );
+      },
+    };
+
+    /**
+     * render 函数中使用 插槽
+     * 非作用域插槽 要作为子节点传递组件，声明 slot 属性
+     * 作用域插槽则是通过属性 scopedSlots 属性中 [插槽名](props){return ...} 来使用的
+     */
+
+    const ChildComponent6 = {
+      components: {
+        ChildComponent5,
+      },
+      render (h) {
+        return h(
+          ChildComponent5,
+          {
+            scopedSlots: {
+              footer: props => {
+                return h('div', props.data);
+              },
+            }
+          },
+          [
+            h(
+              'template',
+              { slot: 'header' },
+              '传入 header 插槽的内容'
+            ),
+            // default 插槽不需要注明 { slot: default }
+            '传入 default 插槽的内容',
+          ]
+        )
+      },
+    };
+
+
     new Vue({
       el: '#root',
-      data: vm => ({
-        data1: '3',
-      }),
       components: {
         ChildComponent1,
         ChildComponent2,
         ChildComponent3,
-        ChildComponent4
+        ChildComponent4,
+        ChildComponent6
       },
+      data: vm => ({
+        data1: '3',
+      }),
       mounted () {
         setTimeout(() => {
           this.data1 = '4';
@@ -175,7 +215,10 @@
               {{userInfo}}
             </template>
           </ChildComponent3>
+          <hr />
+          <ChildComponent6 />
         </div>
+       
         `
       ,
     });
