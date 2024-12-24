@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>textarea</title>
+</head>
+
+<body>
+  <!-- textarea 主要是利用 value 和 input 事件 -->
+  <label>
+    文本域
+    <!-- 注意如果要设置初始值，在标签上直接使用 value 属性是不行的，可以在标签之间 输入文字 -->
+    <textarea id="textarea1">123</textarea>
+    <!-- <textarea id="textarea1" value="123"></textarea> -->
+  </label>
+
+  <script type="text/javascript">
+    const Textarea1 = document.getElementById('textarea1');
+    setTimeout(() => {
+      Textarea1.value; // 可以获取到文本域之间的内容
+      debugger
+      Textarea1.value = 'www'; // 设置文本域显示的内容
+    }, 2000);
+
+    Textarea1.addEventListener('input', e => {
+      e.target.value;
+      debugger
+    })
+  </script>
+
+</body>
+
+</html>

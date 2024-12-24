@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>select</title>
+</head>
+
+<body>
+  <section>
+    <!-- 主要利用 value 属性和 change 事件 -->
+    <label>
+      选择
+      <!-- 如果没有任何的 option 设置成了 selected 属性，则会默认选中第一个 -->
+      <select id="select1">
+        <option value="1-1">1-1</option>
+        <!-- 如果没有设置 value 属性，会取元素中的文本 -->
+        <option>2-2</option>
+        <option value="3-3">3-3</option>
+        <!-- selected 属性默认表示默认选中 -->
+        <option selected value="4-4">4-4</option>
+      </select>
+    </label>
+  </section>
+
+  <script type="text/javascript">
+    const Select1 = document.getElementById('select1');
+
+    setTimeout(() => {
+      Select1.value = '2-2';
+    }, 2000);
+
+    Select1.addEventListener('change', e => {
+      e.target.value;
+      debugger
+    })
+  </script>
+
+</body>
+
+</html>

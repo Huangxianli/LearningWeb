@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>inputText</title>
+</head>
+
+<body>
+  <!-- inputText 主要是利用 value 属性和 input 事件 -->
+  <section>
+    <label>
+      inputText
+      <input id="inputText1" type="text" value="123" />
+    </label>
+  </section>
+
+  <script type="text/javascript">
+    const Text1 = document.getElementById('inputText1');
+    setTimeout(() => {
+      Text1.value = ''; // 手动修改属性，不会进入到 input 事件里面
+    }, 2000);
+
+    Text1.addEventListener('input', (e) => {
+      e.target.value;
+      debugger
+    })
+
+  </script>
+
+</body>
+
+</html>
