@@ -13,16 +13,14 @@
   <script>
 
     /**
-     * 由于HTML中的attribute的大小写不敏感，会将大写转化成小写
-     * 如果是在DOM的模板中使用，要将小驼峰命名的转化成kebab-case的写法，如果是在字符串模板中就不需要
+     * 由于 HTML 中的 attribute 的大小写不敏感，会将大写转化成小写
+     * 如果是在 DOM 的模板中使用，要将小驼峰命名的转化成 kebab-case 的写法，如果是在字符串模板中就不需要，在单文件组件的 template 中也不用
     */
     const ChildComponent1 = {
       props: {
         fatherComponentName: String,
         content: String,
       },
-      data: vm => ({
-      }),
       template:
         `
         <div>
@@ -31,27 +29,22 @@
           <div>content：{{content}}</div>
         </div>
         `
+      // 在字符串模板中，props 不需要转化成 kebab-case 的写法
       ,
-      computed: {
-      },
-      methods: {
-      },
-      watch: {
-      },
     };
 
 
     /**
-     * prop验证
-     * prop会在组件床架你之前进行验证，所以在default validtor中访问不到data computed等
-     * 支持的类型 String、Number、Boolean、Symbol、Object、Array、Function、Date、构造函数（会通过insatanceof来判断是不是当前实例）
+     * prop 验证
+     * prop 会在组件创建之前进行验证，所以在 default validtor 中访问不到 data computed 等
+     * 支持的类型 String、Number、Boolean、Symbol、Object、Array、Function、Date、构造函数（会通过 insatanceof 来判断是不是当前实例）
     */
     const ChildComponent2 = {
       props: {
         fatherName: {
           type: [Number, String],
           required: true,
-          // default可以通过一个方法返回，也可以是直接默认的值，要注意如果本身就是要传一个函数的话，default: ()=> (()=> {})
+          // default 可以通过一个方法返回，也可以是直接默认的值，要注意如果本身就是要传一个函数的话，default: ()=> (()=> {})
           default: function () {
             return ''
           },
@@ -63,8 +56,6 @@
           }
         }
       },
-      data: vm => ({
-      }),
       template:
         `
         <div>
@@ -73,70 +64,57 @@
         </div>
         `
       ,
-      computed: {
-      },
-      methods: {
-      },
-      watch: {
-      },
     };
 
 
     /**
-     * 对于在组件内没有设置prop接受的attribute，会自动的加载根节点上作为attribute
+     * 对于在组件内没有设置 prop 接受的 attribute，会自动的加载在根节点上作为组件根节点的 attribute（sytle 和 class 也会加载该组件的根节点上）
+     * 除了 style 和 class 会合并，其他的 attribute ，其他组件根节点的 attribute 如果和使用组件时在组件上写的 attribute 同名的话，组件内根节点的该同名 attribute 会被覆盖掉
     */
     const ChildComponent3 = {
-      props: {
-      },
-      data: vm => ({
-      }),
       template:
         `
-        <div>
-          <div>ChildComponent3</div>
+        <div fatherName="unset">
+          <div >ChildComponent3</div>
         </div>
         `
       ,
-      computed: {
-      },
-      methods: {
-      },
-      watch: {
-      },
     };
 
     /**
-     * 限制attribute可以被根组件继承
-     * inheritAttris: false; 不会继承attribute，不会影响style和class
-     * $attrs: 父作用域中不作为prop识别的attribute（除去class和style）
+     * 限制 attribute 被根组件继承
+     * inheritAttris: false; 不会继承 attribute，但是 style 和 class 依旧会加在该组件的根元素上
+     * $attrs: 在使用组件时，不作为 prop 识别的 attribute（除去class和style）
     */
     const ChildComponent4 = {
-      inheritAttris: false,
+      inheritAttris: false, // 在使用组件时，不会将加载组件上的 attribute 加在组件的根元素上
       props: {
         fatherName: String,
       },
-      data: vm => ({
-      }),
+      data: vm => ({}),
+      computed: {},
+      watch: {},
+      methods: {},
       template:
         `
         <div>
           <div>ChildComponent4</div>
-          <!-- { "dataProp1": "1", "dataProp2": "2", "dataProp3": "3" }由于prop中有fatherName，所以不会包含在这个对象内，在这个里面，还没有全部转化为小写 -->
-          <div>{{$attrs}}</div>
+          <!-- 由于在使用的时候传入了 'fatherName'、'dataProp1'、'dataProp2'、'dataProp3'，但是 'fatherName' 被作为了 prop，所以 $attrs 就是 { "dataProp1": "1", "dataProp2": "2", "dataProp3": "3" }，在这个里面，还没有全部转化为小写 -->
+          <div>{{ $attrs }}</div>
         </div>
         `
       ,
-      computed: {
-      },
-      methods: {
-      },
-      watch: {
-      },
     };
 
     new Vue({
       el: '#root',
-      comments: true,
+      components: {
+        ChildComponent1,
+        ChildComponent2,
+        ChildComponent3,
+        ChildComponent4
+      },
+      comments: true, // 保留 html 中的注释
       data: vm => ({
         info: {
           content: 'abcd',
@@ -147,12 +125,6 @@
           dataProp3: '3'
         },
       }),
-      components: {
-        ChildComponent1,
-        ChildComponent2,
-        ChildComponent3,
-        ChildComponent4
-      },
       template:
         `
         <div>
