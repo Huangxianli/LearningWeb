@@ -10,7 +10,18 @@
 <body>
   <div id="root"></div>
   <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
-  <script>
+  <script type="text/x-template" id="childComponent3">
+    <section>
+      <div>这里是childComponent3</div>
+      <br />
+      <div>
+        这里是childComponent3中使用的ChildComponent2
+        <ChildComponent2/>
+      </div>
+    </section>
+  </script>
+  <script type="module">
+    import ChildComponent4 from './ChildComponent4.js';
     /**
      * 在单文件组件和字符串模板中，尽量用大驼峰的写法
      * 在DOM模板中只能使用 my-component （由于其大小写不敏感）
@@ -22,11 +33,11 @@
       data: vm => ({}),
       computed: {},
       watch: {},
+      methods: {},
       template:
         `
         <div>全局注册组件ChildComponent1</div>
         `,
-      methods: {},
     });
 
 
@@ -34,10 +45,11 @@
      * 局部组件
     */
     const ChildComponent2 = {
-      props: {
-      },
-      data: vm => ({
-      }),
+      props: {},
+      data: vm => ({}),
+      computed: {},
+      watch: {},
+      methods: {},
       template:
         `
         <div>
@@ -45,19 +57,22 @@
         </div>
         `
       ,
-      computed: {
+    };
+
+    const ChildComponent3 = {
+      components: {
+        ChildComponent2,
       },
-      methods: {
-      },
-      watch: {
-      },
+      template: "#childComponent3"
     };
 
 
     new Vue({
       el: '#root',
       components: {
-        ChildComponent2
+        ChildComponent2,
+        ChildComponent3,
+        ChildComponent4
       },
       data: vm => ({}),
       template:
@@ -65,8 +80,12 @@
         <div>
           <!-- 由于组件名称最终是大驼峰的写法，这里也可以使用kwbab-case方式 -->
           <ChildComponent1 />
-          <br />
+          <hr />
           <ChildComponent2 />
+          <hr />
+          <childComponent3 />
+          <hr />
+          <ChildComponent4 />
         </div>
         `
       ,
