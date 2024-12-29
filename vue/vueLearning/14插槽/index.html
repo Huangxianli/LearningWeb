@@ -13,6 +13,7 @@
   <script>
     /**
      * 匿名插槽及其默认内容
+     * 注意 this.$slots 是不具备响应式的
     */
     const ChildComponent1 = {
       props: {},
@@ -33,9 +34,9 @@
 
     /**
      * 具名插槽使得一个组件中可以使用多个插槽
-     * 如果default的内容没有写v-solt则会自动收集所有散落的内容，加载到default对应的slot上
-     * 如果加了v-slot:default则只取最后一个v-slot:default，其他v-slot:other的也是一样，只取最后一个
-     * v-slot要使用在<template>上，只有一种情况例外
+     * 如果 default 的内容没有写 v-slot 则会自动收集所有散落的内容，加载到 default 对应的 slot 上
+     * 如果加了v-slot:default 则只取最后一个 v-slot:default，其他 v-slot:other 的也是一样，只取最后一个
+     * v-slot 要使用在 <template> 上，只有一种情况例外（被提供的内容只有默认插槽的时候才能将 v-slot 放在组件标签上）
     */
     const ChildComponent2 = {
       props: {},
@@ -165,6 +166,14 @@
       },
     };
 
+    const ChildComponent7 = {
+      template: `
+        <div>
+          <slot #default>这里是 ChildComponent7</slot>
+        </div>
+      `,
+    };
+
 
     new Vue({
       el: '#root',
@@ -173,7 +182,8 @@
         ChildComponent2,
         ChildComponent3,
         ChildComponent4,
-        ChildComponent6
+        ChildComponent6,
+        ChildComponent7,
       },
       data: vm => ({
         data1: '3',
@@ -202,13 +212,33 @@
             <template v-slot:second>
               传入 slot second的内容2
             </template>
-            <template v-slot:default>
+           <template v-slot:default>
               <div>default的内容3</div>
               <div>{{data1}}</div>
               <ChildComponent4 />
             </template>
           </ChildComponent2>
           <hr />
+          <!-- 下面的内容不会显示，会报错 -->
+          <!-- 
+            <ChildComponent2 #default>
+             测试将 v-slot 不放在 template 标签上的情况 
+          </ ChildComponent2>
+          <hr />
+          -->
+          <!-- 可以显示，因为 ChildComponent7 里面只提供了 default 插槽-->
+          <ChildComponent7 #default>
+            测试将 v-slot 不放在 template 标签的情况
+          </ChildComponent7>
+          <hr />
+          <!-- 会报错，因为 v-slot 不是使用在 template 上或者 满足条件的 组件标签上 -->
+          <!--
+          <ChildComponent7 #default>
+            <div #default>
+              测试将 v-slot 不放在 template 标签的情况
+            </div>
+          </ChildComponent7>
+          -->
 
           <ChildComponent3>
             <template v-slot:user="userInfo">
@@ -216,6 +246,7 @@
             </template>
           </ChildComponent3>
           <hr />
+          
           <ChildComponent6 />
         </div>
        

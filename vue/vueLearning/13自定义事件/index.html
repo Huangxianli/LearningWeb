@@ -12,14 +12,20 @@
   <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
   <script>
     /**
-     * v-on的绑定，在DOM模板中会自动的转化成全小写，v-on:myEvent会转化成v-on:myevent，在字符串模板中不会转
+     * v-on 的绑定，在 DOM 模板中会自动的转化成全小写（因为 v-on 绑定的事件名不会被当成 property，所以小驼峰的方式不会转化成 kebab-case 的写法），v-on:myEvent 会转化成 v-on:myevent，在字符串模板中不会转
      * 推荐$emit('kebab-case'); v-on:kebab-case 的写法注册和绑定自己的事件
     */
     const ChildComponent1 = {
-      props: {
+      props: {},
+      data: vm => ({}),
+      computed: {},
+      watch: {},
+      methods: {
+        clickBtn () {
+          this.$emit('clickChild1Btn', 'clickChild1Btn事件');
+          this.$emit('click-child-btn-kebab-case', 'click-child-btn-kebab-case');
+        },
       },
-      data: vm => ({
-      }),
       template:
         `
         <div>
@@ -28,16 +34,6 @@
         </div>
         `
       ,
-      computed: {
-      },
-      methods: {
-        clickBtn () {
-          this.$emit('clickChild1Btn', 'clickChild1Btn事件');
-          this.$emit('click-child-btn-kebab-case', 'click-child-btn-kebab-case');
-        },
-      },
-      watch: {
-      },
     };
 
     /**
@@ -68,8 +64,15 @@
           validator: () => true,
         },
       },
-      data: vm => ({
-      }),
+      data: vm => ({}),
+      computed: {},
+      watch: {},
+      methods: {
+        checkedChange (event) {
+          console.log(event.target.checked);
+          this.$emit('change', event.target.checked);
+        }
+      },
       template:
         `
         <div>
@@ -79,42 +82,26 @@
         </div>
         `
       ,
-      computed: {
-      },
-      methods: {
-        checkedChange (event) {
-          console.log(event.target.checked);
-          this.$emit('change', event.target.checked);
-        }
-      },
-      watch: {
-      },
     };
 
     /**
-     * 在使用组件的时候，希望直接在组件的根元素上绑定事件，可以使用native修饰符，@click.native=""
-     * 但是有时候，想要绑定绑定事件的元素并不是组件的根元素，例如<div><input /></div>是组件myInput的template，<MyInput @focus.native="" /> 该事件就没有任何的意义
-     * $listeners可以获取在组件上绑定的包括自定义事件在内的所有事件（即使该事件是不存在的），除了用了native修饰符
+     * 在使用组件的时候，希望直接在组件的根元素上绑定事件，可以使用 native 修饰符，@click.native=""
+     * 但是有时候，想要绑定绑定事件的元素并不是组件的根元素，例如 <div><input /></div> 是组件 myInput 的 template，<MyInput @focus.native="" /> 该事件就没有任何的意义
+     * $listeners 可以获取在组件上绑定的包括自定义事件在内的所有事件（即使该事件是不存在的），除了用了 native 修饰符
     */
     const ChildComponent3 = {
-      props: {
-      },
-      data: vm => ({
-      }),
-
-
-      computed: {
+      props: {},
+      data: vm => ({}),
+      computed: {},
+      watch: {},
+      mounted () {
+        // 会将组件上所有绑定的事件打印出来，除了绑定了 .native 修饰符的
+        console.log(this.$listeners);
       },
       methods: {
         textInput () {
           this.$emit('textInput');
         },
-      },
-      watch: {
-      },
-      mounted () {
-        // 会将组件上所有绑定的事件打印出来，除了绑定了.native修饰符的
-        console.log(this.$listeners);
       },
       template:
         `
@@ -127,8 +114,8 @@
     };
 
     /**
-     * 传入到组件的prop prop1在组件内部如果要修改的时候，一般会this.$emit('update:prop1', data1)，在父组件来进行更新；在组件引用时 @update:prop1="data=> {prop1 = data}"
-     * :prop1.sync="prop1" 就能省略v-on的部分
+     * 传入到组件的 prop prop1 在组件内部如果要修改的时候，一般会 this.$emit('update:prop1', data1)，在父组件来进行更新；在组件引用时 @update:prop1="data=> {prop1 = data}"
+     * :prop1.sync="prop1" 就能省略 v-on 的部分
     */
     const ChildComponent4 = {
       props: {
@@ -145,10 +132,8 @@
           validator: () => true,
         }
       },
-      data: vm => ({
-      }),
-      computed: {
-      },
+      data: vm => ({}),
+      computed: {},
       methods: {
         updateProp1 () {
           this.$emit('update:prop1', 'newData');
@@ -157,8 +142,7 @@
           this.$emit('update:prop2', 'newData2')
         },
       },
-      watch: {
-      },
+      watch: {},
       template:
         `
         <div>
@@ -172,19 +156,18 @@
 
     new Vue({
       el: '#root',
-      data: vm => ({
-        testChecked: false,
-        testLisetners: true,
-        testUpdate: '',
-        testSync: '',
-      }),
       components: {
         ChildComponent1,
         ChildComponent2,
         ChildComponent3,
         ChildComponent4
       },
-
+      data: vm => ({
+        testChecked: false,
+        testLisetners: true,
+        testUpdate: '',
+        testSync: '',
+      }),
       methods: {
         clickChild1Btn (data) {
           console.log('执行了自定义事件clickChild1Btn，' + '参数为：' + data);
