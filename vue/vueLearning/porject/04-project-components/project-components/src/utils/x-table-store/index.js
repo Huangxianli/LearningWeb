@@ -36,7 +36,8 @@ export class Store {
     this.view.total = total;
   }
   set currentPage (currentPage) {
-    this.view.currentPage = currentPage;
+    // this.view.currentPage = currentPage;
+    Vue.set(this.view, 'currentPage', currentPage);
   }
   set pageSize (pageSize) {
     this.view.pageSize = pageSize;
@@ -50,12 +51,15 @@ export class Store {
 
   constructor(tableData = [], filter = {}) {
     this.view = {};
+    this.pageSize = this.pageSizes[0];
+
     Vue.set(this.view, 'tableData', tableData);
     Vue.set(this.view, 'filter', filter);
     Vue.set(this.view, 'total', 0);
     Vue.set(this.view, 'currentPage', 1);
     Vue.set(this.view, 'pageSize', this.pageSizes[0]);
     Vue.set(this.view, 'status', REQUEST_STATUS.UN_START);
+    Vue.observable(this.view)
     this.params = {};
     this.filter = filter;
     this.filterParams = {}; // 请求的时候，搜索表单的参数，只有点击搜索的时候才更新，点击页码的时候不更新
@@ -90,8 +94,11 @@ export class Store {
       this.#tableAllData = this.staticTableData;
       this.tableData = this[setTableData]({ currentPage, pageSize });
       this.total = this.#tableAllData.length;
+      // this.currentPage = 1;
+      debugger
+
       this.currentPage = currentPage;
-      this.pageSize = pageSize;
+      // this.pageSize = pageSize;
       return;
     }
     this.status = REQUEST_STATUS.LOADING;

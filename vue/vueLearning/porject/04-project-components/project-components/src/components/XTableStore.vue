@@ -3,6 +3,9 @@
     <el-table v-bind="$attrs" :data="store.tableData" size="mini" v-loading="store.status === REQUEST_STATUS.LOADING">
       <slot></slot>
     </el-table>
+    <div>
+      {{ store.currentPage }}
+    </div>
     <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange"
       :current-page="store.currentPage" :page-sizes="store.pageSizes" :page-size="store.pageSize"
       layout="total, sizes, prev, pager, next, jumper" :total="store.total" :pager-count="5">
@@ -32,6 +35,11 @@ export default {
       type: Object,
     }
   },
+  data () {
+    return {
+      aaa: 10
+    }
+  },
   computed: {
     REQUEST_STATUS () {
       return REQUEST_STATUS;
@@ -50,6 +58,13 @@ export default {
 
     handleCurrentChange (currentPage) {
       this.store.load({ currentPage });
+
+      setTimeout(() => {
+        console.log('this.store.currentPage')
+        console.log(this.store.currentPage)
+        console.log(this.store)
+        this.aaa = 1;
+      }, 10000);
     },
   }
 }

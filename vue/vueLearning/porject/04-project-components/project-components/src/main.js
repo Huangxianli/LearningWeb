@@ -3,15 +3,18 @@ import VueRouter from 'vue-router';
 import ElementUI from 'element-ui';
 import 'element-ui/lib/theme-chalk/index.css';
 
-import ajax from '@/ajax/index.js'
 import App from './App.vue';
 import router from './router';
+
+import ajax from '@/ajax/index.js'
+import ajax1 from '@/components1/ajax';
 
 Vue.use(VueRouter);
 Vue.use(ElementUI);
 Vue.config.productionTip = false;
 
 Vue.prototype.$ajax = ajax;
+Vue.prototype.$ajax1 = ajax1;
 
 new Vue({
   router,
