@@ -14,18 +14,18 @@
  */
 
 /*
-promise 的特点：
-1、promise对象的状态不受外部的影响。
-  pending、fulfilled、rejected。只有异步执行的结果可以决定当前是出于什么状态，其他的任何操作都无法改变这个状态。这也是promise名字的来源。
-2、一旦对象的状态发生了改变，就不会再变了。只能从pending到fulfilled或者rejected。
+Promise 的特点：
+1、Promise 对象的状态不受外部的影响。
+  pending、fulfilled、rejected。只有异步执行的结果可以决定当前是出于什么状态，其他的任何操作都无法改变这个状态。这也是 Promise 名字的来源。
+2、一旦对象的状态发生了改变，就不会再变了。只能从 pending 到 fulfilled 或者 rejected。
 
 缺点：
-1、无法取消promise，一旦建立就会立即执行，无法中途取消。
-2、如果不设置回调函数，promise内部的错误，不会返回发到外部。
-3、当处于pendinig状态的时候，无法知道是刚开始还是即将完成
+1、无法取消 Promise，一旦建立就会立即执行，无法中途取消
+2、如果不设置回调函数，Promise 内部的错误，不会返回发到外部
+3、当处于 pendinig 状态的时候，无法知道是刚开始还是即将完成
  */
 
-function setPromiseResult (successCall, failCall, asyncDoing = () => { isSuccess: true }, time = 0) {
+function setPromiseResult (successCall, failCall, asyncDoing = () => ({ isSuccess: true }), time = 0) {
   setTimeout(() => {
     const { isSuccess, value } = asyncDoing();
     if (isSuccess) {
@@ -38,14 +38,15 @@ function setPromiseResult (successCall, failCall, asyncDoing = () => { isSuccess
 
 function createPromise (asyncDoing, time = 0) {
   const promise = new Promise((resolve, reject) => {
-    // console.log("这里内容在编译到这里的时候会立即执行"); // 记住： new Promise的回调函数的内容在new的时候就会执行，除非是代码本身就是异步的
+    // console.log("这里内容在编译到这里的时候会立即执行");
+    // 记住： new Promise(() => { }) 里的回调函数的内容在 new 的时候就会执行，除非是代码本身就是异步的
     const successDoing = function (value) {
       resolve(value);
     };
     const failDoing = function (error) {
       reject(error);
     }
-    setPromiseResult(successDoing, failDoing, asyncDoing, time);
+    setPromiseResult(successDoing, failDoing, asyncDoing, time); // 立马执行
   })
   return promise;
 }
