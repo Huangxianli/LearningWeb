@@ -274,11 +274,17 @@ function test6 () {
   let p8 = new Promise(resolve => { resolve(Promise.resolve()) }).then(() => { console.log(1) });
   let p9 = new Promise(resolve => { resolve() }).then(console.log(2));
 
-  let p10 = new Promise(resolve => { resolve(new Promise(res => { res() })) }).then(() => { console.log(1) });
+  let p10 = new Promise(resolve => { resolve(new Promise(res => { res() })) })
+    .then(() => { console.log(1) });
   // 这里 resolve 一个 promise 后面的 then 会被加在第二轮微任务队列的末尾，为什么会这样？？？
-  let p11 = new Promise(resolve => { resolve() }).then(() => { console.log(2) });
-  let p12 = new Promise(resolve => { resolve() }).then(() => { console.log(3) }).then(() => { console.log(4) }).then(() => { console.log(5) });
+  let p11 = new Promise(resolve => { resolve() })
+    .then(() => { console.log(2) });
+  let p12 = new Promise(resolve => { resolve() })
+    .then(() => { console.log(3) })
+    .then(() => { console.log(4) })
+    .then(() => { console.log(5) });
   // 2 3 4 1 5
+
   let p13 = new Promise(resolve => { resolve() });
   console.log(p13);
   let p14 = new Promise(resolve => { resolve() }).then();
