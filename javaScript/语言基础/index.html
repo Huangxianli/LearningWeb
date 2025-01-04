@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>js语言基础</title>
+  <script type="text/javascript" src="./content/控制跳转语句.js" defer="defer"></script>
+</head>
+
+<body>
+
+  <script>
+    Function.prototype.MyBind = function () {
+      console.log("myBind", this);
+    }
+    let a = function () { };
+    let arr = [a];
+    a.MyBind()
+    arr[0].MyBind()
+    let obj = {
+      a: 12,
+      b: a1
+    }
+    function a1 () {
+      console.log(
+        "this.a", this.a
+      )
+    }
+    obj.b();
+    let arr1 = [obj];
+    arr1[0].b();
+
+    let c1 = function () {
+      console.log("c1-this", this)
+    }
+
+    c1();
+    let arr3 = [c1];
+    arr3[0]();
+    let arr4 = {
+      0: c1
+    }
+    // arr4.0()
+    console.log("---------------------")
+    function test () {
+      console.log(a);
+      {
+        function a () {
+        }
+      }
+    }
+    console.log(ddddd);
+    test();
+  </script>
+</body>
+
+</html>

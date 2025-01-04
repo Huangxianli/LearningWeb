@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>添加交互</title>
+
+  <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+
+<body>
+  <div id="root"></div>
+
+  <script type="text/babel">
+    // 响应事件
+    function ChildComponent1 () {
+      const clickBtn = function () {
+        const inputDom = document.getElementById('child-component-1-input');
+        inputDom.focus();
+      };
+      return (
+        <>
+          <label htmlFor="child-component-1-input">输入框：</label>
+          <input id='child-component-1-input' type='text' placeholder='请输入' />
+          <button onClick={clickBtn}>点击</button>
+        </>
+      );
+    };
+
+    // State：组件的记忆
+    function ChildComponent2 () {
+
+      const [count, setCount] = useState(0);
+      const addCount = function () {
+        count++;
+      };
+      return (
+        <>
+          <div>{count}</div>
+          <button onClick={addCount}>增加</button>
+        </>
+      );
+    };
+
+
+    function RootComponent () {
+      return (
+        <>
+          <ChildComponent1 />
+          <ChildComponent2 />
+        </>
+      );
+    };
+
+    const container = document.getElementById('root');
+    const root = ReactDOM.createRoot(container);
+    root.render(<RootComponent />)
+  </script>
+</body>
+
+</html>

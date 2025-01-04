@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>组件注册</title>
+</head>
+
+<body>
+  <div id="root"></div>
+  <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+  <script type="text/x-template" id="childComponent3">
+    <section>
+      <div>这里是childComponent3</div>
+      <br />
+      <div>
+        这里是childComponent3中使用的ChildComponent2
+        <ChildComponent2/>
+      </div>
+    </section>
+  </script>
+  <script type="module">
+    import ChildComponent4 from './ChildComponent4.js';
+    /**
+     * 在单文件组件和字符串模板中，尽量用大驼峰的写法
+     * 在DOM模板中只能使用 my-component （由于其大小写不敏感）
+     * 如果组件名称最终是大驼峰的写法，在模板中使用，两种方法都可以；如果组件的名称最终是kebab-case的写法，那么在模板中只能使用kebab-case的写法
+    */
+    Vue.component('ChildComponent1', {
+      components: {},
+      props: {},
+      data: vm => ({}),
+      computed: {},
+      watch: {},
+      methods: {},
+      template:
+        `
+        <div>全局注册组件ChildComponent1</div>
+        `,
+    });
+
+
+    /**
+     * 局部组件
+    */
+    const ChildComponent2 = {
+      props: {},
+      data: vm => ({}),
+      computed: {},
+      watch: {},
+      methods: {},
+      template:
+        `
+        <div>
+          <div>ChildCompoent2</div>
+        </div>
+        `
+      ,
+    };
+
+    const ChildComponent3 = {
+      components: {
+        ChildComponent2,
+      },
+      template: "#childComponent3"
+    };
+
+
+    new Vue({
+      el: '#root',
+      components: {
+        ChildComponent2,
+        ChildComponent3,
+        ChildComponent4
+      },
+      data: vm => ({}),
+      template:
+        `
+        <div>
+          <!-- 由于组件名称最终是大驼峰的写法，这里也可以使用kwbab-case方式 -->
+          <ChildComponent1 />
+          <hr />
+          <ChildComponent2 />
+          <hr />
+          <childComponent3 />
+          <hr />
+          <ChildComponent4 />
+        </div>
+        `
+      ,
+    });
+  </script>
+</body>
+
+</html>

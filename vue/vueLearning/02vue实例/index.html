@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>vue实例</title>
+</head>
+
+<body>
+  <div id="root"></div>
+  <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+  <script>
+    const childCompoent1 = {
+      data: vm => ({
+        childData1: vm.formFather
+      }), // 如果使用箭头函数，里面的this就不指向当前vue实例，但是箭头函数的第一个参数表示当前实例
+      props: {
+        formFather: '',
+      },
+      template: `<span>这里是子组件，formFatrher：{{formFather}}，childData1：{{childData1}}</span>`,
+    };
+
+    const ChildCompoent2 = {
+      data () {
+        return {
+          child2Data1: 1,
+        }
+      },
+      mounted () {
+        setTimeout(() => {
+          this.child2Data1 = {};
+        }, 5000);
+      },
+      template: `
+        <div>
+          <span>这里是子组件2，child2Data1：{{child2Data1}}</span>
+        </div>
+      `,
+    };
+    const symbol1 = Symbol.for('symbol1');
+    let data1 = {
+      a: 1,
+      b: {
+        [symbol1]: 'symbol1'
+      },
+      c: {
+        c1: 1,
+        c2: Symbol(),
+      },
+      d: {
+        d1: new Map([
+          ['a', 1],
+          ['b', 2],
+        ]),
+        d2: new Set([1, 2, 3]),
+      },
+      e: symbol1
+    };
+    console.log(data1);
+
+    const vm = new Vue({
+      el: '#root', // el确定了vue最终要挂载的地方
+      data: data1, // new实例的时候，会将data1对象中的property加入到响应式系统中，当property对应的内容发生改变的时候，视图会自动更新
+      components: {
+        'child-compoent1': childCompoent1,
+        ChildCompoent2,
+      },
+      template: // 使用了template的话，template的内容会覆盖el对应的元素
+        `
+        <div>
+          <span>这里是父的data
+            <br />
+            a：{{a}}，
+            <br />
+            b：{{b}}，
+            <br />
+            b[symbol1]: {{b[e]}}
+            <br />
+            c：{{c}}，
+            <br />
+            c.c2：{{c.c2}}
+            <br />
+            d：{{d}}
+            <br />
+            d.d1: {{d.d1}}
+            <br />
+            d.d2: {{d.d2}}
+            </span>
+          <br/>
+          <child-compoent1 formFather="123"/>
+          <br />
+          <ChildCompoent2 />
+        </div>
+        `,
+      // 注意 b 只会显示 {}，b 里面的内容不会显示，因为 b 里面的属性都是 Symbol 类型的属性，c 中不会显示 c.c2 的内容，连属性 c2 都不会显示，因为 c.c2 对应的值是一个 Symbol 类型的值，但是如果单独的将 c.c2 拎出来，就会显示 c.c2 的值；d 中 d1 和 d2 会显示成 {}，但是单独拎出来显示的是 [Object Map] [Obeject Set]
+      /* 
+        这里是父的data
+        a：1，
+        b：{}，
+        c：{ "c1": 1 }，
+        c.c2：Symbol()
+        d：{ "d1": {}, "d2": {} }
+        d.d1: [object Map]
+        d.d2: [object Set]
+       */
+    });
+
+    // 注意这里两个对象是完全一样
+    console.log('data1 === vm.$data: ', data1 === vm.$data); // data1 === vm.$data:  true
+    console.log('vm.$data: ', vm.$data); // 在浏览器打印中可以看到 __ob__ get set
+
+    function changeData () {
+      setTimeout(() => {
+        data1.a = 12;
+        data1.b[symbol1] = 12; // 这里视图更新了的原因是因为，其他的属性一起修改了，视图的更新是其他的属性触发的，只是在更新视图的时候，读取到了最新的这个属性的值，如果单独的只更新这个属性，是不会触发视图的更新的
+        data1.c.c1 = 12;
+        // 注意这里不会中断data1.c的响应式
+        data1.c = {}
+        // 从下面这一步开始就已经中断了 data1 的响应式
+        data1 = {};
+        data1.a = 0;
+        console.log(JSON.parse(JSON.stringify(vm.$data))); // 注意这种写法会将以Symbol类型作为key或者value的属性丢失掉，同时map和set都会变成“{}”，并不能还原到原来的对象，和官网的说法有差异 https://v2.cn.vuejs.org/v2/api/#data
+      }, 1000);
+    };
+    // changeData();
+
+    function changeDataB () {
+      setTimeout(() => {
+        data1.b[symbol1] = 13;
+      }, 1000);
+    };
+    changeDataB();
+  </script>
+</body>
+
+</html>

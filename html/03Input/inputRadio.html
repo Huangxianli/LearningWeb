@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>inputRadio</title>
+</head>
+
+<body>
+  <section>
+    <!-- 
+    相同 name inputRadio 会被单程一组单选，它们的选中状态是互斥的，即使是通过代码设置，它们也是互斥的
+    注意这里的 value 主要用来提交的时候使用，和界面展示没有什么关系
+    使用 checked 和 change 事件来处理
+      -->
+    <label>
+      <input id="inputRadio1" type="radio" value="Y" name="YesOrNo" />
+      是
+    </label>
+    <label>
+      <input id="inputRadio2" type="radio" value="N" name="YesOrNo" />
+      否
+    </label>
+  </section>
+
+  <script type="text/javascript">
+    const Radio1 = document.getElementById('inputRadio1');
+    const Radio2 = document.getElementById('inputRadio2');
+
+    setTimeout(() => {
+      Radio1.checked = true;
+    }, 1000);
+
+    setTimeout(() => {
+      Radio2.checked = true; // 通过代码手动的修改不会触发 change 事件
+      Radio1.checked; // false
+      debugger
+    }, 2000);
+
+    Radio1.addEventListener('change', (e) => {
+      debugger
+      e.target.checked;
+    });
+    Radio2.addEventListener('change', (e) => {
+      debugger
+      e.target.checked;
+    });
+
+
+  </script>
+</body>
+
+</html>

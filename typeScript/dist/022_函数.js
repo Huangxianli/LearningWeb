@@ -6,11 +6,31 @@ function print(a) {
     console.log(a);
 }
 greeter(print);
+let function1 = function (aaa, bbb) {
+    return "";
+};
+function1(1, "1");
+let function2 = function () {
+    return "";
+};
+function2(1, "");
+let function3 = function (a) {
+    return a;
+};
+function3.length = 2;
+let canIndex1 = {
+    0: false,
+    "nihao": false,
+};
+// interface DescripFunction {
+//   description: string,
+//   (arg: number): string
+// }
 function doSomething(fn) {
-    console.log(fn.description + fn(1));
+    console.log(fn.description + fn(1, 2, "2"));
 }
-function fn(n) {
-    return String(n);
+function fn(n, m, z) {
+    return String(n) + String(m) + String(z);
 }
 fn.description = "hello World";
 doSomething(fn);
@@ -25,7 +45,6 @@ class Ctor {
 function fn1(class1) {
     return new class1("huangxianli");
 }
-t;
 function fn2(fn) {
     let d = new fn("2023-12-01");
     let s = fn();
@@ -41,6 +60,11 @@ function firstElement(arr) {
 firstElement([1, 2, 3]);
 firstElement(["1", "2", "3"]); // 前面这两种调用方式都是可以的
 // firstElement<string>([1,2,3]) // 这种调用方式会有问题
+function firstElement4(arr) {
+    return arr[0];
+}
+;
+firstElement4([]);
 function map_1(arr, fun) {
     return arr.map(fun);
 }
@@ -124,6 +148,7 @@ myForEach([1, 2, 1], (arr, i) => {
     // console.log(i.toFixed()) // 这里的编译会报出问题，因为前面定义的时候，定义了该回调参数的第二个参数是可选的，不一定可以使用这个参数 
 });
 function makeDate(mOrTimestamp, d, y) {
+    // 由于第一个重载签名只有一个入参，所以这里的d和y要是可选的
     if (d !== undefined && y !== undefined) {
         return new Date(y, mOrTimestamp, d);
     }
@@ -136,7 +161,7 @@ makeDate(12, 12, 12);
 function len(x) {
     return x.length;
 }
-// len(Math.random() > 0.5 ? "hello" : [4, 5]); // 这里编译会报错，现在函数的入参满足的是string | any[]，而不是满足重载签名中的一个
+// len(Math.random() > 0.5 ? "hello" : [4, 5]); // 这里编译会报错，现在函数的入参满足的是string | any[]，而不是满足重载签名中的一个，也就是说，推断的结果必须要100%的包含在去一个重载签名内
 // let a = Math.random() > 0.5 ? "hello" as string : [4, 5];
 // len(a);
 function lenGood(x) {
@@ -144,5 +169,33 @@ function lenGood(x) {
 }
 lenGood(Math.random() > 0.5 ? "hello" : [4, 5]);
 /*
-函数内的this声明
- */ 
+手动的声明this
+ */
+/*
+形参展开
+ */
+function multiply(n, ...m) {
+    return m.map(x => n * x);
+}
+multiply(11, 12, 12, 12, 1);
+/*
+实参展开
+ */
+const arr_1 = [];
+const arr_2 = [12, 2, 1];
+arr_1.push(...arr_2);
+const args = [8, 3];
+Math.atan2(...args); // 这里atan2只接收两个参数，但是args其实在ts看来其中的内容是可变的，不一定是两个
+/*
+参数解构
+ */
+function sum({ a = 1, b = 2, c = 3 } = { a: 1, b: 2, c: 3 }) {
+    console.log(a + b + c); // a,b,c是从对象中结构出来的
+}
+sum({ a: 1, b: 2, c: 3 });
+sum();
+const f1 = () => true;
+const result1 = f1(); // 这里的result1会被判断成void类型
+function f2() {
+    // return true // 字面量函数的写法，返回定义了是void之后，在函数中就不能返回
+}

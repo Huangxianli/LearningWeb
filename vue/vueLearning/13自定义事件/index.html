@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>自定义事件</title>
+</head>
+
+<body>
+  <div id="root"></div>
+  <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+  <script>
+    /**
+     * v-on 的绑定，在 DOM 模板中会自动的转化成全小写（因为 v-on 绑定的事件名不会被当成 property，所以小驼峰的方式不会转化成 kebab-case 的写法），v-on:myEvent 会转化成 v-on:myevent，在字符串模板中不会转
+     * 推荐$emit('kebab-case'); v-on:kebab-case 的写法注册和绑定自己的事件
+    */
+    const ChildComponent1 = {
+      props: {},
+      data: vm => ({}),
+      computed: {},
+      watch: {},
+      methods: {
+        clickBtn () {
+          this.$emit('clickChild1Btn', 'clickChild1Btn事件');
+          this.$emit('click-child-btn-kebab-case', 'click-child-btn-kebab-case');
+        },
+      },
+      template:
+        `
+        <div>
+          <div>ChildCompoent1</div>
+          <button @click="clickBtn">点击按钮</button>
+        </div>
+        `
+      ,
+    };
+
+    /**
+     * 在组件上使用v-model的时候，默认的是 :value="" @input=""，
+     * model属性支持我们在组件上使用v-model的时候，自己指定使用的是哪个property和event
+     * model: {
+     *   prop: '',
+     *   event: '',
+     * }
+    */
+    const ChildComponent2 = {
+      // v-model="data1" => v-bind:checked="data1" @change="data => data1 = data"
+      model: {
+        prop: 'checked',
+        envent: 'change'
+      },
+      props: {
+        labelName: {
+          type: String,
+          default: '',
+          required: true,
+          validator: () => true,
+        },
+        checked: {
+          type: Boolean,
+          default: () => false,
+          required: true,
+          validator: () => true,
+        },
+      },
+      data: vm => ({}),
+      computed: {},
+      watch: {},
+      methods: {
+        checkedChange (event) {
+          console.log(event.target.checked);
+          this.$emit('change', event.target.checked);
+        }
+      },
+      template:
+        `
+        <div>
+          <div>ChildComponent2</div>
+          <label for="checkbox1">{{labelName}}</label>
+          <input type="checkbox" id="checkbox1" :checked="checked" @change="checkedChange" />
+        </div>
+        `
+      ,
+    };
+
+    /**
+     * 在使用组件的时候，希望直接在组件的根元素上绑定事件，可以使用 native 修饰符，@click.native=""
+     * 但是有时候，想要绑定绑定事件的元素并不是组件的根元素，例如 <div><input /></div> 是组件 myInput 的 template，<MyInput @focus.native="" /> 该事件就没有任何的意义
+     * $listeners 可以获取在组件上绑定的包括自定义事件在内的所有事件（即使该事件是不存在的），除了用了 native 修饰符
+    */
+    const ChildComponent3 = {
+      props: {},
+      data: vm => ({}),
+      computed: {},
+      watch: {},
+      mounted () {
+        // 会将组件上所有绑定的事件打印出来，除了绑定了 .native 修饰符的
+        console.log(this.$listeners);
+      },
+      methods: {
+        textInput () {
+          this.$emit('textInput');
+        },
+      },
+      template:
+        `
+        <div>
+          <div>ChildComponent3</div>
+          <input type="text" @input="textInput" v-on="$listeners"/>
+        </div>
+        `
+      ,
+    };
+
+    /**
+     * 传入到组件的 prop prop1 在组件内部如果要修改的时候，一般会 this.$emit('update:prop1', data1)，在父组件来进行更新；在组件引用时 @update:prop1="data=> {prop1 = data}"
+     * :prop1.sync="prop1" 就能省略 v-on 的部分
+    */
+    const ChildComponent4 = {
+      props: {
+        prop1: {
+          type: String,
+          required: true,
+          default: '',
+          validator: () => true,
+        },
+        prop2: {
+          type: String,
+          required: true,
+          default: '',
+          validator: () => true,
+        }
+      },
+      data: vm => ({}),
+      computed: {},
+      methods: {
+        updateProp1 () {
+          this.$emit('update:prop1', 'newData');
+        },
+        updateProp2 () {
+          this.$emit('update:prop2', 'newData2')
+        },
+      },
+      watch: {},
+      template:
+        `
+        <div>
+          <div>ChildComponent4</div>
+          <button @click="updateProp1">通知父组件更新prop1</button>
+          <button @click="updateProp2">通知父组件更新prop2></button>
+        </div>
+        `
+      ,
+    };
+
+    new Vue({
+      el: '#root',
+      components: {
+        ChildComponent1,
+        ChildComponent2,
+        ChildComponent3,
+        ChildComponent4
+      },
+      data: vm => ({
+        testChecked: false,
+        testLisetners: true,
+        testUpdate: '',
+        testSync: '',
+      }),
+      methods: {
+        clickChild1Btn (data) {
+          console.log('执行了自定义事件clickChild1Btn，' + '参数为：' + data);
+        },
+        clickChildBtnKeababCase (data) {
+          console.log('执行了自定义事件clickChild1BtnKebabCase，' + '参数为：' + data);
+        },
+        foucsEvent () {
+          console.log('执行了focus事件');
+          this.testLisetners = !this.testLisetners;
+          console.log('this.testLisetners：', this.testLisetners);
+        },
+      },
+      watch: {
+        testUpdate: {
+          handler (newValue) {
+            console.log('watch testUpdate：', this.testUpdate);
+          },
+        },
+        testSync (newData) {
+          console.log('watch testSync：', this.testSync)
+        },
+      },
+      template:
+        `
+        <div>
+          <ChildComponent1 @clickChild1Btn="clickChild1Btn" @click-child-btn-kebab-case="clickChildBtnKeababCase" />
+          <hr />
+          <ChildComponent2 labelName="测试checkbox" v-model="testChecked"/>
+          <!-- 两个的写法是等同的 -->
+          <!-- <ChildComponent2 labelName="测试checkbox" :checked="testChecked" @change="data => testChecked = data "/> -->
+          <hr />
+          <ChildComponent3 @textInput="() => {}" @focus="foucsEvent" @input.native="() => {}" @adn="() => {}"/>
+          <hr />
+          <ChildComponent4 :prop1="testUpdate" @update:prop1="testUpdate = $event" :prop2.sync="testSync"/>
+        </div>
+        `
+      ,
+    });
+  </script>
+</body>
+
+</html>

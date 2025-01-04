@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>列表循环</title>
+</head>
+
+<body>
+  <div id="root"></div>
+  <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+  <script>
+
+    /**
+     * 在 vue2 中，如果是 v-for 渲染的元素，其中的顺序该变了，vue2 不会移动 DOM 元素，而是就地的更新每个元素，确保他们在每个位置上正确渲染就可以了
+     * 虽然高效，但是在了不依赖临时 DOM 状态（前面的表单切换但是输入）和不依赖子组件状态是才有效
+     * 其他的时候要加个 key，让 vue 能够更好的重用和重新排序现有元素
+     * key 请使用字符串或者数字类型
+    */
+
+    /**
+     * v-for 为什么不推荐与 v-if 一起使用
+     * v-for 的优先级与 v-if 要高，两个同时出现的时候，无论是什情况都会先执行 v-for 然后再每次迭代中项中判断该项是否渲染（注意，如果是 v-if 为 false，则不会渲染）
+     * 1、循环列表根据某一属性来判断是否显示的时候，会遍历所有的数据，再判断是否要渲染，而且如果是组件里的模板重新渲染但是列表数据没有变的话，又会导致重新遍历所有的数据，可以先将要渲染的内容提取成一个 computed 再 v-for，
+     * 1.1 将逻辑与显示分开，
+     * 1.2 如果组件内部触发重新渲染但不是数据改变的时候，渲染时，无需重新遍历所有列表数据
+     * 1.3 组件内触渲染的时候，是全部重新渲染，还是说会复用一些没有变的？？？
+     * 2、判断整个列表是否要显示，应该将 v-if 放在 v-for 的外面判断，这样只有显示的时候才会去执行 v-for
+    */
+
+    /**
+     * v-for 遍历数组
+     * 数组中，push、pop、shift、unshift、splice、sort、reverse 才能触发视图的更新
+    */
+    const ChildComponent1 = {
+      props: {
+      },
+      data: vm => ({
+        todoList: [
+          { [Symbol.for('for1')]: 1, only: Symbol(), id: 123, eventName: '事件1', isDown: false },
+          { [Symbol.for('for1')]: 2, only: Symbol(), id: 1232, eventName: '事件2', isDown: true },
+          { [Symbol.for('for1')]: 3, only: Symbol(), id: 1562, eventName: '事件3', isDown: true },
+          { [Symbol.for('for1')]: 4, only: Symbol(), id: 12332, eventName: '事件4', isDown: false },
+          { [Symbol.for('for1')]: 5, only: Symbol(), id: 1233, eventName: '事件5', isDown: false }
+        ]
+      }),
+      computed: {},
+      watch: {},
+      beforeCreate () {
+        Math.Symbol1 = Symbol.for('for1');
+      },
+      methods: {
+        console1 () {
+          console.log('执行了console1'); // 只执行了两次
+        },
+      },
+      template:
+        `
+        <div>
+          <div>ChildComponent1</div>
+          <ul>
+            <!-- <template v-for="(item ,index) in todoList" >-->
+            <template v-for="(item ,index) of todoList" >
+              <li :key="item.id">
+                <span>{{item.eventName}}</span>
+                <span v-if="item.isDown" >已完成</span>
+                <span v-else >未完成</span>
+                <span>{{item[Math.Symbol1]}}</span>
+                <span>{{item.only}}</span>
+              </li>
+            </template>
+            <li v-for="(item ,index) of todoList" v-if="item.isDown">{{console1()}}</li>
+          </ul>
+        </div>
+        `
+      ,
+
+    }
+
+    /**
+     * v-for 遍历对象和 Object.keys() 实现一样，无法保证遍历的顺序，无法获取到 key 为 Symbol 值的 value
+     * 会遍历 value 为 Map 或者 Set
+    */
+    const ChildComponent2 = {
+      props: {
+      },
+      data: vm => ({
+        listObj: {
+          [Symbol()]: 1,
+          [Symbol()]: 2,
+          [Symbol()]: 3,
+          4: 4
+        },
+        listObj1: {
+          1: Symbol(),
+          2: Symbol(),
+          3: Symbol(),
+        },
+        listObj2: {
+          1: new Map(),
+          2: new Map(),
+          3: new Map(),
+        },
+        listObj3: {
+          1: new Set(),
+          2: new Set(),
+          3: new Set(),
+          4: new Set(),
+        },
+        listObj4: new Map([[1, 1], [2, 2]]),
+        listObj5: new Set([1, 2, 3, 4])
+      }),
+      computed: {},
+      watch: {},
+      methods: {},
+      template:
+        `
+        <div>
+          <div>ChildComponent2</div>
+          <div>遍历key为Symbol的对象</div>
+          <ul>
+            <template v-for="(value,key) in listObj">
+              <li :key="key">{{value}}</li>
+            </template>
+          </ul>
+          <div>遍历value为Symbol的对象</div>
+          <ul>
+            <li v-for="value in listObj1">{{value}}</li>
+          </ul>
+          <div>遍历value为Map的对象</div>
+          <ul>
+            <li v-for="value in listObj2">{{value}}</li>
+            <!--[object Map]-->
+          </ul>
+          <div>遍历value为Set的对象</div>
+          <ul>
+            <li v-for="value in listObj3">{{value}}</li>
+            <!--[object Set]-->
+          </ul>
+          <div>遍历Map对象</div>
+          <ul>
+            <li v-for="value in listObj4">{{value}}</li>
+            <!--[ 1, 1 ]-->
+          </ul>
+          <div>遍历Set对象</div>
+          <ul>
+            <li v-for="value in listObj5">{{value}}</li>
+            <!--1-->
+          </ul>
+        </div>
+        `
+      ,
+    };
+
+
+    const ChildCompoenent4 = {
+      beforeCreate () {
+        console.log('ChildCompoenent4-beforeCreate'); // 只会打印3次
+      },
+      template: `
+        <div>
+          12312
+        </div>`,
+    };
+
+    const ChildComponent3 = {
+      components: {
+        ChildCompoenent4,
+      },
+      data: vm => ({
+        list: [
+          { id: 0 },
+          { id: 1 },
+          { id: 2 },
+          { id: 3 },
+          { id: 4 },
+          { id: 5 },
+        ]
+      }),
+      template: `
+        <div>
+          <ChildCompoenent4 v-for="item in list" v-if="item.id % 2 === 0" :key="item.id"/>
+        </div>
+      `,
+    };
+
+
+    new Vue({
+      el: '#root',
+      data: vm => ({}),
+      components: {
+        ChildComponent1,
+        ChildComponent2,
+        ChildComponent3
+      },
+      template:
+        `
+        <div>
+          <ChildComponent1 />
+          <hr />
+          <ChildComponent2 />
+          <hr />
+          <ChildComponent3 />
+        </div>
+        `
+      ,
+    });
+  </script>
+</body>
+
+</html>

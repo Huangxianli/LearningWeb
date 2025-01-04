@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>条件渲染</title>
+</head>
+
+<body>
+  <div id="root"></div>
+  <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+  <script>
+
+    /**
+     * v-if 用于条件性的渲染一块内容，最开始不渲染，只有为条件第一次为真了才开始渲染
+     * 当其指令表达式为truthy的时候才会被渲染
+     * 一定要是v-if后面的内容一定要是响应式的吗？？？
+     * 注意vue的内部会复用一些相同的html元素，例如inuput，
+    */
+    const ChildComponent1 = {
+      props: {
+      },
+      data: vm => ({
+        isActive: true,
+        showInputOne: true,
+      }),
+      computed: {
+      },
+      watch: {
+      },
+      methods: {
+        changeActive () {
+          this.isActive = !this.isActive;
+        },
+
+        changeInputShow () {
+          this.showInputOne = !this.showInputOne;
+        },
+      },
+      template:
+        `
+        <div>
+          <div>ChildComponent1</div>
+          <button @click="changeActive">点击切换显示隐藏</button>
+          <template v-if="isActive">
+            <div :style="{'height': '100px', backgroundColor: 'red' }"></div>
+          </template>
+          <div :style="{height: '10px', backgroundColor: 'green'}"></div>
+          <div v-if="isActive" :style="{'height': '100px', backgroundColor: 'red'}"></div>
+          <div :style="{heigh: '20px',backgroundColor: 'yellow'}"></div>
+          <br />
+          <button @click="changeInputShow">点击切换input</button>
+          <!-- 没有加key的时候，其实只是切换了 placeholder 的值，复用了以前的 input ，可以看输入了内容，但是切换后内容没有消失-->
+          <template v-if="showInputOne"> 
+            <input  key="1" placeholder="第一个inoput" />
+          </template>
+          <template v-else >
+            <input key="2" placeholder="第二个input" />
+          </template>
+        </div>
+        `
+      ,
+    }
+
+
+    /**
+     * v-show也用于条件渲染一块内容，开始不管是为真还是为假，都会渲染，然后根据值来进行简单的css切换
+    */
+    const ChildComponent2 = {
+      props: {
+      },
+      data: vm => ({
+      }),
+      computed: {
+      },
+      watch: {
+      },
+      methods: {
+      },
+      template:
+        `
+        <div>
+        </div>
+        `
+      ,
+    }
+
+    new Vue({
+      el: '#root',
+      components: {
+        ChildComponent1,
+      },
+      data: vm => ({}),
+      template:
+        `
+        <div>
+          <ChildComponent1 />
+        </div>
+        `
+      ,
+    });
+  </script>
+</body>

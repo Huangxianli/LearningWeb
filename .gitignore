@@ -1,0 +1,4 @@
+# git忽略的文件夹
+node_modules/
+*/node_modules/
+element-ui源码

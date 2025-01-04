@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>保持组件纯粹</title>
+
+  <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+
+<body>
+  <div id="root"></div>
+
+  <script type="text/babel">
+
+    /**
+     * 纯函数： 
+     * 1、只负责自己的任务，不会更改在该函数调用前就已经存在的变量或对象（应该视props，state，context都是只读的）
+     * 2、输入相同则输出相同
+     * 保证React组件都是纯函数
+     * 
+     */
+    function RootComponent () {
+      return (
+        <></>
+      );
+    };
+
+    const container = document.getElementById('root');
+    const root = ReactDOM.createRoot(container);
+    root.render(<RootComponent />)
+  </script>
+
+</body>
+
+</html>

@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>进入/离开&列表过渡</title>
+</head>
+
+<body>
+  <div id="root"></div>
+  <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+  <script>
+
+    /**
+     * transition封装的组件，可以在下面场景下进行进入和离开的过渡
+     * v-if/v-show/动态组件/根组件节点
+    */
+    const ChildComponent1 = {
+      props: {
+      },
+      data: vm => ({
+      }),
+      computed: {
+      },
+      methods: {
+      },
+      watch: {
+      },
+      template:
+        `
+        <div>
+          <div>ChildComponent1</div>
+        </div>
+        `
+      ,
+    };
+
+
+    new Vue({
+      el: '#root',
+      data: vm => ({}),
+      components: {
+        ChildComponent1
+      },
+      template:
+        `
+        <div>
+          <ChildCompoent1 />
+        </div>
+        `
+      ,
+    });
+  </script>
+</body>
+
+</html>

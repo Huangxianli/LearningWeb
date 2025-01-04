@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>css基础</title>
+  <style>
+    @layer test1 {
+      .test1 {
+        /* background-color: blue !important; */
+        background-color: blue;
+        /* color: white; */
+      }
+    }
+
+    @layer test2 {
+      .test1 {
+        /* background-color: blueviolet !important; */
+        background-color: blueviolet;
+        /* color: white; */
+      }
+
+
+
+      @layer test3 {
+        .test1 {
+          /* color: red !important; */
+          background-color: green;
+        }
+      }
+
+      @layer test1 {
+        .test1 {
+          /* color: yellow !important; */
+        }
+      }
+    }
+
+    .test1 {
+      /* background-color: black !important; */
+      /* background-color: black; */
+    }
+
+    @layer {
+      .test1 {
+        /* background-color: antiquewhite !important; */
+        /* background-color: antiquewhite; */
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="test1">
+    测试普通样式的中层叠层的优先权
+  </div>
+  <div style="height: 20px; margin-bottom: 20px; background-color: red;">
+  </div>
+  <div style="height: 20px; margin-top: 20px; background-color: aqua;">
+  </div>
+  <span
+    style="background-color: black; margin-top: 80px; border-top: 1px solid red; padding-top: 20px;">阿斯蒂芬流口水放假了撒会计法撒理发阿加莎浪费时间阿发里卡多设计费阿萨法萨菲隆打开撒发家史发啦甲方沙发</span>
+  <span style="background-color: black; margin-top: 80px; border-top: 1px solid red; padding-top: 20px;">123123</span>
+
+  <span style="margin-right: 10px;">123</span><span style="margin-left: 10px;">321</span>
+</body>
+
+</html>

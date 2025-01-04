@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>混入</title>
+</head>
+
+<body>
+  <div id="root"></div>
+  <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+
+  <script type="module">
+    import mixin from './mixin.js';
+
+    /**
+     * data会进行合并，如果重名了，就以自己组件本身的为主
+     * 同名的声明周期钩子和合并成一个数组，现执行mixin的在执行自己组件中的
+     * methods、components、derectives，混入的和自己组件内的，会合并成一个对象，有冲突取组件自己的
+    */
+    const ChildComponent1 = {
+      mixins: [mixin],
+      props: {
+      },
+      data: vm => ({
+        data1: 11,
+        data3: 33,
+      }),
+      computed: {
+      },
+      methods: {
+        clickBtn () {
+          // methods、components、derctives，都会合并成一个对象，有冲突的以组件自己定义的为准
+          console.log('测试methods、components、derctives的混入，执行了组件的methods clickBtn'); // 或执行这个方法
+        },
+      },
+      watch: {
+      },
+      beforeCreate () {
+        // 同名的声明周期钩子和合并成一个数组，现执行mixin的在执行自己组件中的
+        console.log('测试声明周期钩子的合并：执行了组件自己的beforeCreate'); // 会执行这个方法
+      },
+      mounted () {
+        // 合并data，若有冲突，以组件自己的为主
+        console.log('测试data合并的结果：', this.$data); // {data1: 11, data2: 2, data3: 33}
+      },
+      template:
+        `
+        <div>
+          <div>ChildComponent1</div>
+          <button @click="clickBtn">测试methods的合并</button>
+        </div>
+        `
+      ,
+    };
+
+
+    new Vue({
+      el: '#root',
+      data: vm => ({}),
+      components: {
+        ChildComponent1
+      },
+      template:
+        `
+  <div>
+    <ChildComponent1 />
+  </div>
+  `
+      ,
+    });
+  </script>
+</body>
+
+</html>

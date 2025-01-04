@@ -1,0 +1,27 @@
+.slot-test-2 .slot-test-2__input-add {
+  margin-right: 8px;
+}
+
+.slot-test-2 .slot-test-2__list-context {
+  list-style-type: none;
+  padding: 0;
+}
+
+.slot-test-2 .slot-test-2__list-context .slot-test-2__list-item {
+  width: 300px;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.slot-test-2__list-item-value {
+  width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  word-break: keep-all;
+}
+
+.slot-test-2__list-item-time {
+  width: 100px;
+  color: gray;
+}
