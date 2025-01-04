@@ -9,6 +9,10 @@
   - [Generator.prototype.return()](#generatorprototypereturn)
   - [next()、throw()、return() 的共同点](#nextthrowreturn-的共同点)
   - [yield\* 表达式](#yield-表达式-1)
+  - [作为对象属性的 Generator 函数](#作为对象属性的-generator-函数)
+  - [Generator 函数的 this](#generator-函数的-this)
+  - [含义](#含义)
+  - [应用](#应用)
 
 # Generator 函数的语法
 ## 简介
@@ -258,3 +262,50 @@ arr1; // [1, 2]
 
 ## yield* 表达式
 yield* 相当于又执行了一次 for...of
+如果 yield* 后面的 Generator 函数中有 return，那么 return 的内容不会被作为 { value： ..., done: } 的形式返回，但是可以接收到 return 后面返回的内容
+```js
+function *generator() {
+  yield 1;
+  return 2;
+}
+function *generator2() {
+  const a = yield generator1();
+  console.log(a);
+  yield 3;
+}
+const iterator1 = generator2();
+iterator1.next(); // { value: 1, done: false }
+iterator1.next(); // 2 { value: 3, done: false }
+iterator1.next(); // { value: undefined, done: true }
+```
+
+## 作为对象属性的 Generator 函数
+```js
+const a = {
+  *generator1() {}
+}
+```
+
+## Generator 函数的 this
+普通调用的情况下，Generator 函数中的 this 和返回的遍历器函数没有任何的关系
+Generator 函数不可以使用 new 操作符，但是生成的遍历器对象会被当成是 Generator 函数的实例
+```js
+function *generator() {
+  this.a = 1;
+  yield 1;
+}
+const iterator1 = generator();
+iterator1 instanceof generator; // true
+
+// 可以使用 call 的方式将 this 和 生成的 iterator 对象关联起来
+const iterator2 = generator.call(generator.prototype)
+// 这里因为 iterator2 本身的 [Prototype] 指向的就是 generator.protorype 的，iterator2 上找不到的内容就会去 generator.prototype 上去找
+```
+
+## 含义
+
+## 应用
++ 异步操作的同步化表达式
++ 控制流管理
++ 部署 iterator 接口
++ 作为数据结构
