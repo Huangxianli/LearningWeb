@@ -94,11 +94,8 @@ export class Store {
       this.#tableAllData = this.staticTableData;
       this.tableData = this[setTableData]({ currentPage, pageSize });
       this.total = this.#tableAllData.length;
-      // this.currentPage = 1;
-      debugger
-
       this.currentPage = currentPage;
-      // this.pageSize = pageSize;
+      this.pageSize = pageSize;
       return;
     }
     this.status = REQUEST_STATUS.LOADING;
