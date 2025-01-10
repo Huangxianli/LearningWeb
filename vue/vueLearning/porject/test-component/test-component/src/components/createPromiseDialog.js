@@ -1,12 +1,17 @@
 import Vue from 'vue';
 import { Dialog } from 'element-ui';
 
-import DialogFooterButton from './DialogFooterButton.vue';
+// import DialogFooterButton from './DialogFooterButton.vue';
 
 import { DIALOG_TYPE } from './constant';
 
 export function createPromiseDialog (component) {
-  return (componentData = {}, dialogOptions = {}) => {
+  return (componentData = {}, dialogOptions = {}, other = {
+    afterConfirm: () => undefined,
+    afterCancel: () => undefined,
+    afterClose: () => undefined
+
+  }) => {
 
     return new Promise((resolve, reject) => {
       const div = document.createElement('div');
@@ -45,25 +50,36 @@ export function createPromiseDialog (component) {
                 {
                   ref: 'componentRef',
                   props: {
-                    dialogType: componentData.type || DIALOG_TYPE.READ, // add change read
+                    dialogType: componentData.dialogType || DIALOG_TYPE.READ, // add change read
+                  },
+                  on: {
+                    clickConfirm: destroy,
+                    clickCancel: destroy,
+                    clickClose: destroy,
                   }
                 },
 
               ),
-              h(
-                DialogFooterButton,
-                {
-                  slot: 'footer',
-                  on: {
-                    clickConfim: destroy,
-                    clickCancel: destroy,
-                    clickClose: destroy,
-                  },
-                  props: {
-                    dialogType: componentData.type || DIALOG_TYPE.READ,
-                  }
-                },
-              )
+              h('div', {
+                slot: 'footer',
+                attrs: {
+                  id: 'self_promise_dialog_footer'
+                }
+              }),
+              // h(
+              //   DialogFooterButton,
+              //   {
+              //     slot: 'footer',
+              //     on: {
+              //       clickConfirm: destroy,
+              //       clickCancel: destroy,
+              //       clickClose: destroy,
+              //     },
+              //     props: {
+              //       dialogType: componentData.dialogType || DIALOG_TYPE.READ,
+              //     }
+              //   },
+              // )
             ],
           )
         }

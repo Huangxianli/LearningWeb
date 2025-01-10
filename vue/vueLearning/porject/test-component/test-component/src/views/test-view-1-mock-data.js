@@ -17,4 +17,27 @@ export const total = 304;
 
 export function queryTableData (pageSize = 5, currentPage = 1) {
   return data.slice((currentPage - 1) * pageSize, currentPage * pageSize);
+};
+
+export function queryData () {
+  return {
+    formItem1: 'formItem1',
+    formItem2: 'formItem2',
+    formItem3: 'formItem3',
+    formItem4: 'formItem4',
+  }
+}
+
+export function querySelectData () {
+  const options = [];
+  let option = {};
+  for (let i = 1; i < 5; i++) {
+    option = {
+      label: `label-${i}`,
+      value: `value-${i}`,
+      key: `key-${i}`,
+    }
+    options.push(option);
+  }
+  return options;
 }

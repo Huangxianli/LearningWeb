@@ -1,7 +1,10 @@
 <template>
-  <section class="x-table-store-box" v-loading="store.status === LOAD_STATUS.START">
+  <section class="x-table-store-box" v-loading="store.status === REQUEST_STATUS.START">
     <div class="x-table-store-header-button">
       <slot name="headerButton"></slot>
+    </div>
+    <div class="x-table-store-header-search">
+      <slot name="headerSearch"></slot>
     </div>
     <el-table class="x-table-store-table" :data="store.data" size="mini" v-bind="$attrs" v-on="$listeners">
       <slot></slot>
@@ -14,7 +17,7 @@
 </template>
 
 <script>
-import { LOAD_STATUS } from './constant';
+import { REQUEST_STATUS } from './constant';
 export default {
   // 当前页实际的条数如果多于下拉框中每页的条数，最大的高度为（当前页的的条数 + 1）* 每行的高度；当前页的实际的条数如果小于下拉框中每页的条数，表格的最大高度为（实际显示的条数 + 1）* 每页的高度
   props: {
@@ -31,8 +34,8 @@ export default {
     }
   },
   computed: {
-    LOAD_STATUS () {
-      return LOAD_STATUS;
+    REQUEST_STATUS () {
+      return REQUEST_STATUS;
     }
   },
   created () {
@@ -57,11 +60,15 @@ export default {
 .x-table-store-box {
   display: flex;
   flex-direction: column;
-  height: 100%;
+  /* height: 100%; */
   justify-content: flex-start;
 }
 
 .x-table-store-header-button {
+  margin-bottom: 12px;
+}
+
+.x-table-store-header-search {
   margin-bottom: 12px;
 }
 

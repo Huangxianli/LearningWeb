@@ -1,4 +1,4 @@
-export const LOAD_STATUS = {
+export const REQUEST_STATUS = {
   NOT_START: 0,
   START: 1,
   SUCCESS: 2,
