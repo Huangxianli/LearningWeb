@@ -23,6 +23,73 @@
       <el-table-column label="第二列" prop="col2"></el-table-column>
       <el-table-column label="操作"></el-table-column>
     </x-table-store>
+
+    <div>
+
+      <el-form :model="form" label-width="auto">
+        <el-row class="row_flex">
+          <el-col :span="6">
+            <el-form-item label="1">
+              <el-select v-model="form.item1" multiple>
+                <el-option v-for="item in 10" :key="item" :label="item" :value="item"></el-option>
+              </el-select>
+            </el-form-item>
+          </el-col>
+          <el-col :span="6">
+            <el-form-item label="2">
+              <el-select v-model="form.item2" multiple>
+                <el-option v-for="item in 10" :key="item" :label="item" :value="item"></el-option>
+              </el-select>
+            </el-form-item>
+          </el-col>
+          <el-col :span="6">
+            <el-form-item label="3">
+              <el-select v-model="form.item3" multiple>
+                <el-option v-for="item in 10" :key="item" :label="item" :value="item"></el-option>
+              </el-select>
+            </el-form-item>
+          </el-col>
+          <el-col :span="6">
+            <el-form-item label="4">
+              <el-select v-model="form.item4" multiple>
+                <el-option v-for="item in 10" :key="item" :label="item" :value="item"></el-option>
+              </el-select>
+            </el-form-item>
+          </el-col>
+          <el-col :span="6">
+            <el-form-item label="5">
+              <el-select v-model="form.item5" multiple>
+                <el-option v-for="item in 10" :key="item" :label="item" :value="item"></el-option>
+              </el-select>
+            </el-form-item>
+          </el-col>
+          <el-col :span="6">
+            <el-form-item label="6">
+              <el-select v-model="form.item6" multiple>
+                <el-option v-for="item in 10" :key="item" :label="item" :value="item"></el-option>
+              </el-select>
+            </el-form-item>
+          </el-col>
+          <el-col :span="6">
+            <el-form-item label="7">
+              <el-select v-model="form.item7" multiple>
+                <el-option v-for="item in 10" :key="item" :label="item" :value="item"></el-option>
+              </el-select>
+            </el-form-item>
+          </el-col>
+          <el-col :span="6">
+            <el-form-item label="8">
+              <el-select v-model="form.item8" multiple>
+                <el-option v-for="item in 10" :key="item" :label="item" :value="item"></el-option>
+              </el-select>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-form-item label="9"></el-form-item>
+      </el-form>
+
+    </div>
+
   </section>
 </template>
 
@@ -46,6 +113,7 @@ export default {
     return {
       store: new TestView1Store(),
       select1Store: new TestView1SelectStore(),
+      form: {}
     }
   },
   mounted () {
@@ -83,5 +151,10 @@ export default {
 <style scoped>
 .test-view-1 {
   height: 100%;
+}
+
+.row_flex {
+  display: flex;
+  flex-flow: row wrap;
 }
 </style>
