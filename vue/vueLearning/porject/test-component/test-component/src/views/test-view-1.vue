@@ -7,7 +7,8 @@
       <template #headerSearch>
         <el-form :model="store.filter">
           <el-form-item prop="formItem1" label="formItem1">
-            <xSelectStore :store="select1Store" v-model="store.filter.formItem1"></xSelectStore>
+            <xSelectStore :store="select1Store" v-model="store.filter.formItem1" @visible-change="visibleChange">
+            </xSelectStore>
           </el-form-item>
           <el-form-item prop="formItem2" label="formItem2">
             <el-input v-model="store.filter.formItem2"></el-input>
@@ -144,6 +145,10 @@ export default {
       }
     },
     reset () { },
+    visibleChange (visible) {
+      this;
+      debugger
+    }
   }
 }
 </script>

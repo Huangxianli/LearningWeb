@@ -111,6 +111,7 @@ export class Stroe {
 
 export class SelectStore {
   autoLoad = false;
+  isFetchData = true;
   get data () {
     return this.view.data;
   }
