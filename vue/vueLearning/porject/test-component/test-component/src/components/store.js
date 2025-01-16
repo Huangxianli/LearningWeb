@@ -110,8 +110,13 @@ export class Stroe {
 }
 
 export class SelectStore {
-  autoLoad = false;
-  isFetchData = true;
+  autoLoad = false; // 是否在创建的时候就自动加载
+  isFetchData = true; // 下拉数据是否要网络请求
+  isMasonryLayout = true; //  是否使用瀑布流的方式获取下拉，无限滚动
+  currentPage = 1;
+  pageSize = 10;
+  total = 0;
+
   get data () {
     return this.view.data;
   }
@@ -131,12 +136,24 @@ export class SelectStore {
       data,
       status: REQUEST_STATUS.NOT_START
     };
+
     this.view = Vue.observable(view);
   }
 
   async load (params = { currentPage: this.currentPage, pageSize: this.pageSize }) {
+    let params1 = {};
+    if (this.isMasonryLayout) {
+      if ((this.total !== 0 && this.data.length >= this.total) || this.status === REQUEST_STATUS.START) {
+        return
+      }
+      params1 = {
+        currentPage: this.currentPage,
+        pageSize: this.pageSize,
+        ...params,
+      }
+    }
     this.status = REQUEST_STATUS.START;
-    const params1 = {};
+
     const mockData = {
       data: this.mockData ? this.mockData() : [], // 在派生类中定义
     };
@@ -144,7 +161,13 @@ export class SelectStore {
       const { code, data } = await Vue.prototype.$ajax.get(this.url, params1, mockData);
       if (code === 200) {
         this.status = REQUEST_STATUS.SUCCESS;
-        this.data = data.data;
+        if (this.isMasonryLayout) {
+          this.data.push(...data.data);
+          this.currentPage = this.currentPage + 1;
+          this.total = 20;
+        } else {
+          this.data = data.data;
+        }
       } else {
         this.status = REQUEST_STATUS.FAIL;
       }

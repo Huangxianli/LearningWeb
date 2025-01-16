@@ -146,8 +146,6 @@ export default {
     },
     reset () { },
     visibleChange (visible) {
-      this;
-      debugger
     }
   }
 }

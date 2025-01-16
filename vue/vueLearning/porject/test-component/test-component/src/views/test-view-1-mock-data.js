@@ -31,7 +31,7 @@ export function queryData () {
 export function querySelectData () {
   const options = [];
   let option = {};
-  for (let i = 1; i < 5; i++) {
+  for (let i = 1; i < 11; i++) {
     option = {
       label: `label-${i}`,
       value: `value-${i}`,
