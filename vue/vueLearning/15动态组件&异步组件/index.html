@@ -11,17 +11,21 @@
   <div id="root"></div>
   <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
 
-  <script type="text/x-templte" id="rootComponent">
+  <script type="text/x-template" id="rootComponent">
     <section>
       <ChildComponent3 />
       <hr />
       <ChildComponent4 />
       <hr />
       <ChildComponent5 />
+      <hr />
+      <ChildComponent6 />
+      <hr />
+      <ChildComponent7 />
     </section>
   </script>
 
-  <script type="text/x-templte" id="ChildComponent1">
+  <script type="text/x-template" id="ChildComponent1">
     <div style="border: 1px solid red;">
       这里是 ChildComponent1
       <button @click="clickHandler">点击增加</button>
@@ -30,7 +34,8 @@
       </div>
     </div>
   </script>
-  <script type="text/x-templte" id="ChildComponent2">
+
+  <script type="text/x-template" id="ChildComponent2">
     <div style="border: 1px solid red;">
       这里是 ChildComponent2
       <button @click="clickHandler">点击增加</button>
@@ -39,33 +44,52 @@
       </div>
     </div>
   </script>
-  <script type="text/x-templte" id="ChildComponent3">
+
+  <script type="text/x-template" id="ChildComponent3">
     <div>
       这里是 ChildComponent3
       <button @click="clickHandler">点击切换组件</button>
-      <keep-alive>
-        <component :is="componentName"></component>
+      <button @click="click2Handler">点击销毁组件</button>
+      <keep-alive v-if="show" :exclude="['ChildComponent2']">
+        <component  :is="componentName" ></component>
       </keep-alive>
     </div>
    
   </script>
 
 
-  <script type="text/x-templte" id="ChildComponent4">
+  <script type="text/x-template" id="ChildComponent4">
     <div>
       这里是 ChildComponent4
     </div>
   </script>
-  <script type="text/x-templte" id="ChildComponent5">
+
+  <script type="text/x-template" id="ChildComponent5">
     <div>
       这里是 ChildComponent5
+      <ChildComponent1 />
+    </div>
+  </script>
+
+  <script type="text/x-template" id="ChildComponent6">
+    <div>
+      ChildComponent6
+      <ChildComponent1 />
+    </div>
+  </script>
+  <script type="text/x-template" id="ChildComponent7">
+    <div>
+      这里是 ChildComponent7
     </div>
   </script>
 
 
   <script type="text/javascript">
     /**
-     * 被包裹在 <keep-alive> 中的组件会被缓存，同时多了两个生命周期钩子函数 activated 和 deactivated
+     * 被包裹在 <keep-alive> 中的组件会被缓存（但是在切换的时候，之前组件的 dom 元素会从页面移除掉，而不是像 v-show 一样），同时多了两个生命周期钩子函数 activated 和 deactivated
+     * 如果在 exclude 里面加入了对应的组件名，那么对应的组件中的 activated 和 deactivated 钩子函数不会触发
+     * v-if 如果放在 keep-alive 上，当被销毁的时候会依次执行 deactivated beforeDestroy destroyed
+     * 如果 v-if 是放在 component 上的，那么当组件被销毁的时候，只会执行 deactivated 钩子，beforeDestroy 和 destroyed 不会执行
      */
     const ChildComponent1 = {
       data () {
@@ -73,15 +97,24 @@
           clicks: 0,
         };
       },
+      mounted () {
+        console.log('进入了 ChildComponent1 的 mounted');
+      },
       activated () {
-        console.log('进入了 ChildComponent1 的 actived')
+        console.log('进入了 ChildComponent1 的 actived');
       },
       deactivated () {
-        console.log('进入了 ChildComponent1 的 deactived')
+        console.log('进入了 ChildComponent1 的 deactived');
+      },
+      beforeDestroy () {
+        console.log('进入了 ChildComponent1 的 beforeDestroy');
+      },
+      destroyed () {
+        console.log('进入了 ChildComponent1 的 destroyed');
       },
       methods: {
         clickHandler () {
-          this.clicks++
+          this.clicks++;
         }
       },
       template: '#ChildComponent1',
@@ -93,15 +126,18 @@
           clicks: 0,
         };
       },
+      mounted () {
+        console.log('进入了 ChildComponent2 的 mounted');
+      },
       activated () {
-        console.log('进入了 ChildComponent2 的 actived')
+        console.log('进入了 ChildComponent2 的 actived');
       },
       deactivated () {
-        console.log('进入了 ChildComponent2 的 deactived')
+        console.log('进入了 ChildComponent2 的 deactived');
       },
       methods: {
         clickHandler () {
-          this.clicks++
+          this.clicks++;
         }
       },
       template: '#ChildComponent2',
@@ -110,16 +146,22 @@
     const ChildComponent3 = {
       components: {
         ChildComponent1,
-        ChildComponent2
+        ChildComponent2,
       },
       data () {
         return {
           componentName: 'ChildComponent1',
+          show: true,
         };
       },
       methods: {
         clickHandler () {
           this.componentName = this.componentName === 'ChildComponent1' ? 'ChildComponent2' : 'ChildComponent1';
+        },
+        click2Handler () {
+          setTimeout(() => {
+            this.show = false;
+          })
         },
       },
       template: '#ChildComponent3',
@@ -128,45 +170,82 @@
 
     /**
      * 异步组件
+     * 组件是一个函数，如果要使用异步组件
+     * 1. 如果异步组件要有 loading 等状态，那就相当于要对原有组件做一个包装，包一层 function，return 一个对象，这个对象里面的 componet 接收一个 promise 包裹的组件
+     * 2. 如果不需要 loading 等状态，直接使用函数的第一个参数 resolve 就可以了
      */
+    // 不需要 loading 等状态的时候
     const ChildComponent4 = function (resolve, reject) {
       setTimeout(() => {
         resolve({
           template: '#ChildComponent4',
         })
-      }, 2000)
-    }
-    const ChildComponent5 = {
-      components: {
-        ChildComponent4: () => ({
-          component: () => new Promise((resolve, reject) => {
-            resolve(ChildComponent4)
-          }),
-          loading: '加载中',
-          // 加载失败时使用的组件
-          error: '加载失败',
-          // 展示加载时组件的延时时间。默认值是 200 (毫秒)
-          delay: 200,
-          // 如果提供了超时时间且组件加载也超时了，
-          // 则使用加载失败时使用的组件。默认值是：`Infinity`
-          timeout: 3000
-        }),
-      },
-      template: `
-      <div>
-        这里是 ChildComponent5
-        <ChildComponent4 />
-      </div>
-      `
+      }, 2000);
     };
 
+    // 需要 loading 等状态的情况
+    const ChildComponent5 = {
+      components: {
+        // 用一个新的函数包裹一层，return 一个对象
+        ChildComponent1: () => ({
+          // component 接收的一定是一个 promise
+          component: new Promise((resolve, reject) => {
+            setTimeout(() => {
+              resolve(ChildComponent1)
+            }, 3000);
+          }),
+          loading: {
+            template: '<div> 加载中 </div>',
+          },
+          // 加载失败时使用的组件
+          error: {
+            template: '<div> 加载失败 </div>',
+          },
+          // 展示加载时组件的延时时间。默认值是 200 (毫秒)
+          delay: 0,
+          // 超过时间还没有resolve组件则使用加载失败时使用的组件。默认值是：`Infinity`
+          // timeout: 2009,
+          timeout: 3000,
+        }),
+      },
+      template: '#ChildComponent5',
+    };
 
+    // 不需要 loading 等状态的情况
+    const ChildComponent6 = {
+      components: {
+        ChildComponent1: function (resolve) {
+          setTimeout(() => {
+            resolve(ChildComponent1);
+          }, 3000);
+        }
+      },
+      template: '#ChildComponent6',
+    }
+
+    // 需要 loading 等状态的情况
+    const ChildComponent7 = function () {
+      return {
+        // 注意一定要是一个 Promise，不然不会进入 loading
+        component: new Promise(resolve => {
+          setTimeout(() => {
+            resolve({ template: '#ChildComponent7' })
+          }, 2000);
+        }),
+        loading: {
+          template: '<div> ChildComponent7 加载中 </div>',
+        },
+        delay: 0,
+      }
+    }
     new Vue({
       el: '#root',
       components: {
         ChildComponent3,
         ChildComponent4,
         ChildComponent5,
+        ChildComponent6,
+        ChildComponent7,
       },
       template: '#rootComponent',
     })

@@ -15,8 +15,9 @@
     import mixin from './mixin.js';
 
     /**
-     * data会进行合并，如果重名了，就以自己组件本身的为主
-     * 同名的声明周期钩子和合并成一个数组，现执行mixin的在执行自己组件中的
+     * 如果混入对象的属性和组件选项同名的话，会以恰当的方式进行合并
+     * data 会进行合并，如果重名了，就以自己组件本身的为主
+     * 同名的生命周期钩子和合并成一个数组，先执行 mixin 的再执行自己组件中的
      * methods、components、derectives，混入的和自己组件内的，会合并成一个对象，有冲突取组件自己的
     */
     const ChildComponent1 = {
@@ -32,7 +33,7 @@
       methods: {
         clickBtn () {
           // methods、components、derctives，都会合并成一个对象，有冲突的以组件自己定义的为准
-          console.log('测试methods、components、derctives的混入，执行了组件的methods clickBtn'); // 或执行这个方法
+          console.log('测试methods、components、derctives的混入，执行了组件的methods clickBtn'); // 会执行这个方法，而不是执行 mixin 里面的同名方法
         },
       },
       watch: {
