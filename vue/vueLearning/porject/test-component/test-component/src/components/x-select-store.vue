@@ -1,7 +1,7 @@
 <template>
   <div>
-    <el-select size="mini" :popper-class="{ 'x-store-select-option': needDestoryOption }" v-bind="$attrs"
-      @visible-change="visibleChange" v-on="listeners">
+    <el-select size="mini" v-bind="attrs" clearable @visible-change="visibleChange" v-on="listeners">
+      <!-- prop 比 $attrs 中的同名属性优先级更高 -->
       <template #empty>
         <div class="empty-option-box">
           <div v-if="store.isFetchData" v-loading="store.status === REQUEST_STATUS.START">
@@ -12,7 +12,7 @@
               class="empty-option-box-content">
               <div v-if="configName && configPath" class="empty-option-box-content-config">
                 <span>暂无数据，请前往<a :href="configPath" target="_black">{{ configName
-                    }}</a>配置；<br />如果已配置，请点击按钮重新获取</span>
+                    }}</a>配置；<br />如果已经配置，请点击按钮重新获取</span>
                 <el-button class="empty-option-box-retry" size="mini" @click="clickReload">重新获取</el-button>
               </div>
               <div v-else>
@@ -70,15 +70,15 @@ export default {
       default: 'value',
       type: String,
     },
-    configName: {
+    configName: { // 配置下拉数据的页面名称
       default: '配置页面',
       type: String,
     },
-    configPath: {
+    configPath: { // 配置下拉数据的地址
       default: '1',
       type: String,
     },
-    needDestoryOption: {
+    needDestoryOption: { // 是否要销毁下拉框对应的dom
       default: true,
       type: Boolean,
     }
@@ -86,13 +86,18 @@ export default {
   data () {
     return {
       // showOptions: false, // 因为 element ui 中 el-select 的下拉框是在第一次创建之后就不会销毁的，如果一个表格中有很多的 el-select ，每个都打开一次，那么会导致 dom 过多，页面会卡顿，展开下拉的时候为true，收起下拉的时候为false
-      originVisibleChange: null,
       listeners: {},
     };
   },
   computed: {
     REQUEST_STATUS () {
       return REQUEST_STATUS;
+    },
+    attrs () { // 中转一次 $attrs 处理
+      return {
+        ...this.$attrs,
+        'popper-class': `${this.$attrs['popper-class']} x-store-select-option`,
+      }
     }
   },
 
@@ -101,6 +106,7 @@ export default {
     eventsName.forEach(eventName => {
       this.listeners[eventName] = this.$listeners[eventName];
     });
+
     if (this.store.autoLoad) {
       this.store.load();
     }
@@ -109,9 +115,9 @@ export default {
     clickReload () {
       this.store.load();
     },
-    visibleChange (visible) {
+    visibleChange (visible) { // 处理 visible-change 事件
       this.showOptions = visible;
-      this.$emit('visible-change', visible);
+      this.$emit('visible-change', visible); // 内部使用了但是外部也要能够再次触发，要先将 $listeners 里面的该事件先移除掉
       if (!visible && this.needDestoryOption) {
         const options = document.getElementsByClassName('x-store-select-option');
         const length = options.length ?? 0;

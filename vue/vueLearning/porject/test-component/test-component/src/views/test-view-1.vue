@@ -7,7 +7,8 @@
       <template #headerSearch>
         <el-form :model="store.filter">
           <el-form-item prop="formItem1" label="formItem1">
-            <xSelectStore :store="select1Store" v-model="store.filter.formItem1" @visible-change="visibleChange">
+            <xSelectStore popper-class="123" :store="select1Store" v-model="store.filter.formItem1"
+              @visible-change="visibleChange">
             </xSelectStore>
           </el-form-item>
           <el-form-item prop="formItem2" label="formItem2">
@@ -120,10 +121,11 @@ export default {
   mounted () {
   },
   methods: {
-    addNewRow () {
+    async addNewRow () {
       const diaolog = createPromiseDialog(TestView1Dialog);
+      let data = {};
       try {
-        diaolog({
+        data = await diaolog({
           dialogType: DIALOG_TYPE.ADD
         }, {
           props: {
@@ -135,6 +137,7 @@ export default {
           }
         })
       } catch (error) {
+        debugger
       }
     },
     search () {

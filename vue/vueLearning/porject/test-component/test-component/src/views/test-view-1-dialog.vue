@@ -6,7 +6,7 @@
         <el-input v-else v-model="model.data.formItem1"></el-input>
       </el-form-item>
     </el-form>
-    <dialog-footer-button :dialogType='dialogType' @clickConfirm="clickConfirm" />
+    <dialog-footer-button :dialogType='dialogType' :beforeConfirm="beforeConfirm" />
   </section>
 </template>
 
@@ -55,11 +55,12 @@ export default {
       })
     }
   },
-  mounted () {
-
-  },
   methods: {
-    async clickConfirm () {
+    async beforeConfirm () {
+      const data = {
+        close: true,
+        data: {}
+      };
       try {
         if (this.dialogType === DIALOG_TYPE.CHANGE) {
           await this.model.change();
@@ -67,12 +68,15 @@ export default {
           await this.model.create();
         }
         if (this.model.status === REQUEST_STATUS.SUCCESS) {
-          this.$emit('clickConfirm')
+          // this.$emit('clickConfirm')
         }
-      } catch (error) { }
+      } catch (error) {
+        // 
+      }
+      return data;
     },
     clickClose () {
-      this.$emit('clickClose');
+      // this.$emit('clickClose');
     }
   }
 }
