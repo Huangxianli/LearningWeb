@@ -1,14 +1,22 @@
 <template>
   <div class="dialog-footer-button" id="self_promise_dialog_button_component">
-    <slot name="confirmBtn" v-if="[allDialogType.ADD, allDialogType.CHANGE].includes(dialogType)">
-      <el-button type="primary" size="mini" @click="clickBtn('clickConfirm')">确定</el-button>
-    </slot>
-    <slot name="cancelBtn" v-if="[allDialogType.ADD, allDialogType.CHANGE].includes(dialogType)">
-      <el-button size="mini" @click="clickBtn('clickCancel')">取消</el-button>
-    </slot>
-    <slot name="closeBtn" v-if="[allDialogType.READ].includes(dialogType)">
-      <el-button size="mini" @click="clickBtn('clickClose')">关闭</el-button>
-    </slot>
+    <el-button v-if="[allDialogType.ADD, allDialogType.CHANGE].includes(dialogType)" type="primary" size="mini"
+      @click="clickBtn('clickConfirm')">
+      <slot name="confirmBtnText">
+        确定
+      </slot>
+    </el-button>
+    <el-button v-if="[allDialogType.ADD, allDialogType.CHANGE].includes(dialogType)" size="mini"
+      @click="clickBtn('clickCancel')">
+      <slot name="cancelBtnText">
+        取消
+      </slot>
+    </el-button>
+    <el-button v-if="[allDialogType.READ].includes(dialogType)" size="mini" @click="clickBtn('clickClose')">
+      <slot name="closeBtnText">
+        关闭
+      </slot>
+    </el-button>
     <slot name="otherBtn"></slot>
   </div>
 </template>

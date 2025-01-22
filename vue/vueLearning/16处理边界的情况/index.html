@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>处理边界情况</title>
+  <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+  <style>
+    .component-box {
+      border: 1px solid red;
+      padding: 10px;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="root"></div>
+
+  <script type="text/x-template" id="rootComponent">
+    <div>
+      <Component2 />
+      <Component3 />
+      <Component4 />
+    </div>
+  </script>
+
+  <script type="text/x-template" id="component1">
+    <div class="component-box">
+      这里是 Component1 组件
+      <br />
+      <button @click="clickHandler">点击获取父组件</button>
+    </div>
+  </script>
+
+  <script type="text/x-template" id="component2">
+    <div class="component-box">
+      这里是 Component2 组件
+      <br />
+      <button @click="clickHandler">点击获取子组价</button>
+      <Component1 ref="Component1"/>
+    </div>
+  </script>
+
+  <script type="text/x-template" id="component3">
+    <div class="component-box">
+      这里是 Component3 组件
+    </div>
+  </script>
+
+  <script type="text/x-template" id="component4">
+    <div class="component-box">
+      这里是 Component4 组件 - {{deepIndex}}
+      <div v-if="deepIndex > 0">
+        <Component4 :deepIndex="deepIndex -1"/>
+      </div>
+    </div>
+  </script>
+
+
+
+  <script type="text/javascript">
+    /**
+     * 边界处理情况都是处理一些特殊情况，一般都是有些劣势的
+     */
+
+    /**
+     * 访问元素 & 组件
+     * this.$root —— Vue 实例对象
+     * this.$parent —— Vue 实例对象
+     * this.$children ——  Vue 实例数组
+     * this.$refs —— Vue 实例 | dom 元素
+     * provide/inject
+     */
+    const Component1 = {
+      inject: ['aaa'],
+      methods: {
+        clickHandler () {
+          console.log(this.$parent);
+        },
+      },
+      template: '#component1',
+    };
+
+    const Component2 = {
+      provide () { // 注意使用箭头函数可能会有 this 指向问题
+        return {
+          aaa: 'aaa',
+        }
+      },
+      components: {
+        Component1,
+      },
+      methods: {
+        clickHandler () {
+          console.log(this.$children);
+        },
+      },
+      template: '#component2',
+    };
+
+    /**
+     * 程序化的事件监听
+     * 
+     * $on ($once) $emit $off
+     * 
+     * 注意和浏览器 event 事件不同，addEventListener dispatchEvent removeEventListener
+     */
+    const Component3 = {
+      created () {
+        this.$on('test', data => { // 回调接收的参数不是 event，而是 emit 传递的内容 
+          // 相当于 <Component3 @test="test"></Component3>
+          console.log('触发了 Component3 组件的 test 事件');
+        });
+
+        this.$emit('test', 'data');
+
+        this.$once('hook: beforeDestroy', () => {
+          // $once 只会触发一次，触发之后就会被移除
+          this.$off('test');
+          // $off 不需要传入回调函数也可以移除所有的事件
+          // 如果没传事件名 移除该组件通过 this.$on this.$once 设置的所有事件监听（模板上@ v-on 绑定的不会移除）；如果传了事件名，但是没有传回调，移除该组件通过 this.$on this.$once 设置该事件的所有监听；如果传了事件名和回调，移除该组件通过 this.$on this.$once 设置该事件的该回调监听
+        });
+      },
+      template: '#component3',
+    };
+
+    /**
+     * 组件的递归
+     * 利用 name 属性，一定要有结束递归的条件，不然会造成死循环
+     * 
+     * 组件间的循环引用， A 组件中使用了 B 组件，B 组件中又使用了 A 组件（互相是自己的 祖 孙 ）
+     * webpack 会报错
+     * 解决这个的核心思想是 延迟加载
+     * 在 Vue 2.0 中，可以使用异步组件解决 A: () => import(...B.vue)
+     * 或者在组件的生命周期 beforeCreate 中再引入
+     * beforeCreate() {
+     *   this.$options.components.ComponentB = require('./ComponentB.vue').default;
+     * }
+     */
+    const Component4 = {
+      name: 'Component4',
+      props: {
+        deepIndex: {
+          type: Number,
+          default: 4,
+        },
+      },
+      template: '#component4',
+    };
+
+
+    /**
+     * 内联模板
+     * inline-template 和使用组件的插槽类似，但是访问是 提供插槽的组件的作用域
+     * <template>
+     *  <ChildComponent inline-template>
+     *   <div>{{ a }} 这里的 a 是 ChildComponent 中的 a，而不是当前组件的 a</div>
+     *  </ChildComponent >
+     * </template > 
+     * 
+     * x-template
+     * <script type="text/x-template">
+     */
+
+    /**
+     * 控制更新
+     * this.$forceUpdate() 强制更新
+     * 
+     * 利用 v-once 创建低开销的静态组件 该 组件/元素  只会渲染一次，不会再次渲染，即使数据发生了变化，也就是说页面上的数据不会更新
+     * 要注意和 v-if 配合使用的情况
+     * 分情况讨论，在组件上，在元素上
+     * v-if 在 v-once 外，v-if 和 v-once 在一起， v-if 在 v-once 内
+     * ??? ？？？
+     * 
+     */
+
+
+    const app = new Vue({
+      el: '#root',
+      components: {
+        Component2,
+        Component3,
+        Component4,
+      },
+      template: '#rootComponent',
+    });
+  </script>
+</body>
+
+</html>

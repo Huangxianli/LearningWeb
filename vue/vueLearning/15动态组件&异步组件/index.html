@@ -169,10 +169,12 @@
 
 
     /**
-     * 异步组件
-     * 组件是一个函数，如果要使用异步组件
-     * 1. 如果异步组件要有 loading 等状态，那就相当于要对原有组件做一个包装，包一层 function，return 一个对象，这个对象里面的 componet 接收一个 promise 包裹的组件
-     * 2. 如果不需要 loading 等状态，直接使用函数的第一个参数 resolve 就可以了
+     * 异步组件--只有在需要的时候才进行加载--以一个工厂函数的方式定义你的组件，这个工厂函数会异步解析你的组件定义。Vue 只有在这个组件需要被渲染的时候才会触发该工厂函数，且会把结果缓存起来供未来重渲染
+     * 如果是 Vue.component 全局注册，则直接可以不用工厂函数的形式，直接使用 promise 包裹对象式的组件即可
+     * 
+     * 组件是一个函数或者是一个对象，如果要使用异步组件，工厂函数的返回值变成一个 promise 实例或者返回一个 对象，里面的 component 是一个 promise 实例包裹原始的对象组件
+     * 1. 如果异步组件要有 loading 等状态，那就相当于要对原有的组件做包装，最终应该是 一个函数 return 一个对象，这个对象里面有 component（对应之前的对象式的组件，必须包裹一层 promise 实例）loading error delay timeout 等属性
+     * 2. 如果不需要 loading 等状态，直接使用工厂函数，return 一个被promise 包裹的对象组件即可（工厂函数的第一个参数是 promise 的 resolve）
      */
     // 不需要 loading 等状态的时候
     const ChildComponent4 = function (resolve, reject) {
@@ -191,7 +193,7 @@
           // component 接收的一定是一个 promise
           component: new Promise((resolve, reject) => {
             setTimeout(() => {
-              resolve(ChildComponent1)
+              resolve(ChildComponent1);
             }, 3000);
           }),
           loading: {
