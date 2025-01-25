@@ -51,9 +51,8 @@ export default {
   methods: {
     handlerClick (e) {
       const id = e.target.dataset.id;
-      debugger
-      // 如果没有加 /，会从当前的根路由开始算起
-      // this.$router.push(`${id}/orderDetail`);
+      // 如果没有加 /，相当于 ../，会取当跳转前的路由的倒数第二级，然后 push 中的路径拼接上去 <router-link /> 中的 to 也是这样的表现
+      // this.$router.push(`${id}/orderDetail`); // 在路由参数中如果使用了 path 也使用了 params，path 的优先级更高
       this.$router.push({
         name: 'orderDetail',
         params: {

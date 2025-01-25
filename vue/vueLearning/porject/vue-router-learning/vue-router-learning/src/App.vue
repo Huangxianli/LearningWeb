@@ -1,5 +1,6 @@
 <template>
-  <div>
+  <div class="app">
+    <router-view name="menu" class="menu-view" />
     <router-view />
   </div>
 </template>
@@ -14,12 +15,16 @@ export default {
 </script>
 
 <style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
+body {
+  margin: 0;
+  padding: 0;
+}
+</style>
+<style scoped>
+.app {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  flex-direction: row;
 }
 </style>
