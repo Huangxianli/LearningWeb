@@ -23,7 +23,7 @@
         // 可以 return 一个函数，但是需要支持 jsx 
       },
     });
-    const message = 'hello world !!!'; // 这种写法，如果要在组件的 template 里面可以反问到，必须要用一个东西来承接 data computed ... 或者 setup 中返回
+    const message = 'hello world !!!'; // 这种写法，如果要在组件的 template 里面可以访问到，必须要用一个东西来承接 message 变量，如 data computed ... 或者 setup 中返回
     // 为什么 setup 如此特殊，setup 究竟做了什么
     const app2 = createApp({
       template: '<div>{{message}}</div>',
