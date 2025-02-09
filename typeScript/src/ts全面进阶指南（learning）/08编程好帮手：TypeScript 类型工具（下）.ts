@@ -129,6 +129,3 @@ function test2_4() {
  * & 关键字
  * 有冲突的属性会推断成 never
  */
-function test3() {
-
-}
