@@ -1,0 +1,10 @@
+import { add } from './a.mjs';
+import { multi } from './b.mjs';
+import { max } from './c.mjs';
+const a = 1, b = 2;
+const addValue = add(a, b);
+const multiValue = multi(a, b);
+const maxValue = max(a, b);
+console.log(addValue);
+console.log(multiValue);
+console.log(maxValue);
