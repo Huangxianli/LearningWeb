@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>11侦听器</title>
+  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+
+</head>
+
+<body>
+  <div id="app1"></div>
+  <script>
+    const { createApp, ref, reactive, watch } = Vue;
+    // 在状态发生改变的时候执行一些副作用，这个时候不应该用 computed，而应该用 watch
+    createApp({
+      setup () {
+        const value = ref('');
+        watch(value, (newValue, oldValue) => {
+          console.log(newValue, oldValue);
+        })
+        return {
+          value,
+        };
+      },
+      template: `
+        <div>
+          <input v-model="value" />
+        </div>
+      `,
+    }).mount('#app1');
+
+    /**
+     * watch 可以监听 ref reactive getter函数 多个数据元组成的数组
+     */
+
+  </script>
+
+
+</body>
+
+</html>
