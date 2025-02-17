@@ -1,4 +1,3 @@
-import { Result } from '../../../element-ui源码/element/types/element-ui';
 function test() {
   console.log('---类型系统层级：从 Top Type 到 Bottom Type---------------------------------------------');
 
