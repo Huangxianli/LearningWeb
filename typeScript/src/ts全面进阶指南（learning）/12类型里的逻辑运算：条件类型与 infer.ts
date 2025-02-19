@@ -3,6 +3,7 @@ function test() {
 
   test1();
   test2();
+  test3();
 
 };
 /**
@@ -16,7 +17,7 @@ function test1(): void {
   const fun1 = function <T extends string | number>(x: T, y: T): T {
     return x + (y as any);
   };
-  // a(1, '12'); // 两个参数设置的都是 T 类型，但是 1 和 '12' 两者 并不兼容，所以会报错
+  // fun1(1, '12'); // 两个参数设置的都是 T 类型，但是 1 和 '12' 两者 并不兼容，所以会报错
   // 在 x 传入 1 的时候，满足了 T extends number， 后面的参数也要满足 T extends number，传入‘12’的时候，不满足该条件，所以会报错
 
   const a = fun1(1, 2); // a: 1 | 2； T 被自动的推导为 1 | 2 的联合类型
@@ -52,6 +53,15 @@ function test2() {
   type PropType<T, K extends keyof T> = T extends { [Key in K]: infer R } ? R : never;
   // type PropTypeResult1 = PropType<{ name: string; age: number }, 'a'>; // 不满足第二个泛型的约束，会报错
   type PropTypeResult2 = PropType<{ name: string; age: number }, 'name' | 'age'>; // string | number
+};
+
+/**
+ * 分布式条件类型
+ * 参数类型是联合类型，且类型参数是通过泛型的方式传入的，条件类型中的泛型不能被包裹，这样就产生了分布式条件类型
+ */
+function test3() {
+  console.log('---test3---------------------------------------------');
+
 };
 
 export default test;
