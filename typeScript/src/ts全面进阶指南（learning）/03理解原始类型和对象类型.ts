@@ -32,7 +32,7 @@ function test1_1(): void {
 /**
  * undefined 和 null
  * 在 js 中：
- * undefined 表示 已经声明了，但是没有赋值
+ * undefined 表示 已经声明了，但是没有赋值；对象中不存在的属性；函数未返回值
  * null 表示 已经声明了，而且给了一个 null 值（或者说变量应该有值但是目前还没有，且期待是一个引用类型的值）
  * 在 ts 中：
  * null 和 undefined 都有具体的意义
@@ -49,20 +49,20 @@ function test1_2(): void {
 
 /**
  * void
- * 在 js 中：执行后面的表达式，并总是放回 undefined
- * 在 ts 中：用于描述一个没有 没有 return 、return了但是没有显示的值 的函数的返回值
+ * 在 js 中：执行后面的表达式，并总是返回 undefined
+ * 在 ts 中：用于描述一个没有 return 、return 了但是没有显式的值 的函数的返回值
  * 
- * 注意一点，即使显示 return undefined，会被推导成 undefined，但是在声明的时候可以用 void；说明 undefined 是可以赋值给 void 类型的；也就表明，即使是 void 类型，其值有可能是实实在在的 undefined
+ * 注意一点，即使显式的 return undefined，会被推导成 undefined，但是在声明的时候可以用 void；说明 undefined 是可以赋值给 void 类型的；也就表明，即使标注的是 void 类型，其值有可能是实实在在的 undefined
  * 
  * 注意：只有显示的 return undefined 的时候，才会被推导成 undefined 类型
  * 
- * 其实在实际上 void 表示的类型范围是要比 undefined 类型要大的
+ * 其实在实际上 void 表示的类型范围是要比 undefined 类型要大的，undefined 类型可以赋值给 void 类型
  */
 function test1_3(): void {
   console.log('---test1_3---------------------------------------------');
 
   // 鼠标移到函数名称函看类型推导
-  function test1_3_1() { // 表明没有显示的 return 具体的内容的时候，会被推导成 void 类型，只有 return 了一个显示的内容，才会推导成对应的类型
+  function test1_3_1() { // 表明没有显式的 return 具体的内容的时候，会被推导成 void 类型，只有 return 了一个显示的内容，才会推导成返回值对应的类型
     // return; // 会推导成 void
     // return undefined; // 会推导成 undefined
   };
