@@ -1,0 +1,49 @@
+/*!*******************************************************************************************************************************************************!*\
+  !*** css ./node_modules/css-loader/dist/cjs.js!./node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[0].use[2]!./assets/font-icon/iconfont.css ***!
+  \*******************************************************************************************************************************************************/
+@font-face {
+  font-family: "iconfont"; /* Project id  */
+  src: url(../media/7464793d.ttf?t=1735692178006) format('truetype');
+}
+
+.iconfont {
+  font-family: "iconfont" !important;
+  font-size: 16px;
+  font-style: normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-dianping:before {
+  content: "\e653";
+}
+
+.icon-yonghuliebiao:before {
+  content: "\e604";
+}
+
+.icon-faxianshebei:before {
+  content: "\e60b";
+}
+
+
+/*!******************************************************************************************************************************************************************************!*\
+  !*** css ./node_modules/css-loader/dist/cjs.js!./node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[1].use[2]!./node_modules/less-loader/dist/cjs.js!./src/main.less ***!
+  \******************************************************************************************************************************************************************************/
+.box1 {
+  height: 200px;
+  width: 200px;
+  background-color: red;
+}
+.box2 {
+  height: 100px;
+  width: 100px;
+  background-color: burlywood;
+}
+.box3 {
+  height: 100px;
+  width: 100px;
+  background-image: url(../imgs/937ee858.png);
+  background-size: cover;
+}
+

@@ -3,6 +3,7 @@ function test(): void {
 
   test1();
   test2();
+  test3();
 };
 
 /**
@@ -17,13 +18,13 @@ function test1(): void {
 };
 
 /**
- * any：表示任意类型
+ * any：表示任意类型，any 类型是 ts 系统中的顶级类型
  * 没有赋值的 变量、函数参数 默认为 any 类型
  * 注意 noImplicitAny 如果为 true，这两种没有手动的赋值为 any，自动推断为 any 时，会报错
  * 
  * any 类型的变量可以拥有任意类型的值
  * 标记为 具体类型 的变量也可以接受 any 类型的值
- * （兼容所有类型且被所有类型兼容，要除去 never，注意 never 类型只能接受 never 类型的赋值，但是 never 类型可以赋值给其他的类型）
+ * （兼容所有类型且被所有类型兼容，要除去 never，注意 never 类型只能接受 never 类型的赋值，但是 never 类型可以赋值给其他的类型，也就是说 any 类型不可以赋值给 never 类型，但是可以接收 never 类型）
  */
 declare let val5: never;
 function test1_1(): void {
@@ -41,14 +42,18 @@ function test1_1(): void {
 
 
   let val6: any;
-  val6 = val5;
-  // val5 = val6;
+  val6 = val5; // never 类型可以赋值给 any 类型
+  // val5 = val6; // any 类型不可以赋值给 never 类型，除了这个类型 any 可以赋值给任何其他的类型
+
+  let val7: any;
+  val7 = 12;
+  let val8: string = val7; // any 类型即使是被赋值成其他的类型还是可以赋值给另一个类型的，因为看的是定义时候的类型
 };
 
 /**
  * unknown：在后面的某一刻可能会知道是什么类型
- * unknown 类型可以接受其他所有类型
- * 只有 unknown 和 any 可以接受 unknown 类型
+ * unknown 类型可以接受其他所有类型（这里和 any 类型一样）
+ * 只有 unknown 和 any 可以接受 unknown 类型，unknown 类型 只能赋值给 any 和 unknown
  */
 declare let test1_2_val4: never;
 function test1_2(): void {
@@ -64,7 +69,7 @@ function test1_2(): void {
 };
 
 /**
- * never：never 类型严格来说不携带任何的类型信息，是整个类型系统中 最底层 的类型
+ * never：never 类型严格来说不携带任何的类型信息，是整个类型系统中 最底层 的类型 bottom type
  * never 类型的变量只接受 never 类型
  * 其他类型可以接受 never 类型
  * 也可以表示说 无法执行到
@@ -96,6 +101,29 @@ function test1_3(): void {
 function test2(): void {
   console.log('---test2---------------------------------------------');
 
+  let a: unknown;
+  a = '';
+  let b: string = a as string;
+  let c: string = <string>a; // 这两种都是类型断言
+  // let d: number = c as number; // 会报错
+  let d: number = c as unknown as number; // 先断言成 unknown 类型 再断言成 number 类型
+  d = <number><unknown>c;
+}
+
+/**
+ * 非空断言
+ * ! 表示 ! 前面一定是非 null 非 undefined
+ */
+function test3(): void {
+  interface Obj {
+    fun?: () => void
+  };
+
+  const obj: Obj = {
+    fun() { }
+  };
+  // obj.fun(); // 会报错，根据定义，你一定会有 fun 属性
+  obj.fun!(); // 注意和 js 中的 ? 不同，虽然在编译的时候不会报错，但是可能在运行的时候报错
 }
 
 

@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>vue2对比</title>
+  <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+
+</head>
+
+<body>
+  <div id="app1"></div>
+  <script>
+
+    /**
+     * 在 Vue2 中 v-for 的优先级是比 v-if 要高的，先执行 v-for 再执行 v-if
+     */
+    new Vue({
+      el: '#app1',
+      data () {
+        return {
+          list: [
+            { id: 1, name: '一', show: false },
+            { id: 2, name: '二', show: true },
+            { id: 3, name: '三', show: true },
+          ],
+        };
+      },
+      methods: {
+        getName (item) {
+          return item.name;
+        },
+        getList () {
+          console.log('执行了 getList 方法'); // 会先打印这里
+          return this.list;
+        },
+        itemShow (item) {
+          console.log('执行了 itemShow 方法'); // 后面才会打印这里
+          return item.show;
+        },
+        // 从两个的打印可以看出，是先执行 v-for 再 执行 v-if 的
+      },
+      template: `
+        <ul>
+          <li>比较 v-if 和 v-for 的优先级</li>
+          <li  v-for="item in getList()" v-if="itemShow(item)" :key="item.id">{{item.name}}</li>
+        </ul>
+      `,
+    });
+  </script>
+</body>
+
+</html>

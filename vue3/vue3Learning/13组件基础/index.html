@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>组件基础</title>
+  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+</head>
+
+<body>
+  <div id="app1"></div>
+  <hr />
+  <div id="app2"></div>
+  <hr />
+  <div id="app3"></div>
+  <hr />
+  <div id="app4"></div>
+  <hr />
+  <div id="app5"></div>
+
+  <script type="module">
+    const { createApp } = Vue;
+
+    import Component1 from './Component1.js'
+
+    /**
+     * 定义一个组件
+     * 当使用构建步骤时，一般会将 Vue 组件定义在一个单独的 .vue 文件中，称之为：单文件组件（SFC）；
+     * 当不适用构建步骤时，一个 Vue 组件以一个包含 Vue 特定选项的 JS 对象来定义
+     */
+    createApp({
+      components: { // 主组件使用的不是单文件组件，需要在 components 中声明
+        Component1
+      },
+      setup () {
+      },
+      template: `
+        <div>
+          <h1>组件</h1>
+          <p>这是一个组件</p>
+          <Component1 />
+        </div>
+      `
+    }).mount('#app1');
+
+    /**
+     * 使用组件
+     */
+    createApp({
+      components: { // 主组件使用的不是单文件组件，需要在 components 中声明
+        Component1
+      },
+      setup () { },
+      template: `
+        <Component1 />
+        <br/>
+        <Component1 />
+        <br/>
+        <Component1 />
+      `,
+    }).mount('#app2');
+
+    /**
+     * 传递 props
+     * 如果是在 <script setup> 中，使用 defineProps() 来声明 props
+     */
+    createApp({
+      components: {
+        Component1
+      },
+      setup () { },
+      template: `
+        <Component1 :title="'Hello Vue3'"/>
+      `,
+    }).mount('#app3');
+
+    /**
+     * 监听事件
+     * 如果使用的 <script setup>，使用 const emits = defineEmits(['']) 来声明事件 emits('a')
+     */
+    createApp({
+      components: {
+        Component1
+      },
+      setup () {
+        const handleInput = (e) => {
+          console.log('handleInput', e);
+        };
+        const handleClick = (e) => {
+          console.log('handleClick', e);
+        };
+
+        return {
+          handleInput,
+          handleClick
+        }
+      },
+      template: `
+        <Component1 @myInput="handleInput" @myClick="handleClick" />
+      `,
+    }).mount('#app4');
+
+
+    /**
+     * DOM 内模板解析注意事项
+     * 只在 DOM 中直接书写 Vue 模板时要注意
+     * 单文件组件、内联模板字符串 (例如 template: '...')、<script type="text/x-template"> 不用在意
+     * 1. 大小写区分 大驼峰的组件名、小驼峰的 prop、v-on 的事件名称，都要转化成 kebab-case 的形式
+     * 2. 闭合标签 自己定义的组件必须显示的写出关闭标签，不能直接在 /> 结尾
+     * 3. 元素位置限制，有些标签只能在在某些标签的内部，例如 <tr> 只能在 <table> 内部，<tr is="vue:my-component"> 可以解决这个问题
+     */
+    createApp({
+
+    }).mount('#app5');
+
+
+
+  </script>
+</body>
+
+</html>

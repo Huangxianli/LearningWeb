@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>05类与样式绑定</title>
+  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+
+</head>
+
+<body>
+  <div id="app1"></div>
+  <script>
+    const { createApp, ref } = Vue;
+    /**
+     * class 写在组件上，默认的会被组件继承，如果组件只有一个根元素，会继承在根元素上，如果有多个根元素，那么该 class 就会失效
+     */
+    const Component1 = {
+      template: `
+        <div>1</div>
+        <div>2</div>
+      `,
+    };
+    const Component2 = {
+      template: `
+        <div>3</div>
+      `,
+    }
+    createApp({
+      components: {
+        Component1,
+        Component2,
+      },
+      setup () {
+        return {};
+      },
+      template: `
+      <Component1 class="huang" />
+      <Component2 class="huang" />
+      `,
+    }).mount('#app1');
+  </script>
+
+</body>
+
+</html>

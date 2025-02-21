@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>创建一个Vue应用</title>
+  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+</head>
+
+<body>
+  <div id="app"></div>
+
+  <script>
+    const { createApp } = Vue;
+    const app1 = createApp({
+      template: '<div>{{message}}</div>',
+      setup () {
+        const message = 'hello World';
+        return {
+          message,
+        };
+        // 可以 return 一个函数，但是需要支持 jsx 
+      },
+    });
+    const message = 'hello world !!!'; // 这种写法，如果要在组件的 template 里面可以访问到，必须要用一个东西来承接 message 变量，如 data computed ... 或者 setup 中返回
+    // 为什么 setup 如此特殊，setup 究竟做了什么
+    const app2 = createApp({
+      template: '<div>{{message}}</div>',
+      data () {
+        return {
+          message
+        }
+      }
+    });
+    // app1.mount('#app');
+    app2.mount('#app');
+
+  </script>
+</body>
+
+</html>

@@ -1,13 +1,13 @@
 function test() {
   console.log('---编程好帮手：TypeScript 类型工具（下）---------------------------------------------');
 
-  // 类型的安全保障
+  // 类型的安全保障：类型查询操作符 类型守卫
   test1();
   test2();
 };
 
 /**
- * 熟悉又陌生的 typeof
+ * 熟悉又陌生的 typeof（类型查询操作符）
  * 在 js 中 typeof 返回的是 变量的数据类型，ts 中返回的是一个 TypeScript 类型
  * 
  * 在逻辑代码中访问一定是 js 的 typeof，在类型代码中一定是 ts 的 typeof
@@ -19,9 +19,12 @@ function test1() {
   console.log('---test1---------------------------------------------');
 
   const str = 'link';
-  type Str = typeof str; // 'link'
+  type Str = typeof str; // 'link' 常量返回的是更加精确的字面量类型
   let str1 = 'link';
-  type Str1 = typeof str1; // string
+  type Str1 = typeof str1; // string 变量返回的是没那么精确的
+
+  let obj1 = { 1: 2 };
+  const obj2: typeof obj1 = { 1: 12 }; // const obj1: {1: number} 注意这里的 1 对应的类型是 number 而不是 2，无论 obj1 是变量还是常量
 
   const func = (input: string) => {
     return input.length > 10;
@@ -76,7 +79,7 @@ function test2_2() {
     }
   }
 
-  // ts 提供了 is 关键字来显示的提供信息
+  // ts 提供了 is 关键字来显式的提供信息
   function isString1(input: unknown): input is string {
     return typeof input === 'string';
   }
@@ -85,7 +88,7 @@ function test2_2() {
 };
 
 /**
- * 基于 in 的instanceof 的类型保护
+ * 基于 in 的 instanceof 的类型保护
  */
 function test2_3() {
   console.log('---test2_3---------------------------------------------');
@@ -129,6 +132,3 @@ function test2_4() {
  * & 关键字
  * 有冲突的属性会推断成 never
  */
-function test3() {
-
-}

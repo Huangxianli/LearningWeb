@@ -10,7 +10,7 @@ a1_1.console("执行了class A1 的 console 方法");
 
 
 class A2 {
-  constructor(x, y) { // 构造函数，其中的this就是当前new的实例
+  constructor(x, y) { // 构造函数，其中的 this 就是当前 new 的实例
     this.x = x;
     this.y = y;
   };
@@ -24,7 +24,7 @@ class A2 {
 const a2_1 = new A2(1, 2);
 a2_1.console();
 
-// 类的所有普通的方法都是绑定在类的prototype上的
+// 类的所有普通的方法都是绑定在类的 prototype 上的
 class A3 {
   constructor() {
   };
@@ -48,7 +48,7 @@ console.log(A4ProtoKeys); // []
 
 class B1 {
   constructor() {
-    // constructor 默认会 return this，也就是当前的实例对象，可以手动的改变return
+    // constructor 默认会 return this，也就是当前的实例对象，可以手动的改变 return
     return {};
   };
 };
@@ -56,8 +56,8 @@ const b1_1 = new B1();
 console.log(b1_1 instanceof B1); // false
 
 /**
- * 类的constructor方式是绑定在哪里的？？？是在prototype上吗？如果是在prototype上，那么与其本身的constructor是不是有冲突呢？？？
- * 如果是直接在类上面，那么Object.getOwnPropertyNames为什么获取不到这个方法？？？
+ * 类的 constructor 方式是绑定在哪里的？？？是在 prototype 上吗？如果是在 prototype 上，那么与其本身的 constructor 是不是有冲突呢？？？
+ * 如果是直接在类上面，那么 Object.getOwnPropertyNames 为什么获取不到这个方法？？？
  */
 function test1 () {
   console.log('----test1--------------------------------');
@@ -116,7 +116,7 @@ function test2 () {
 test2();
 
 /**
- * es2022实例属性的新写法，是将属性直接放在实例上还是放在了类的prototype上？？？
+ * es2022 实例属性的新写法，是将属性直接放在实例上还是放在了类的 prototype 上？？？
  * --- 是直接绑定在实例上的
  */
 function test3 () {
@@ -127,13 +127,13 @@ function test3 () {
   const test3_1_1 = new Test3_1();
   console.log(Object.getOwnPropertyNames(test3_1_1)); // ['property']
   console.log(Object.getOwnPropertyNames(Test3_1.prototype)); // ['constructor']
-  // 由此可以看出是绑定在实例上，不是绑定在类的prototype上
+  // 由此可以看出是绑定在实例上，不是绑定在类的 prototype 上
 };
 test3();
 
 /**
- * getter 和 setter 函数设置的属性是直接在实例上还是在类的prototype上？？？
- * --- 是绑定在类的prototype属性上的
+ * getter 和 setter 函数设置的属性是直接在实例上还是在类的 prototype 上？？？
+ * --- 是绑定在类的 prototype 属性上的
  */
 function test4 () {
   console.log('----test4--------------------------------');
@@ -147,7 +147,7 @@ function test4 () {
   const test4_1_1 = new Test4_1();
   console.log(Object.getOwnPropertyNames(test4_1_1)); // []
   console.log(Object.getOwnPropertyNames(Test4_1.prototype)); // ['constructor', 'testName']
-  // 由此可以看出，getter和setter函数设置的属性是绑定在类的prototype上的
+  // 由此可以看出，getter 和 setter 函数设置的属性是绑定在类的 prototype 上的
 
   class Test4_2 {
     constructor() {
@@ -210,7 +210,7 @@ function test4 () {
 test4()
 
 /**
- * 类中的this的指向（取决于调用函数的方式），讨论普通的调用方式
+ * 类中的 this 的指向（取决于调用函数的方式），讨论普通的调用方式
  * constructor：指向实例对象
  * 静态方法：类本身
  * 实例方法：实例对象
@@ -276,10 +276,10 @@ function test7 () {
 test7();
 
 /**
- * （this的指向取决于调用函数的方式，讨论普通的调用方式）在constructor中，this是指向实例的；在类的prototype方法中，this指向实例；在静态方法中，this指向的类本身
+ * （this 的指向取决于调用函数的方式，讨论普通的调用方式）在 constructo r中，this 是指向实例的；在类的 prototype 方法中，this 指向实例；在静态方法中，this 指向的类本身
  * 私有方法和属性只可以在类内部调用；注意，普通私有属性和普通私有方法都是绑定在实例本身上
- * 普通私有属性是绑定在实例本身上，静态私有属性是绑定在类本身上的，调用这些私有属性和方法要遵循这些this；
- * 注意，普通私有属性和方法，不能类.prototype调用，即使是在类的内部；在constructor函数中，可以直接this.普通私有属性和方法的调用
+ * 普通私有属性是绑定在实例本身上，静态私有属性是绑定在类本身上的，调用这些私有属性和方法要遵循这些 this；
+ * 注意，普通私有属性和方法，不能 类.prototype 调用，即使是在类的内部；在 constructor 函数中，可以直接 this. 普通私有属性和方法的调用
  */
 function test8 () {
   console.log('----test8--------------------------------');
@@ -334,13 +334,13 @@ function test8 () {
 test8();
 
 /**
- * 改变this的指向
+ * 改变 this 的指向
  */
 function test9 () {
   console.log('----test9--------------------------------');
   class Test9_1 {
-    a = this; // 类的顶层的this是否就是指向实例的？？？
-    fun = () => { // 这里的fun被当成一个实例的属性，绑定在实例上
+    a = this; // 类的顶层的 this 是否就是指向实例的？？？
+    fun = () => { // 这里的 fun 被当成一个实例的属性，绑定在实例上
       return this;
     };
     constructor() {
@@ -372,7 +372,7 @@ function test9 () {
   // 普通方法
   class Test9_3 {
     constructor() {
-      this.fun1 = this.fun1; // 这里是将Test9_3上的fun1赋值给实例上的fun1
+      this.fun1 = this.fun1; // 这里是将 Test9_3 上的 fun1 赋值给实例上的 fun1
       this.fun2 = this.fun1.bind(this);
     };
     fun1 () {
@@ -384,7 +384,7 @@ function test9 () {
   console.log(Object.getOwnPropertyNames(Object.getPrototypeOf(test9_3_1))); // ['constructor', 'fun1']
 
   const { fun2: fun9_3_2 } = test9_3_1;
-  fun9_3_2(); // Test9_3 {fun1: ƒ, fun2: ƒ} 这里的this返回的是当前的实例，在内部就绑定了this，如果内部没有bind绑定this的话，返回的应该是undefined
+  fun9_3_2(); // Test9_3 {fun1: ƒ, fun2: ƒ} 这里的 this 返回的是当前的实例，在内部就绑定了 this，如果内部没有 bind 绑定 this 的话，返回的应该是 undefined
   const { fun1: fun9_3_3 } = Object.getPrototypeOf(test9_3_1);
   fun9_3_3(); // undefined
 
@@ -394,12 +394,12 @@ function test9 () {
     }
   };
   const { staticFun1 } = Test9_4;
-  staticFun1(); // class Test9_4 { } 这里可以看出使用箭头函数，this是已经绑定在类本身上的，不是undefined
+  staticFun1(); // class Test9_4 { } 这里可以看出使用箭头函数，this 是已经绑定在类本身上的，不是 undefined
 };
 test9();
 
 /**
- * new.target 可以判定是不是new操作符调用的，如果是new操作的，则返回当前的函数或类
+ * new.target 可以判定是不是 new 操作符调用的，如果是 new 操作的，则返回当前的函数或类
  * 创建只能被继承的类，不能创建实例的类
  * 创建不能被继承的类
  */

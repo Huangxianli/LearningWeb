@@ -19,12 +19,13 @@ function test1(): void {
 
 /**
  * 函数的类型签名
+ * 函数的类型描述的是函数的入参类型和函数返回值类型
  */
 function test1_1(): void {
   console.log('---test1_1---------------------------------------------');
 
   const fun1 = function (a: number): void { };
-  const fun2: () => number = () => { return 1 };
+  const fun2: () => number = () => { return 1 }; // 实际上这种写法，可读性不好，一般会抽出来
   const fun3 = (a: number): number => { return 1 };
 
   interface Fun4 {
@@ -72,7 +73,7 @@ function test1_3() {
 };
 
 /**
- * 函数签名重载，利用函数签名重载，可以更好的推断出返回值的类型，在有多种入参方式的时候，可以匹配入参方式，获取到对应的返回值的类型
+ * 函数签名重载，利用函数签名重载，可以更好的推断出返回值的类型，在有多种入参方式的时候，可以匹配入参方式，获取到对应的返回值的类型（将入参和返回进行关联）
  */
 function test1_4(): void {
 
@@ -86,6 +87,7 @@ function test1_4(): void {
 
   const a = test1_4_1(1); // a 的类型被推导成 string | number
 
+  // 前面叫重载签名，最后一个叫实现签名，要包含重载签名的所有可能
   function test1_4_2(foo: number, bar: true): number
   function test1_4_2(foo: number, bar?: false): string
   function test1_4_2(foo: number, bar?: boolean): string | number {
@@ -158,10 +160,10 @@ function test2_2_1(): void {
 
   class A {
     public name1: string = '';
-    constructor(name: string) {
+    constructor(name: string) { // 通常不会为构造方法添加修饰符，默认的是 public
       this.name1 = '';
     };
-    setName1(name: string) {
+    setName1(name: string): void {
       this.name1 = name;
     };
   };
@@ -260,11 +262,12 @@ function test2_3(): void {
 
 /**
  * 抽象类 一个抽象方法描述了这一方法在实际实现中的结构
+ * ts 中无法声明静态的抽象成员
  */
 function test2_4(): void {
   console.log('---test2_4---------------------------------------------');
 
-  abstract class A {
+  abstract class A { // 还可以 interface A {
     abstract name1: string;
     constructor() { };
     abstract getName1(): string;

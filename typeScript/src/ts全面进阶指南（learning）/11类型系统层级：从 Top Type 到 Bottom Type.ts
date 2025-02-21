@@ -1,4 +1,3 @@
-import { Result } from '../../../element-ui源码/element/types/element-ui';
 function test() {
   console.log('---类型系统层级：从 Top Type 到 Bottom Type---------------------------------------------');
 
@@ -6,6 +5,7 @@ function test() {
   test2();
   test3();
   test4();
+  test5();
 };
 
 /**
@@ -16,7 +16,7 @@ declare let b: string | number;
 function test1() {
   console.log('---test1---------------------------------------------');
 
-  // 第一种，使用 extends 关键字 来判断前面的是不是后面的子类型，<a 类型> extends <b 类型> 说明 <a 类型> 是 <b 类型> 的子类型
+  // 第一种，使用 extends 关键字 来判断前面的是不是后面的子类型，<a 类型> extends <b 类型> 说明 <a 类型> 是 <b 类型> 的子类型，如果不成立不能说明 <b 类型> 是 <a 类型> 的子类型，也就是 extends 只能正向的看，不能反向的看
   type Result = 'huang' extends string ? 1 : 2; // Result 1
   type Result1 = 'huang' extends String ? 1 : 2; // Result1 1
 
@@ -59,6 +59,8 @@ function test3() {
 
 /**
  * 联合类型
+ * 只要满足其中一个类型，就可以认为实现了这个联合类型
+ * 字面量类型 < 包含此字面量类型的联合类型（同一基础类型） < 对应的原始类型 
  */
 function test3_1() {
   console.log('---test3_1---------------------------------------------');
@@ -85,7 +87,7 @@ function test3_2() {
 
   const a: {} = '1223';
   // let b: object = '123'; // 会报错
-  type Result4 = {} extends object ? 1 : 2; // Result4 1 // 这里很奇怪，按理来说，{} 类型应该比 object 类型更加的广，为什么 {} 会是 object 的子类型
+  type Result4 = {} extends object ? 1 : 2; // Result4 1 // 这里很奇怪，按理来说，{} 类型应该比 object 类型更加的广，为什么 {} 会是 object 的子类型。这里比较会将 {} 当成一个字面量 {}，当 {} 在 extends 后面的时候，会当成类型，而不是字面量
   type Result5 = {};
   type Result6 = Result5 extends object ? 1 : 2; // 1 
 
@@ -96,22 +98,25 @@ function test3_2() {
  * Top Type
  * any 和 unknown 无视一切的因果定律
  * Object 类型是 any 和 unknown 类型的子类型
+ * Object < any / unknown
  */
 function test3_3() {
   console.log('---test3_3---------------------------------------------');
 
-  // any extends 时，表现的是，any 让一部分的条件满足，让一部分的条件不满足，实际表现为，直接将返回条件类型组合成联合类型
+  // any extends 时，表现的是，any 让条件成立一部分，让条件不成立一部分，实际表现为，直接将返回条件类型组合成联合类型
   type Result24 = any extends Object ? 1 : 2; // 1 | 2
-  // unknown类型和any类型是不同的，它只能赋值给 unknown 类型和 any 类型 
+  // unknown 类型和 any 类型是不同的，它只能赋值给 unknown 类型和 any 类型 
   type Result25 = unknown extends Object ? 1 : 2; // 2
 
-  // any extends unknown 和 unknown extends any 都是成立的
+  // any extends unknown 和 unknown extends any 都是完全成立的，不存在一部分满足一部分不满足
 
 };
 
 /**
  * 向下探索，直到万物虚无
  * never null undefined void
+ * 
+ * never < 字面量类型
  */
 function test4() {
   console.log('---test4---------------------------------------------');
@@ -119,6 +124,24 @@ function test4() {
   // never 类型是 虚无 的类型，他是任何类型的 子类型
   type Result1 = never extends undefined ? 1 : 2; // Result1 1
 
+  // null undefined void
+  type Result2 = null extends '' ? 1 : 2; // Result2 2
+  type Result3 = undefined extends '' ? 1 : 2; // Result3 2
+  type Result4 = void extends '' ? 1 : 2; // Result4 2
+
+};
+
+/**
+ * 其他场景比较场景
+ * 基类和派生类
+ * 联合类型的多个成员
+ * 数组和元组
+ */
+function test5() {
+  // 基类和派生类 本身就是 extends 获得的产物
+  // 联合类型的多个成员
+  type Result1 = 1 | 2 extends 1 | 2 | 3 ? 1 : 2; // Result1 1
+  type Result2 = 1 | 4 extends 1 | 2 | 3 ? 1 : 2; // Result2 2
 
 };
 export default test;

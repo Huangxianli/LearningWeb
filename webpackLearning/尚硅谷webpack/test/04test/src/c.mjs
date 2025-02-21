@@ -1,0 +1,1 @@
+export const max = (a, b) => Math.max(a, b); 

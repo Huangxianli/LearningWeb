@@ -20,6 +20,7 @@ function test1(): void {
 
 /**
  * es6及以上新增的原始类型
+ * 原始类型 String Number Boolean Null Undefined BigInt Symbol
  */
 function test1_1(): void {
   console.log('---test1_1---------------------------------------------');
@@ -31,11 +32,12 @@ function test1_1(): void {
 /**
  * undefined 和 null
  * 在 js 中：
- * undefined 表示 已经声明了，但是没有赋值
+ * undefined 表示 已经声明了，但是没有赋值；对象中不存在的属性；函数未返回值
  * null 表示 已经声明了，而且给了一个 null 值（或者说变量应该有值但是目前还没有，且期待是一个引用类型的值）
  * 在 ts 中：
  * null 和 undefined 都有具体的意义
  * 如果 strictNullChecks 为 false，则是其他类型的子类型；如果 strictNullChecks 为 true，则不是其他类型的子类型，赋值给其他类型的时候会报错
+ * 在实际的开发过程中，最好是将 strictNullChecks 设置为 true，不让 null 和 undefined 作为其他类型的子类型
  */
 function test1_2(): void {
   console.log('---test1_2---------------------------------------------');
@@ -47,32 +49,38 @@ function test1_2(): void {
 
 /**
  * void
- * 在 js 中：执行后面的表达式，并返回 undefined
- * 在 ts 中：用于描述一个没有 没有 return 、return了但是没有显示的值 的函数的返回值
+ * 在 js 中：执行后面的表达式，并总是返回 undefined
+ * 在 ts 中：用于描述一个没有 return 、return 了但是没有显式的值 的函数的返回值
  * 
- * 注意一点，即使显示 return undefined，会被推导成 undefined，但是在声明的时候，可以用 void；undefined 是可以 赋值给 void 类型的；也就表明，即使是 void 类型，其值有可能是实实在在的 undefined
+ * 注意一点，即使显式的 return undefined，会被推导成 undefined，但是在声明的时候可以用 void；说明 undefined 是可以赋值给 void 类型的；也就表明，即使标注的是 void 类型，其值有可能是实实在在的 undefined
+ * 
+ * 注意：只有显示的 return undefined 的时候，才会被推导成 undefined 类型
+ * 
+ * 其实在实际上 void 表示的类型范围是要比 undefined 类型要大的，undefined 类型可以赋值给 void 类型
  */
 function test1_3(): void {
   console.log('---test1_3---------------------------------------------');
 
   // 鼠标移到函数名称函看类型推导
-  function test1_3_1() {
-    // return;
-    // return undefined;
+  function test1_3_1() { // 表明没有显式的 return 具体的内容的时候，会被推导成 void 类型，只有 return 了一个显示的内容，才会推导成返回值对应的类型
+    // return; // 会推导成 void
+    // return undefined; // 会推导成 undefined
   };
 
   function test1_3_2(): void {
     return undefined; // undefined 可以赋值给 void
   };
+  // let test1_3_2_1: undefined = test1_3_2(); // 会报错，void 类型，不能赋值给 undefined 类型
 
   function test1_3_3(): undefined {
     return; // 按理来说，直接 return，但是 return 后面没有内容，应该是被推导成 void 的，void 应该是不能赋值给 udefined 的 这里为什么可以？？？
+    // 这里是一个边界情况，在 ts 中 return 后面没有接内容的话，应该是会推导成 void 类型的，但是在 js 中，return 后面没有接内容默认的是 return undefined 的，作为一种边界情况，实际上不推荐这么写，没有就 return undefined 定义为 undefined 类型，要不就 return 定义为 void 类型。
   }
 
   let test1_3_4: undefined = undefined;
   let test1_3_5: void = test1_3_4; // undefined 可以被赋值给 void
   let test1_3_6: undefined;
-  test1_3_6 = void 0; // 很奇怪，这里也没有报错
+  test1_3_6 = void 0; // 很奇怪，这里也没有报错 // 这里识别的是 js 中的 void，执行后面的语句，并返回 undefined 类型
 };
 
 /**
@@ -97,6 +105,8 @@ function test2_1(): void {
 
 /**
  * 元祖
+ * 元组限制了数组的类型和长度范围
+ * 还可以使用具名元组来给元组中的每一项做定义
  */
 function test2_2(): void {
   console.log('---test2_2---------------------------------------------');
@@ -104,6 +114,7 @@ function test2_2(): void {
   const arr1: [string, number?] = ['1'];
   // arr1[2];
 
+  // 具名元组
   const arr2: [name: string, age?: number] = ['12'];
 };
 
@@ -127,27 +138,31 @@ function test3_1(): void {
   interface Obj1 {
     name: string,
     male?: boolean, // 这里声明了类型，读这个属性的时候，即使已经给值了，但是会按照接口定义为准 boolean | undefined
-    readonly single: boolean,
+    readonly single: boolean, // 只读属性要在变量定义的时候就赋值，并且之后就不能赋值了
   };
   const obj1: Obj1 = {
     name: '',
-    // age: 12,
+    // age: 12, // age 不在接口 Obj1 里面，不能添加在这个对象里面，即使是赋值原值，也会报错
     single: true,
   };
-  const a = obj1.male;
+  // obj1.single = true; // 即使是赋原值，一样会报错
+  const a = obj1.male;  // 由于定义的时候 male 定义为 boolean 而且该属性不一定存在，所以会 a 的类型是 boolean | undefined
 };
 
 /**
- * 数组/元组上使用 readonly 只能将整个标记成 readonly
+ * 数组/元组上使用 readonly 只能将整个标记成 readonly，在定义时候的赋值之后，里面的每一项都不能在改变，而且也无法再改变长度，无法重新赋值新的引用地址
  * 失去了 push 等方法，不能修改原数组的任何一项的值
  */
 function test3_2() {
   console.log('---test3_2---------------------------------------------');
 
-  const arr1: readonly [number] = [1];
-  const arr2: ReadonlyArray<number> = [1];
+  const arr1: readonly [number] = [1]; // 元组
+  const arr2: ReadonlyArray<number> = [1]; // 数组
   // arr2.push(1);
+  // arr2.pop();
   // arr2[1] = 12;
+  // arr2 = [];
+
   // arr1[0] = 12;
 };
 
@@ -168,6 +183,9 @@ function test3_3(): void {
  * 区分这三者
  * Object 和 {} 都表示除 undefined、null 和 void 0 之外的任何类型，但是 {} 类型不可以进行属性操作，即使是赋值了
  * object 表示除了 undefined、undefined 和 void 0 之外的任何非原始类型
+ * 
+ * Object 在 js 里面是一切
+ * 
  */
 function test4(): void {
   console.log('---test4---------------------------------------------');
@@ -198,11 +216,13 @@ function test4_1(): void {
 
   // const object4: Object = null;
   // const object5: Object = undefined;
+
+  let object6: Object = '' as String; // 装箱类型也是 Object 的子类型
 };
 
 /**
  * object
- * 确保是引用类型（object 也要排除 undefined、null、void 0）
+ * 确保是引用类型（object 类型也要排除 undefined、null、void 0）
  */
 function test4_2(): void {
   console.log('---test4_2---------------------------------------------');
