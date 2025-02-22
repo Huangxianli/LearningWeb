@@ -5,3 +5,7 @@ body {
   padding: 0;
   margin: 0;
 }
+#imgBackGround {
+  height: 100px;
+  background-image: url(../../assets/image.png);
+}
