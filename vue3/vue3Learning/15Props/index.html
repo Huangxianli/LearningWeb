@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>15Props</title>
+  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+</head>
+
+<body>
+  <div id="app1"></div>
+  <hr />
+  <div id="app2"></div>
+  <hr />
+  <div id="app3"></div>
+
+  <script>
+    const { createApp, ref, reactive, watch } = Vue;
+
+    /**
+     * Props 声明
+     * 如果是在 <script setup> 中，使用 defineProps defineProps({ name: String })
+     * 如果是在 setup 函数中，使用 props
+     */
+    const Component1 = {
+      props: {
+        name: String,
+      },
+      template: `
+        <div>{{name}}</div>
+      `
+    };
+
+    createApp({
+      components: {
+        Component1
+      },
+      setup () { },
+      template: `
+        <Component1 name="测试 props"/>
+      `,
+    }).mount('#app1');
+
+
+    /**
+     * 响应式 Props 解构
+     * 使用 defineProps 后进行解构，不需要使用，解构的数据会默认加上 props. ，注意如果是在 watch 等监听中使用的话，要使用 () =>
+     * 但是如果直接是从 props 中解构出来的，就不是响应式的
+     * 
+     * 是如果是在 3.4 及其以下的版本中，解构出来的是一个常量，不是响应式的，用 watch 监听不到
+     * 
+     */
+    const Component2 = {
+      props: {
+        name: String,
+      },
+      setup (props) {
+        console.log('进入了组件 Component2');
+        console.log(props.name);
+        const { name: name1 } = props; // 注意这里解构出来后，name1 是非响应式的
+        console.log(name);
+        watch(() => props.name, (newVal, oldVal) => {
+          console.log('props.name 变化了');
+          console.log(newVal, oldVal);
+        });
+        watch(() => name1, (newVal, oldVal) => {
+          console.log('name 变化了');
+          console.log(newVal, oldVal);
+        });
+        return {
+          name1,
+        }
+      },
+      template: `
+        <div>{{name}}</div>
+        <div>{{name1}}</div>
+      `,
+    };
+    createApp({
+      components: {
+        Component2,
+      },
+      setup () {
+        const name = ref('测试 props');
+        let times = 0;
+        let timer = setInterval(() => {
+          times++;
+          name.value = '测试 props' + Math.random();
+          if (times === 10) {
+            clearInterval(timer);
+            timer = null;
+          }
+        }, 1000);
+        return {
+          name,
+        };
+      },
+      template: `
+        <Component2 :name="name"/>
+      `,
+    }).mount('#app2');
+
+
+    /**
+     * 传递 prop 的细节
+     * Prop 名字格式 定义的时候使用小驼峰的写法，在 template 中，推荐使用 kabel-case 的写法
+     * 传递 Number Boolean 的时候要加 : 修饰符
+     */
+    createApp({
+
+    }).mount('#app3');
+
+    /**
+     * 单向数据流
+     */
+
+
+    /**
+     * Prop 校验
+     * defineProps({
+     *   name: {
+     *     type: String,
+     *     required: true,
+     *     default: '默认值', // 如果是引用类型，要是一个函数
+     *     validator: (value) => {}
+     *   },
+     * });
+     * 
+     * 除了 boolean 类型，其他的默认值都是 undefined
+     * 
+     * defineProps<{name: string}>(); // 也可以这样限制类型校验
+     * 
+     * 如果要是 null 类型，必须用 [] 包起来
+     */
+
+    /**
+     * Boolean 类型转换
+     * 
+     * 如果要在只传一个属性的时候，默认是 true，但是可以是几个类型的时候
+     * 声明的时候，Boolean 类型一定要在最前面
+     * type: [Boolean, String]
+     */
+  </script>
+</body>
+
+</html>
