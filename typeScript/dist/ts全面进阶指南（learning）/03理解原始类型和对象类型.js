@@ -4,6 +4,7 @@ function test() {
     test2();
     test3();
     test4();
+    test5();
 }
 ;
 /**
@@ -29,7 +30,7 @@ function test1_1() {
 /**
  * undefined 和 null
  * 在 js 中：
- * undefined 表示 已经声明了，但是没有赋值
+ * undefined 表示 已经声明了，但是没有赋值；对象中不存在的属性；函数未返回值
  * null 表示 已经声明了，而且给了一个 null 值（或者说变量应该有值但是目前还没有，且期待是一个引用类型的值）
  * 在 ts 中：
  * null 和 undefined 都有具体的意义
@@ -45,14 +46,14 @@ function test1_2() {
 ;
 /**
  * void
- * 在 js 中：执行后面的表达式，并总是放回 undefined
- * 在 ts 中：用于描述一个没有 没有 return 、return了但是没有显示的值 的函数的返回值
+ * 在 js 中：执行后面的表达式，并总是返回 undefined
+ * 在 ts 中：用于描述一个没有 return 、return 了但是没有显式的值 的函数的返回值
  *
- * 注意一点，即使显示 return undefined，会被推导成 undefined，但是在声明的时候可以用 void；说明 undefined 是可以赋值给 void 类型的；也就表明，即使是 void 类型，其值有可能是实实在在的 undefined
+ * 注意一点，即使显式的 return undefined，会被推导成 undefined，但是在声明的时候可以用 void；说明 undefined 是可以赋值给 void 类型的；也就表明，即使标注的是 void 类型，其值有可能是实实在在的 undefined
  *
  * 注意：只有显示的 return undefined 的时候，才会被推导成 undefined 类型
  *
- * 其实在实际上 void 表示的类型范围是要比 undefined 类型要大的
+ * 其实在实际上 void 表示的类型范围是要比 undefined 类型要大的，undefined 类型可以赋值给 void 类型
  */
 function test1_3() {
     console.log('---test1_3---------------------------------------------');
@@ -75,6 +76,8 @@ function test1_3() {
     let test1_3_5 = test1_3_4; // undefined 可以被赋值给 void
     let test1_3_6;
     test1_3_6 = void 0; // 很奇怪，这里也没有报错 // 这里识别的是 js 中的 void，执行后面的语句，并返回 undefined 类型
+    let test1_3_7;
+    // test1_3_6 = test1_3_7; // 这里会报错，通常情况下 void 类型是不能赋值给 undefined 类型的
 }
 ;
 /**
@@ -126,10 +129,10 @@ function test3_1() {
     ;
     const obj1 = {
         name: '',
-        // age: 12, // age 不在接口 Obj1 里面，不能添加在这个对象里面，即使是赋值原值，也会报错
+        // age: 12, // age 不在接口 Obj1 里面，不能添加在这个对象里面
         single: true,
     };
-    // obj1.single = true; // 即使是赋原值，一样会报错
+    // obj1.single = true; // 因为定义类型的时候，添加了修饰符 readonly，即使是赋原值，一样会报错
     const a = obj1.male; // 由于定义的时候 male 定义为 boolean 而且该属性不一定存在，所以会 a 的类型是 boolean | undefined
 }
 ;
@@ -212,7 +215,9 @@ function test4_2() {
  * {}
  * 内部无属性的空对象
  * 除去 undefined、null、void 0 的任何类型
- * 但是无法进行属性的赋值操作，即使是已经进行了赋值
+ * 无法访问属性（除了 Object 原型上的属性）
+ * 无法调用方法
+ * 不能进行属性赋值
  *
  * 避免使用它
  */
@@ -222,11 +227,24 @@ function test4_3() {
     const object2 = {
         12: 12
     };
+    object2.toString(); // 访问 Object 原型上的属性是允许的
+    // object2[12]; // 这种访问也报错
     const object3 = function () { };
     // const object4: {} = undefined;
     // const object5: {} = null;
     // object1.name = 12;
-    // object3();
+    // object3(); // 这种操作也不允许
+}
+;
+/**
+ * unique symbol
+ * 是 symbol 的子类型，没有个 unique symbol 类型都是独一无二的类型
+ */
+function test5() {
+    // let uniqueSymbol1: unique symbol = Symbol('test1'); // unique symbol 类型只能是 const 声明，不能用 let 声明
+    const uniqueSymbol2 = Symbol('test2');
+    // const uniqueSymbol3: unique symbol = uniqueSymbol2; // 因为每一个 unique symbol 类型都是独一无二的类型，所以不能相互赋值
+    const uniqueSymbol4 = uniqueSymbol2; // 可以通过这种方式来进行赋值
 }
 ;
 export default test;

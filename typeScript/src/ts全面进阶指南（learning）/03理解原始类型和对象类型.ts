@@ -5,6 +5,7 @@ function test(): void {
   test2();
   test3();
   test4();
+  test5();
 };
 
 /**
@@ -81,6 +82,8 @@ function test1_3(): void {
   let test1_3_5: void = test1_3_4; // undefined 可以被赋值给 void
   let test1_3_6: undefined;
   test1_3_6 = void 0; // 很奇怪，这里也没有报错 // 这里识别的是 js 中的 void，执行后面的语句，并返回 undefined 类型
+  let test1_3_7: void;
+  // test1_3_6 = test1_3_7; // 这里会报错，通常情况下 void 类型是不能赋值给 undefined 类型的
 };
 
 /**
@@ -100,7 +103,7 @@ function test2_1(): void {
   console.log('---test2_1---------------------------------------------');
 
   const arr1: string[] = [];
-  const arr3: Array<String> = [];
+  const arr3: Array<string> = [];
 };
 
 /**
@@ -142,10 +145,10 @@ function test3_1(): void {
   };
   const obj1: Obj1 = {
     name: '',
-    // age: 12, // age 不在接口 Obj1 里面，不能添加在这个对象里面，即使是赋值原值，也会报错
+    // age: 12, // age 不在接口 Obj1 里面，不能添加在这个对象里面
     single: true,
   };
-  // obj1.single = true; // 即使是赋原值，一样会报错
+  // obj1.single = true; // 因为定义类型的时候，添加了修饰符 readonly，即使是赋原值，一样会报错
   const a = obj1.male;  // 由于定义的时候 male 定义为 boolean 而且该属性不一定存在，所以会 a 的类型是 boolean | undefined
 };
 
@@ -238,7 +241,9 @@ function test4_2(): void {
  * {}
  * 内部无属性的空对象
  * 除去 undefined、null、void 0 的任何类型
- * 但是无法进行属性的赋值操作，即使是已经进行了赋值
+ * 无法访问属性（除了 Object 原型上的属性）
+ * 无法调用方法
+ * 不能进行属性赋值
  * 
  * 避免使用它
  */
@@ -249,14 +254,30 @@ function test4_3(): void {
   const object2: {} = {
     12: 12
   };
+  object2.toString(); // 访问 Object 原型上的属性是允许的
+  // object2[12]; // 这种访问也报错
 
   const object3: {} = function () { };
   // const object4: {} = undefined;
   // const object5: {} = null;
 
   // object1.name = 12;
-  // object3();
+  // object3(); // 这种操作也不允许
 
+};
+
+
+/**
+ * unique symbol
+ * 是 symbol 的子类型，没有个 unique symbol 类型都是独一无二的类型
+ */
+function test5(): void {
+  // let uniqueSymbol1: unique symbol = Symbol('test1'); // unique symbol 类型只能是 const 声明，不能用 let 声明
+  const uniqueSymbol2: unique symbol = Symbol('test2');
+
+  // const uniqueSymbol3: unique symbol = uniqueSymbol2; // 因为每一个 unique symbol 类型都是独一无二的类型，所以不能相互赋值
+
+  const uniqueSymbol4: typeof uniqueSymbol2 = uniqueSymbol2; // 可以通过这种方式来进行赋值
 };
 
 
