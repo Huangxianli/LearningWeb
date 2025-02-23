@@ -107,7 +107,7 @@ function test2() {
   const Foo = Items.Bar;
   const Zero = Items[800];
 
-  const enum Item1 {
+  const enum Item1 { // 常量枚举
     Foo = 0,
   };
   // const Zero1 = Item1[0]; // 会报错
