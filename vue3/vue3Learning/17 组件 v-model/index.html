@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>17组件v-model</title>
+  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+</head>
+
+<body>
+  <div id="app1"></div>
+  <hr />
+  <div id="app2"></div>
+  <hr />
+  <div id="app3"></div>
+  <hr />
+  <div id="app4"></div>
+
+  <script>
+    const { createApp, ref } = Vue;
+
+    /**
+     * Vue3.4 之后的推荐写法是
+     * 在子组件中 const model = defineModel() 生成一个 ref 对象，model.value 接收的是父组件传递的 modelValue，同时修改 model 的时候，会自动执行 $emit('update:modelValue', model.value)
+     * 会被解析为：
+     * 一个名为 modelValue 的 prop，本地 ref 的值与其同步；
+     * 一个名为 update:modelValue 的事件，当本地 ref 的值发生变更时触发。
+     * 
+     * 
+     * const model = defineModel({ 
+     *  required: true, // 使用该组件的时候，必须要加上 v-model
+     *  default: 0, // 默认值为0，但是注意，这个0不会反作用到使用 父组件和该组件 v-model 绑定的对象上
+     * })
+     */
+    const Component1 = {
+      emits: ['update:modelValue'],
+      props: {
+        modelValue: {
+          type: String,
+          required: true
+        }
+      },
+      template: `
+        <input :value="modelValue" @input="$emit('update:modelValue', $event.target.value)" />
+      `,
+    };
+    createApp({
+      components: {
+        Component1
+      },
+      setup () {
+        const inputValue = ref('');
+        const inputValue1 = ref('');
+
+        return {
+          inputValue,
+          inputValue1
+        };
+      },
+      template: `
+        <Component1 v-model="inputValue" />{{inputValue}}
+        <br />
+        <Component1 :modelValue="inputValue1" @update:modelValue="inputValue1 = $event" />{{inputValue1}}
+      `,
+    }).mount('#app1');
+
+
+    /**
+     * v-model 的参数
+     * defineModel('model1'); 表示，有一个 prop 叫 model1，更新事件为 update:model1
+     * defineModel('model1', { required: true }); 也可以
+     * 在使用该组件的时候，绑定 v-model 应该为 v-model:model1=""
+     */
+    const Component2 = {
+      props: {
+        model1: {
+          type: String,
+          required: true,
+        }
+      },
+      emits: ['update:model1'],
+      template: `
+        <input :value="model1" @input="$emit('update:model1', $event.target.value)" />{{model1}}
+      `,
+    };
+    createApp({
+      components: {
+        Component2
+      },
+      setup () {
+        const modelData = ref('');
+        return {
+          modelData
+        };
+      },
+      template: `
+        <Component2 v-model:model1="modelData" />
+      `,
+    }).mount('#app2');
+
+
+    /**
+     * 多个 v-model 绑定
+     * Vue3.4 中推荐的用法：
+     * defineModel('model1');
+     * defineModel('model2');
+     * 使用的时候是 v-model:model1="" v-model:model2=""
+     */
+    const Component3 = {
+      props: {
+        model1: {
+          type: String,
+          required: true,
+        },
+        model2: {
+          type: String,
+          required: true,
+        }
+      },
+      emits: ['update:model1', 'update:model2'],
+      template: `
+        <input :value="model1" @input="$emit('update:model1', $event.target.value)" />{{model1}}
+        <br />
+        <input :value="model2" @input="$emit('update:model2', $event.target.value)" />{{model2}}
+      `,
+    };
+    createApp({
+      components: {
+        Component3,
+      },
+      setup () {
+        const modelData1 = ref('');
+        const modelData2 = ref('');
+        return {
+          modelData1,
+          modelData2,
+        };
+      },
+      template: `
+        <Component3 v-model:model1="modelData1" v-model:model2="modelData2" />
+      `,
+    }).mount('#app3');
+
+
+    /**
+     * 处理 v-model 修饰符
+     * 有一些内置的修饰符 .trim .number .lazy
+     * 
+     * 在 Vue3.4 之后的写法
+     * const [model, modifiers] = defineModel({ set(value) { if(modifiers.XXX) { return value} return value } });
+     * modifiers 里面就是修饰符信息；在 defineModel() 里面传入 { set= value => value } 来实现 v-model 修饰符
+     * 
+     * 带参数且带修饰符的如何实现
+     * defineModel('modelProps', { set(){} })
+     */
+    const Component4 = {
+      props: {
+        modelValue: {
+          type: String,
+          required: true,
+          default: '1', // 这里的默认值会向上传递，使用 defineModel({default: '1'}) 产生的默认值不会向上传递
+        },
+        modelModifiers: { // 这里面传递的就是修饰符，如果 v-model.upper 那么 modelModifiers.upper = true
+          default: () => ({}),
+        },
+        model1: {
+          type: String,
+          required: true,
+        },
+        model1Modifiers: { // 注意这里有一个 1 
+          default: () => ({})
+        }
+      },
+      emits: ['update:modelValue',],
+      setup (props, ctx) {
+        const handleInput = e => {
+          let value = e.target.value;
+          if (props.modelModifiers.upper) {
+            value = value?.toUpperCase();
+          }
+          ctx.emit('update:modelValue', value);
+        };
+        const handleInput1 = e => {
+          let value = e.target.value;
+          if (props.model1Modifiers.upper) {
+            value = value?.toUpperCase();
+          }
+          ctx.emit('update:model1', value);
+        };
+
+        return {
+          handleInput,
+          handleInput1,
+        };
+      },
+      template: `
+        <input :value="modelValue" @input="handleInput" />{{modelValue}}
+        <br />
+        <input :value="model1" @input="handleInput1" /> {{model1}}
+      `,
+    };
+    createApp({
+      components: {
+        Component4,
+      },
+      setup () {
+        const model = ref();
+        const model1 = ref('1'); // 这个默认值会向下传递
+        return {
+          model,
+          model1,
+        };
+      },
+      template: `
+        <Component4 v-model.upper="model" v-model:model1.upper="model1" />
+      `,
+    }).mount('#app4');
+
+
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>透传 Attributes</title>
+  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+</head>
+
+<body>
+  <div id="app1"></div>
+
+  <script>
+    const { createApp, ref } = Vue;
+
+
+    /**
+     * Attributes 继承
+     */
+    const Component1 = {
+      props: {},
+      template: ``,
+    };
+    createApp({
+      components: {},
+      setup () { },
+      template: ``,
+    }).mount('#app1');
+  </script>
+</body>
+
+</html>
