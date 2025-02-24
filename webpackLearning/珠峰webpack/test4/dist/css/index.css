@@ -1,0 +1,17 @@
+/*!*********************************************************************!*\
+  !*** css ./node_modules/css-loader/dist/cjs.js!./src/css/index.css ***!
+  \*********************************************************************/
+#image1 {
+  height: 100px;
+  background: url(../js/../img/1.cf20dcd651f97374b376.png);
+}
+
+#image2 {
+  height: 100px;
+  background: url(../js/../img/2.41f9a0dab1e5992ed0fa.png);
+}
+
+#image3 {
+  height: 100px;
+  background: url(../js/../img/3.f40b9c993c5b97955364.png);
+}

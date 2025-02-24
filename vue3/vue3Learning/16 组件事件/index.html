@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>组件事件</title>
+  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+</head>
+
+<body>
+  <div id="app1"></div>
+  <hr />
+  <div id="app2"></div>
+  <hr />
+  <div id="app3"></div>
+
+  <script>
+    const { createApp, ref } = Vue;
+
+    /**
+     * 触发与监听事件
+     * 注意，组件触发的事件没有事件冒泡，只能直接父组件接受
+     * 在 template 内触发，直接使用 $emit()
+     * 事件名命名使用小驼峰，绑定的时候，推荐使用 kabel-case
+     */
+    const Component1 = {
+      setup () {
+      },
+      template: `
+        <button @click="$emit('handle-click-1')">点击</button>
+      `,
+    };
+    createApp({
+      components: {
+        Component1
+      },
+      setup () {
+        const handleClick = () => {
+          console.log('子组件触发了点击事件')
+        };
+        return {
+          handleClick,
+        };
+      },
+      template: `
+        <Component1 @handle-click-1.once="handleClick"/>
+      `,
+    }).mount('#app1');
+
+
+    /**
+     * 事件参数
+     * $emit()中传入的参数都会直接传入监听器
+     */
+    const Component2 = {
+      // emits: ['input'],
+      // inheritAttrs: false,
+      template: `
+        <input @input="$emit('input', 1, 2, $event, 3, 4)" @change="$emit('my-change', 1, 2, 3, 4)"/>
+      `,
+    };
+
+    createApp({
+      components: {
+        Component2,
+      },
+      setup () {
+        const handleInput = event => {
+          // 这里会执行两次，原因是：组件内本身是在 input事件 内 $emit('input')，而且根组件就是触发这个 input 事件的标签，而触发的组件又没有 ineritAttrs: false emits: ['input'] 之一，就会导致我们在本组件上绑定的 input 事件又绑定在了触发的组件的标签上，这样子组件的标签上就有两个 input 事件绑定了，
+          console.log(event);
+        };
+        const handleMyChange = (...arg) => {
+          console.log(arg);
+        }
+
+        return {
+          handleInput,
+          handleMyChange,
+        };
+      },
+      template: `
+        <Component2 @input="handleInput" @my-change="handleMyChange" />
+      `,
+    }).mount('#app2');
+
+
+    /**
+     * 声明触发的事件
+     * 如果是在 <script setup> 中，要使用 const emit = defineEmits(['eventName']) emit('eventName') 这样使用
+     * 在 setup(){} 使用 使用 setup 的第二个参数 ctx.emit 来触发，可以在 setup 同级的 emits: ['evenetName'] 中声明，不声明也可以
+     * 
+     * 可以在声明中进行校验参数，注意即使是没有通过校验，还是会传递参数，只是在开发模式下控制台会有警告
+     */
+    const Component3 = {
+      emits: {
+        'my-input' () {
+          return true;
+        },
+        'my-change' () {
+          return true;
+        },
+        'my-blur' (playload) {
+          if (playload === '1') {
+            return true;
+          } else {
+            return false;
+          }
+        }
+
+      }, // 不写也没关系
+      setup (props, ctx) {
+        const inputValue = ref('');
+        const handleChange = () => {
+          ctx.emit('my-change');
+        };
+        return {
+          handleChange,
+        }
+      },
+      template: `
+        <input v-model="inputValue" @input="$emit('my-input')"  @change="handleChange" @blur="$emit('my-blur', inputValue)"/>
+      `,
+    };
+    createApp({
+      components: {
+        Component3,
+      },
+      setup () {
+        const handleMyInput = () => {
+          console.log('进入了 HandleMyInput');
+        };
+        const handleMyChange = () => {
+          debugger
+          console.log('进入了 handleMyChange');
+        };
+        const handleMyBlur = (playload) => {
+          console.log('进入了 handleMyBlur', playload);
+        };
+
+        return {
+          handleMyInput,
+          handleMyChange,
+          handleMyBlur
+        };
+      },
+      template: `
+        <Component3 @my-input="handleMyInput"  @my-change="handleMyChange" @my-blur="handleMyBlur" />
+      `,
+    }).mount('#app3');
+  </script>
+</body>
+
+</html>

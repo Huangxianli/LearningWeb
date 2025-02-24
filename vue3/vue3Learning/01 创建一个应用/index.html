@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>注册</title>
+  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+</head>
+
+<body>
+  <div id="app1"></div>
+  <hr />
+  <div id="app2"></div>
+  <hr />
+  <div id="app3"></div>
+  <hr />
+  <div id="app4">
+    <div>没有在 createApp 的根组件中传递 template</div>
+  </div>
+  <hr />
+  <div id="app5"></div>
+  <script>
+    const { createApp } = Vue;
+
+    /**
+     * 每个 Vue 应用都是通过 createApp 函数创建一个新的 应用实例
+     */
+    createApp({
+      setup () { },
+      template: `
+        <div>这是一个 Vue 应用</div>
+      `,
+    }).mount('#app1');
+
+    const rootComponent = {
+      setup () { },
+      template: `
+        <div>将根组件抽离处理</div>
+      `,
+    };
+    createApp(rootComponent).mount('#app2');
+
+    /**
+     * 引用实例必须在调用了 .mount() 方法之后才会渲染出来；传入的参数可以一个 DOM，可以是一个 CSS 选择器字符串
+     */
+    const DOM = document.querySelector('#app3');
+    createApp({
+      setup () { },
+      template: `
+        <div>.mount() 方法中传递的是一个 DOM</div>
+      `,
+    }).mount(DOM);
+
+    /**
+     * 如果没有 templat 内容，那么会利用容器的 innerHTML 作为模板
+     */
+    createApp({
+      setup () { },
+    }).mount('#app4');
+
+    /**
+     * 应用配置
+     * 应用实例有一个 config 对象，允许配置一些应用级别的选项
+     */
+    const app = createApp({
+      setup () {
+        throw new Error('抛出错误');
+      },
+      template: `
+        <div>应用配置</div>
+      `,
+    });
+    app.config.errorHandler = (err, vm, info) => {
+      console.error('错误处理', err, vm, info);
+    };
+    app.mount('#app5');
+  </script>
+</body>
+
+</html>
