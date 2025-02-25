@@ -10,6 +10,12 @@
 
 <body>
   <div id="app1"></div>
+  <hr />
+  <div id="app2"></div>
+  <hr />
+  <div id="app3"></div>
+  <hr />
+  <div id="app4"></div>
 
   <script>
     const { createApp, ref } = Vue;
@@ -19,16 +25,141 @@
      * Attributes 继承
      * 继承的是没有被声明为 props 或 emits 的 attribute 或 v-on 事件监听器
      * 如果组件是单根元素作渲染时，透传的 atttibute 会被添加到根元素上
+     * 
+     * class 和 style 会合并
+     * class 会两者并集，style 取并集，如果是相同的属性绑定在组件上的会覆盖掉组件内根元素的相同属性
+     * 
+     * v-on 的绑定的事件也会被继承，如果是两个相同的事件，会先执行元素上绑定的，再执行继承的
+     * 
+     * 如果一个组件中的模板中的内容只是渲染另一个组件，没有任何其他的元素，那么会一层一层的继承
+     * 
+     * 注意：如果是被定义为了 props 和 emits 的话，就不会被继承
      */
     const Component1 = {
       props: {},
-      template: ``,
+      methods: {
+        handleClick () {
+          console.log('Component1 的 click');
+        },
+      },
+      template: `
+        <div class="component1Class" style="color: red; font-size: 12px" @click="handleClick" >
+          <input />
+        </div>
+      `,
     };
     createApp({
-      components: {},
-      setup () { },
-      template: ``,
+      components: {
+        Component1,
+      },
+      setup () {
+        const handleClick = () => {
+          console.log('根组件的 click');
+        };
+        return {
+          handleClick
+        };
+      },
+      template: `
+        <Component1 class="rootClass" style="color: green" @click="handleClick" />
+        <!-- 会被合并成 class="component1Class rootClass"  style="color: green; font-size: 12px;"-->
+      `,
     }).mount('#app1');
+
+    /**
+     * 禁用 Attribute 继承
+     * 可以使用 inheritAttrs: false 来限制继承；注意，class 和 style 也会限制继承，这个和 Vue2 的表现是不同的
+     * 
+     * 如果是在 <script setup> 中，使用 defineOptions({ inheritAttrs: false })
+     * 
+     * $attrs 可以获取到透传进来的 attribute，无论 inheritAttrs的值是什么
+     * $attrs 中除了 props 和 emits 中声明的 attribute，其他的 attribute 都可以访问到
+     */
+    const Component2 = {
+      props: {},
+      inheritAttrs: false,
+      setup (props, ctx) {
+        ctx.attrs.onClick(); // v-on 会转化成 onEventName
+        console.log(ctx.attrs.prop1); // prop1
+        console.log(ctx.attrs.class); // class1
+      },
+      template: `
+        <div>
+          <input />
+        </div>
+      `,
+    };
+    createApp({
+      components: {
+        Component2,
+      },
+      setup () { },
+      template: `
+        <Component2 class="class1" style="background: red" prop1="prop1" @click="console.log('进入了 console')"/>
+      `,
+    }).mount('#app2');
+
+    /**
+     * 多根节点的 Attributes 继承
+     * 多根节点不会自动的 attribute 透传，如果没有显示的绑定 $attrs，会抛出一个运行时警告
+     */
+    const Component3 = {
+      template: `
+        <div>第一个根节点</div>
+        <div v-bind="$attrs">第二个根节点</div>
+      `,
+    };
+    createApp({
+      components: {
+        Component3,
+      },
+      setup () {
+
+      },
+      template: `
+        <Component3 style="background: red" @click="console.log('1')" />
+      `,
+    }).mount('#app3');
+
+
+    /**
+     * 在 JavaScript 中访问透传 Attributes
+     * 
+     * 如果是在 <script setup> 中，使用 useAttrs() 可以获取到 attrs，虽然可以获取到的是最新的数据，但是他不是响应式的
+     */
+    const Component4 = {
+      setup (props, ctx) {
+        const handleInput = () => {
+          ctx.attrs.onInput();
+          ctx.attrs.prop1 += '1';
+          console.log('ctx.attrs.prop1', ctx.attrs.prop1);
+        };
+        return {
+          handleInput,
+        };
+      },
+      template: `
+        <div>
+          <input @input="handleInput" />
+          {{$attrs.prop1}}
+        </div>
+      `,
+    };
+    createApp({
+      components: {
+        Component4,
+      },
+      setup () {
+        const prop1 = ref('prop1');
+        return {
+          prop1,
+        }
+      },
+      template: `
+        <Component4  @input="console.log('1')" :prop1="prop1" />
+      `,
+    }).mount('#app4');
+
   </script>
 </body>
 
