@@ -17,6 +17,8 @@
 
     /**
      * Attributes 继承
+     * 继承的是没有被声明为 props 或 emits 的 attribute 或 v-on 事件监听器
+     * 如果组件是单根元素作渲染时，透传的 atttibute 会被添加到根元素上
      */
     const Component1 = {
       props: {},
