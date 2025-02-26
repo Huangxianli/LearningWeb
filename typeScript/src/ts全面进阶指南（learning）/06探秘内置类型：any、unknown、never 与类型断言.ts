@@ -8,6 +8,9 @@ function test(): void {
 
 /**
  * 内置类型：any、unknown 与 never
+ * any 可以接收任何类型，可以赋值给除了 never 之外的其他所有类型
+ * unknown 可以接收任何类型，可以赋值给 any 和 unknown 类型
+ * never 只可以接收 never 类型，可以赋值给其他任何类型
  */
 function test1(): void {
   console.log('---test1---------------------------------------------');
@@ -89,7 +92,7 @@ function test1_3(): void {
   } else if (typeof val4 === 'number') {
 
   } else {
-    let val5: never = val4; // 这样如果 val5 的类型增加，如果 没有增加 else if 这里就会报错
+    let val5: never = val4; // 这样如果 val5 的类型增加，如果 没有增加 else if 这里就会报错，原因是 never 类型只能接收 never 类型
   }
 };
 
@@ -107,7 +110,7 @@ function test2(): void {
   let c: string = <string>a; // 这两种都是类型断言
   // let d: number = c as number; // 会报错
   let d: number = c as unknown as number; // 先断言成 unknown 类型 再断言成 number 类型
-  d = <number><unknown>c;
+  d = <number><unknown>c; // 从后往前判断
 }
 
 /**
@@ -122,7 +125,7 @@ function test3(): void {
   const obj: Obj = {
     fun() { }
   };
-  // obj.fun(); // 会报错，根据定义，你一定会有 fun 属性
+  // obj.fun(); // 会报错，根据定义，不一定会有 fun 属性
   obj.fun!(); // 注意和 js 中的 ? 不同，虽然在编译的时候不会报错，但是可能在运行的时候报错
 }
 

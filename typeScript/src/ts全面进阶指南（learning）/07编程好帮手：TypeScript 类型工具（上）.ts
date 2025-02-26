@@ -53,7 +53,7 @@ function test2() {
 
   type NeverType = number & string; // 不可能满足是 number 类型的同时又是 string 类型
 
-  // 对象的交叉类型内部的同名属性会按照交叉类型合并
+  // 对象的交叉类型内部的所有属性名称会取并集，同一属性名称的类型会取交集，如果属性对应的又是对象类型，则会再一次按照这个规则进行
   type Struct1 = {
     prop1: string;
     prop2: {
@@ -141,9 +141,16 @@ function test3_3() {
     [key: number]: number;
     [key: symbol]: string;
   };
+  interface NumberRecord1 {
+    [key: number]: number;
+    [key: symbol]: string;
+  };
 
   type NumberKeyValueType = NumberRecord['12']; // number
   type SymbolKeyValueType = NumberRecord[symbol]; // string 像这种 [] 里面是直接的一个类型，就要 NumberRecord 里面是直接定义了 [key: 类型]：类型 才可以
+
+  type NumberKeyValueType1 = NumberRecord['12']; // number
+  type SymbolKeyValueType1 = NumberRecord1[symbol];
 
   type AllValueType = NumberRecord[keyof NumberRecord]; // string | number
   type AllKeyType = keyof NumberRecord; // number | symbol
@@ -160,11 +167,11 @@ function test4() {
   console.log('---test4---------------------------------------------');
 
   type Stringify<T> = { // 在使用的时候，会遍历传入的 T 的所有的 Key ，并且 Key 对应的类型是 string，最终生成的是与传入的 T 的 Key 完全一样，但是 Key 对应的类型是 string 的新的类型
-    [key in keyof T]: string;
+    [key in keyof T]: string; // keyof 返回联合类型，in 遍历联合类型中的每个子类型
   };
 
   type Clone<T> = {
-    [K in keyof T]: T[K]; // 完全拷贝传入的对象的类型
+    [K in keyof T]: T[K]; // 完全拷贝传入的类型
   };
 };
 
