@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>异步组件</title>
+  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+</head>
+
+<body>
+  <div id="app1"></div>
+  <hr />
+  <div id="app2"></div>
+
+  <script>
+    const { createApp, ref, defineAsyncComponent } = Vue;
+
+    /**
+     * 使用 defineAsyncComponent() 来创建一个异步组件
+     * 
+     */
+    const AsyncComponent1 = defineAsyncComponent(() => {
+      return new Promise((resolve, reject) => {
+        setTimeout(() => {
+          resolve({
+            template: `
+              <div>异步加载的组件</div>
+            `,
+          })
+        }, 1000);
+      })
+    });
+    createApp({
+      components: {
+        AsyncComponent1,
+      },
+      template: `
+        <AsyncComponent1 /s>
+      `,
+    }).mount('#app1');
+
+    /**
+     * 加载与错误状态
+     */
+    const AsyncComponent2 = defineAsyncComponent({
+      loader: () => new Promise((resolve, reject) => { // loader 要是一个函数
+        setTimeout(() => {
+          reject();
+        }, 3000);
+      }),
+      loadingComponent: {
+        template: `
+          <div>加载中</div>
+        `,
+      },
+      errorComponent: {
+        template: `<div>加载失败</div>`
+      },
+      onError () { }
+    });
+    createApp({
+      components: { AsyncComponent2 },
+      template: `
+        <AsyncComponent2 />
+      `,
+    }).mount('#app2');
+  </script>
+</body>
+
+</html>

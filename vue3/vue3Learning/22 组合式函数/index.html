@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>组合式函数</title>
+  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+</head>
+
+<body>
+  <div id="app1"></div>
+  <hr />
+  <div id="app2"></div>
+  <hr />
+  <div id="app3"></div>
+
+  <script type="module">
+    import { useMouse, useFetch, useFetch1 } from './useFunction.js'
+    const { createApp, ref } = Vue;
+
+    /**
+     * 基础使用
+     */
+    createApp({
+      setup () {
+        const { x, y } = useMouse();
+        return { x, y }
+      },
+      template: `
+        <div>
+          x：{{x}}，y：{{y}}
+        </div>
+      `,
+    }).mount('#app1');
+
+
+    /**
+     * 异步状态
+     */
+    createApp({
+      setup () {
+        const { state, result } = useFetch('./asdas');
+
+        const url = ref('');
+        const { state: state1, result: result1 } = useFetch1(url);
+        url.value = '12';
+        return { state, result, state1, result1 };
+
+      },
+      template: `
+        <div>
+          state：{{state}}，result： {{result}}
+          <br />
+          state1：{{state1}}，result1： {{result1}}
+        </div>
+      `,
+    }).mount('#app2');
+
+    /**
+     * 约定和最佳实践
+     */
+    createApp({}).mount('#app3');
+
+    /**
+     * 在选项式 API 中使用组合式函数
+     * 只能在在 setup() {} 中调用，并且将返回值 return 除去，才会绑定被绑定在 this 上
+     */
+
+  </script>
+
+</body>
+
+</html>
