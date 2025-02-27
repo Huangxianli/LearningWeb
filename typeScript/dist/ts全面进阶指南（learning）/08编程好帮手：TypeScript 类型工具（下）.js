@@ -4,6 +4,7 @@ function test() {
     // 类型的安全保障：类型查询操作符 类型守卫
     test1();
     test2();
+    test3();
 }
 ;
 /**
@@ -21,6 +22,7 @@ function test1() {
     let str1 = 'link';
     let obj1 = { 1: 2 };
     const obj2 = { 1: 12 }; // const obj1: {1: number} 注意这里的 1 对应的类型是 number 而不是 2，无论 obj1 是变量还是常量
+    const arr1 = [1, 1];
     const func = (input) => {
         return input.length > 10;
     };
@@ -77,6 +79,7 @@ function test2_2() {
 ;
 /**
  * 基于 in 的 instanceof 的类型保护
+ * instanceof 也可以进行类型保护
  */
 function test2_3() {
     console.log('---test2_3---------------------------------------------');
@@ -93,17 +96,47 @@ function test2_3() {
 /**
  * 类型断言守卫
  * asserts 关键字
+ * 表明如果函数执行的时候抛出错误，那么 asserts 后面的语句的返回值是 false
  */
 function test2_4() {
     console.log('---test2_4---------------------------------------------');
+    function assertIsString(val) {
+        if (typeof val !== 'string') {
+            throw new Error('Not a string!');
+        }
+    }
 }
 ;
 /**
  * 接口的继承
  * extends 关键字，子的类型要兼容父的类型
  * 同名的接口也是一样的，后写的要兼容先写的
+ * 接口 extends 继承规则：
+ * 1. 可以完全省略父接口的属性
+ * 2. 重写属性时必须类型兼容，不变或者更精确
+ * 3. 对象类型属性必须包含父接口的所有必需属性
+ * 4. 可以添加新的属性
+ * 5. 不能将可选属性变为必需属性
+ *
+ * 如果声明多个同名接口，接口进行合并
+ * 和 extends 基本都是表现一致的
  *
  * 类型别名形式的继承
  * & 关键字
  * 有冲突的属性会推断成 never
+ *
+ * & 所有属性名称会取并集，同一属性名称的类型会取交集，如果属性对应的又是对象类型，则会再一次按照这个规则进行
+ *
  */
+function test3() {
+    console.log('---test3---------------------------------------------');
+    ;
+    /* interface Child extends Father {
+      prop1: string | number; // 不兼容，只能用更加精确的类型
+      prop2: { // 缺少属性 prop22
+        prop21: string;
+        prop23: string;
+      };
+    }; */
+}
+;
