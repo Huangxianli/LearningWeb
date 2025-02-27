@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
 
 <head>
   <meta charset="UTF-8">
@@ -17,7 +17,59 @@
 
     /**
      * <Teleport> 是一个内置组件，可以将一个组件内部的一部分模板“传送”到该组件 DOM 结构外层的位置去
+     * 往目标元素的里面的最后放
+     * 在使用的时候，要保证组件目标内容在挂载 <teleport> 之前就挂载了
+     * 
+     * 只会改变 DOM 的结构，组件之间的父子关系是不会改变的
+     * 
+     * 使用了 disabled，那么效果就相当于去掉了 <teleport> 标签，里面的内容，在原位置显示
+     * 
+     * 加入了 defer 可以推迟 <teleport> 的目标解析，直到应用的其他部分挂载
      */
+    const Component1 = {
+      template: `
+        <teleport to="#root1">
+          <div>这个是 teleport 内的内容1</div>
+        </teleport>
+        <teleport to="#component2">
+          <div>这个是 teleport 内的内容2</div>
+        </teleport>
+        <teleport to="body">
+          <div>这个是 teleport 内的内容3</div>
+        </teleport>
+        <teleport to="body" disabled>
+          <div>这个是 teleport 内的内容4</div>
+        </teleport>
+         <teleport defer to="#component2">
+          <div>这个是 teleport 内的内容5</div>
+        </teleport>
+      `,
+    };
+    const Component2 = {
+      template: `
+        <div>
+          <div>前</div>
+          <div id="component2"></div>
+          <div>后</div>
+        </div>
+      `,
+    };
+    createApp({
+      components: {
+        Component1,
+        Component2
+      },
+      template: `
+        <div id="root1">
+          <Component2 />
+          <div>前</div>
+            <div>
+              <Component1 />
+            </div>
+          <div>后</div>
+        </div>
+      `,
+    }).mount('#app1');
   </script>
 </body>
 
