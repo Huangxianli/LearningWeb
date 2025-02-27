@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KeepAlive</title>
+  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+
+</head>
+
+<body>
+  <div id="app1"></div>
+  <hr />
+  <div id="app2"></div>
+
+  <script>
+    const { createApp, ref, onActivated, onDeactivated } = Vue;
+
+    /**
+     * component 动态组件，默认会在切换目标组件的时候销毁当前的组件，在加载目标组件，这样就导致再次切换到之前的组件的时候，组件内的状态会重置
+     * 可以使用 KeepAlive 包裹，这样在切换的时候，就不会销毁原先的组件
+     * 
+     * include 和 exclude prop 可以定制缓存哪些，不缓存哪些，可以是数组，逗号分隔的字符串，正则
+     * 
+     * 会根据组件的 name 选项来进行匹配，如果要项被 KeepAlive 条件性的缓存，就必须显示的声明一个 name，<script setup> 会自动的生成一个 name
+     * 
+     * max：最大缓存实例数，如果超过这个数量，那么最久没被访问过的实例会被销毁
+     */
+    const Component11 = {
+      name: 'Component11', // 因为在使用的时候，使用了 include 或者 exclude，必须要添加 name，不然不会生效
+      setup () {
+        const clicks = ref(0);
+        const handleClick = () => {
+          clicks.value++;
+        };
+        return { clicks, handleClick };
+      },
+      template: `
+        <div>Component1</div>
+        <div>{{clicks}}</div>
+        <button @click="handleClick">增加</button>
+      `,
+    };
+    const Component12 = {
+      setup () {
+        const clicks = ref(0);
+        const handleClick = () => {
+          clicks.value++;
+        };
+        return { clicks, handleClick };
+      },
+      template: `
+        <div>Component2</div>
+        <div>{{clicks}}</div>
+        <button @click="handleClick">增加</button>
+      `,
+    };
+    createApp({
+      components: {
+        Component11,
+        Component12,
+      },
+      setup () {
+        const componentsList = ['Component11', 'Component12'];
+        let index = 0;
+        const currentComponentName = ref(componentsList[index]);
+
+        const handleClick = () => {
+          index = (index + 1) % 2;
+          currentComponentName.value = componentsList[index]
+        };
+        return {
+          currentComponentName,
+          handleClick,
+        }
+
+      },
+      template: `
+        <button @click="handleClick">点击切换</button>
+        <keep-alive include="Component11">
+          <component :is="currentComponentName" />
+        </keep-alive>
+      `,
+    }).mount('#app1');
+
+    /**
+     * 缓存实例的声明周期
+     * onActivated onDeactivated（onMounted 之后才会进入 onActivated；onDeactivated 之后才会进入 onBeforeMount）
+     * 不单单可以在当前组件中使用，在当前组件的子组件中也可以使用
+     */
+    const Component21 = {
+      setup () {
+        onActivated(() => {
+          console.log('Component21 activated');
+        });
+        onDeactivated(() => {
+          console.log('Component21 onDeactivated');
+        });
+        const clicks = ref(0);
+        const handleClick = () => {
+          clicks.value++;
+        };
+        return { clicks, handleClick };
+      },
+      template: `
+        <div>Component1</div>
+        <div>{{clicks}}</div>
+        <button @click="handleClick">增加</button>
+      `,
+    };
+    const Component22 = {
+      setup () {
+        onActivated(() => {
+          console.log('Component22 activated');
+        });
+        onDeactivated(() => {
+          console.log('Component22 onDeactivated');
+        });
+        const clicks = ref(0);
+        const handleClick = () => {
+          clicks.value++;
+        };
+        return { clicks, handleClick };
+      },
+      template: `
+        <div>Component2</div>
+        <div>{{clicks}}</div>
+        <button @click="handleClick">增加</button>
+      `,
+    };
+    createApp({
+      components: {
+        Component21,
+        Component22,
+      },
+      setup () {
+        const componentsList = ['Component21', 'Component22'];
+        let index = 0;
+        const currentComponentName = ref(componentsList[index]);
+
+        const handleClick = () => {
+          index = (index + 1) % 2;
+          currentComponentName.value = componentsList[index]
+        };
+        return {
+          currentComponentName,
+          handleClick,
+        }
+
+      },
+      template: `
+        <button @click="handleClick">点击切换</button>
+        <keep-alive >
+          <component :is="currentComponentName" />
+        </keep-alive>
+      `,
+    }).mount('#app2');
+
+  </script>
+
+</body>
+
+</html>

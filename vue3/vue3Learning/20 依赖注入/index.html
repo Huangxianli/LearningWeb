@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>依赖注入</title>
+  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+</head>
+
+<body>
+  <div id="app1"></div>
+  <hr />
+  <div id="app2"></div>
+
+  <script>
+    const { createApp, ref, provide, inject } = Vue;
+
+    /**
+     * provide inject
+     * 和响应式数据配合使用
+     * 默认值
+     */
+    const Component1 = {
+      setup () {
+        const clicks = inject('clicks');
+        const unProvideInject1 = inject('data1', 'data1');
+        console.log('unProvideInject1', unProvideInject1);
+
+        const unProvideInject2 = inject('data2', () => 12);
+        console.log('unProvideInject2', unProvideInject2); // 这样设置，默认值是 () => 12
+
+        const unProvideInject3 = inject('data3', () => 12, true);
+        console.log('unProvideInject3', unProvideInject3); // 12
+        return {
+          clicks
+        };
+      },
+      template: `
+       <div>根组件 provide 的 clicks {{clicks}}</div>
+      `,
+    };
+    createApp({
+      components: {
+        Component1,
+      },
+      setup () {
+        const clicks = ref(0);
+        provide('clicks', clicks);
+        const handleClick = () => {
+          clicks.value += 1;
+        };
+        return {
+          handleClick,
+        };
+      },
+      template: `
+        <button @click="handleClick">根组件修改 clicks</button>
+        <Component1 />
+      `,
+    }).mount('#app1');
+
+    /**
+     * 应用层 Provide
+     */
+    const Component2 = {
+      setup () {
+        const rootProvide = inject('rootProvide');
+        console.log('rootProvide', rootProvide);
+        return {
+          rootProvide,
+        }
+      },
+      template: `
+        <div>应用层 Provide {{rootProvide}}</div>
+      `,
+    };
+    const app = createApp({
+      components: {
+        Component2,
+      },
+      setup () { },
+      template: `
+        <Component2 />
+      `,
+    });
+    app.provide('rootProvide', 'rootProvide'); // 这样在所有的子孙组件里面都可以访问到
+    app.mount('#app2');
+
+
+  </script>
+</body>
+
+</html>

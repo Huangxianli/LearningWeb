@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>插槽 Slots</title>
+  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+
+</head>
+
+<body>
+  <div id="app1"></div>
+  <hr />
+  <div id="app2"></div>
+  <hr />
+  <div id="app3"></div>
+
+  <script>
+    const { createApp, ref } = Vue;
+
+    /**
+     * 具名插槽
+     * 所有位于顶级的非 <template> 节点被隐式地视为默认插槽的内容
+     */
+    const Component1 = {
+      template: `
+        <div>
+          <div>
+            <slot name="head"></slot>
+          </div>
+          <div>
+            <slot name="default"></slot>
+          </div>
+          <div>
+            <slot name="foot"></slot>
+          </div>
+        </div>
+      `,
+    };
+    createApp({
+      components: {
+        Component1
+      },
+      setup () { },
+      // 两个游离的 div 都会在 slot default 中渲染出来
+      template: `
+        <Component1>
+          <template #head>
+            这里是 head
+          </template>
+          <div>这里是游离的 div1</div>
+          <template #foot>
+            这里是 foot
+          </template>
+          <div>这里是游离的 div2</div>
+        </Component1>
+      `,
+    }).mount('#app1');
+
+
+    /**
+     * 条件插槽
+     * 
+     * 结合 $slot 和 v-if 来实现
+     */
+    const Component2 = {
+      template: `
+        <div style="height: 20px; background: red">
+          <div v-if="$slots.head" class="first">
+            <slot name="head"></slot>
+          </div>
+          <div class="second">
+            <slot name="foot"></slot>
+          </div>
+        </div>
+      `,
+    };
+    createApp({
+      components: {
+        Component2,
+      },
+      setup () { },
+      // 这种使用情况，第一个 div.first 不会被渲染，div.second 会被渲染
+      template: `
+        <Component2>
+        </Component2>
+      `
+    }).mount('#app2');
+
+    /**
+     * 作用域插槽
+     * 
+     * 在 slot 上 v-bind 绑定的内容会被组合成一个对象，传递给使用这个 slot 标签上，可以通过 #slotName="data" 来获取，data 就是这个传递的对象
+     * 
+     * v-slot 只能在组件标签（内部定义的时候，只定义了默认插槽时）和 template 标签上使用
+     */
+    const Component3 = {
+      setup () {
+        const data1 = ref('1231');;
+        return {
+          data1,
+        }
+      },
+      template: `
+        <div>
+          <slot name="default" v-bind="{data1: data1}"></slot>
+        </div>
+      `,
+    };
+    createApp({
+      components: {
+        Component3,
+      },
+      setup () { },
+      template: `
+        <Component3>
+          <template #default="{data1}">
+            {{data1}}
+          </template>
+        </Component3>
+      `,
+    }).mount('#app3');
+
+
+  </script>
+</body>
+
+</html>
