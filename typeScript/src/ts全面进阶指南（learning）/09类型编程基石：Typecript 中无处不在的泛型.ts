@@ -10,9 +10,11 @@ function test() {
 };
 /**
  * 类型别名如果使用了泛型坑位，那么就相当于一个接收参数的函数
- * 泛型大部分的事件用来进行工具类型的封装
+ * 泛型大部分的时候用来进行工具类型的封装
  */
 function test1() {
+  test1_1();
+
   type MyType<T> = T | null | undefined | false | 0;
   // 如果是转化成函数就相当于
   /* function MyType(T) {
@@ -24,6 +26,59 @@ function test1() {
   // const a: IsEqual<false> = 1; // 会报错，不能把 1 分配给 2
   const b: IsEqual<false> = 2;
 };
+
+/**
+ * extends 关键字详解
+ * 1. 类型约束
+ * 2. 条件类型中的 extends
+ * 3. 接口继承中 extends
+ * 4. 兼容性检查
+ */
+function test1_1() {
+  interface HasLength {
+    length: number;
+  };
+  function getLength<T extends HasLength>(a: T): number {
+    return a.length;
+  };
+
+  // 多重约束
+  interface HasName {
+    name: string;
+  };
+  function multi<T extends HasLength & HasName>(arg: T): string {
+    return arg.length + arg.name;
+  }
+  multi({ name: '', length: 0 });
+
+  // 条件类型中的 extends
+  type IsNumber<T> = T extends number ? true : false;
+  type a = IsNumber<12>; // true
+
+  // 接口继承 extends
+  interface Animal {
+    name: string;
+  };
+  interface Bird extends Animal {
+    // name: string | undefined; // 如果同名不可以有冲突
+    fly(): void;
+  };
+
+
+  // 兼容性检查
+  interface Parent {
+    name: string;
+  }
+
+  interface Child {
+    name: string | number;
+    age: number;
+  }
+
+
+  type CheckExtends = Child extends Parent ? true : false;  // false 同名属性应该更加的精确或者类型不变才满足 extends 
+};
+
 
 /**
  * 泛型约束与默认值
@@ -50,10 +105,17 @@ function test3() {
  */
 function test4() {
   interface IRes<T = unknown> {
-    code: number,
-    error?: string,
-    data: T
-  }
+    code: number;
+    error?: string;
+    data: T;
+  };
+
+  const iRes1: IRes<string> = {
+    code: 1,
+    data: '',
+    // a: '', // 不能多也不能少
+  };
+
 };
 
 /**
