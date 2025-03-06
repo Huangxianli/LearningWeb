@@ -16,13 +16,32 @@ router.get('/get', (ctx) => {
   ctx.status = 200;
   ctx.body = 'hello';
 });
+router.get('/getjson', ctx => {
+  ctx.query; // 前端传递过来的参数
+
+  ctx.status = 200;
+  ctx.type = "json";
+  ctx.body = {
+    name: 'name',
+    age: 'age',
+  };
+});
+
+router.get('/get/:id', ctx => {
+  ctx.params; // 前端传过来的 { id }
+})
+router.get('/getxml', ctx => {
+  ctx.status = 200;
+  ctx.type = "xml";
+  ctx.body = `<div>test<div>`;
+});
 
 // 注册路由中间件
 app.use(router.routes());
 app.use(router.allowedMethods());
 
 // 启动服务器
-const port = 3000;
+const port = 5500;
 app.listen(port, () => {
   console.log(`Server running on http://localhost:${port}`);
 });
