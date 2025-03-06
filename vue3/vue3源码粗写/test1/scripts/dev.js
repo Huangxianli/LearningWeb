@@ -18,15 +18,16 @@ const target = args._[0] || "reactivity"; // 打包哪个项目
 const format = args.f || "iife"; // 打包后的模块化规范
 
 // 入口文件 根据命令行提供的路径来进行解析
-const entry = resolve(__dirname, `../packages/${target}/src/index.ts`);
+const entry = resolve(__dirname, `../packages/${target}/src1/index.ts`);
+// const entry = resolve(__dirname, `../packages/${target}/src/index.ts`);
 const pkg = require(`../packages/${target}/package.json`);
 // 根据需要进行打包
 
-console.log(resolve(__dirname, `../packages/${target}/dist/${target}.js`));
 esbuild
   .context({
     entryPoints: [entry], // 入口
-    outfile: resolve(__dirname, `../packages/${target}/dist/${target}.js`), // 出口
+    // outfile: resolve(__dirname, `../packages/${target}/dist/${target}.js`), // 出口
+    outfile: resolve(__dirname, `../packages/${target}/dist1/${target}.js`), // 出口
     bundle: true, // reactivity -> shared  会打包到一起
     platform: "browser", // 打包后给浏览器使用
     sourcemap: true, // 可以调试源代码

@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+
+<body>
+  <div></div>
+  <script type="module">
+    import { reactive, effect } from './reactivity.js';
+    const state = reactive({
+      flag: false,
+      name: 'name',
+      age: 'age',
+    });
+    effect(() => {
+      document.body.innerHTML = `${state.flag ? state.name : state.age}`;
+      console.log('执行了')
+    });
+
+    setTimeout(() => {
+      state.flag = true;
+    });
+    setTimeout(() => {
+      state.age = 1; // 按理来说，这一次的改变不应该触发副作用函数
+    })
+  </script>
+
+</body>
+
+</html>
