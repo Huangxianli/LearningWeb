@@ -25,7 +25,14 @@ export function reactive(obj) {
     },
     set(target, key, value, reciever) {
       // 写的时候触发副作用函数
-      return Reflect.set(target, key, value, reciever);
+      // 新旧值没有改变
+      const oldValue = target[key];
+      if (oldValue !== value) {
+        return target[value];
+      }
+      const data = Reflect.set(target, key, value, reciever);
+      trigger(target, key, value, oldValue);
+      return data
     },
   });
 };
@@ -43,11 +50,22 @@ function track(target, key, reciever) {
   let keyDepsMap = objectDepsMap.get(key);
   if (!keyDepsMap) {
     objectDepsMap.set(key, (keyDepsMap = new Map()));
-    keyDepsMap.cleanup = () => objectDepsMap.delete(key);
-    keyDepsMap.name = key;
+    keyDepsMap.cleanup = () => objectDepsMap.delete(key); // cleanup 用来删除 obj 上的整个 key 删除
+    keyDepsMap.name = key; // 这个属性只是为了方便调试
   }
 
-  keyDepsMap.set(activeEffect,)
+  keyDepsMap.set(activeEffect, activeEffect._trackId);
+  // 收集是哪些 key 收集了当前正在执行的副作用函数
+  activeEffect.depsKeyDepsMap[activeEffect._depsKeyDepsMapLength++] = keyDepsMap;
 };
 
-function trigger() { };
+function trigger(target, key, value, oldValue) {
+  // 触发当前 key 收集的副作用函数
+  const keyDepsMap = allEffectMap?.get(target)?.get(key);
+  if (!keyDepsMap) { return }
+  for (let effect of keyDepsMap.keys()) {
+    if (effect.scheduler) {
+      effect.scheduler();
+    }
+  }
+};
