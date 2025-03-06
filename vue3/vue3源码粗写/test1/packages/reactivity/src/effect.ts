@@ -45,7 +45,7 @@ export function trackEffect(activeEffect: ActiveEffectClass, keyDesMap: KeyDepsM
   keyDesMap.set(activeEffect, activeEffect._trackId);
   // 想要知道当前的 activeEffect 被哪些 keyDesMap 收集了
 
-  activeEffect.depsKeyDepsMap[activeEffect.depsKeyDepsMap.length++] = keyDesMap;
+  activeEffect.depsKeyDepsMap[activeEffect._depsKeyDepsMapLength++] = keyDesMap;
 }
 
 export function triggerEffects(keyDepsMap: KeyDepsMap) {

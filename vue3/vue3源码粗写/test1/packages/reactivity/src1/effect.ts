@@ -8,7 +8,13 @@ export function effect(fn, options?) {
 export let activeEffect = undefined;
 const currentEffectStack = [];
 class ActiveEffect {
-  constructor(public fn, public scheduler) { }
+  _trackId = 0;
+  depsKeyDepsMap = [];
+  depsKeyDepsMapLength = 0;
+  constructor(public fn, public scheduler) {
+    // 第一个参数是实际的副作用函数
+    // 第二个参数是调度器
+  }
   run() {
     activeEffect = this;
     currentEffectStack.push(activeEffect);
