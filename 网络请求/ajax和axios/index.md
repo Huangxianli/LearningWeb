@@ -3,7 +3,7 @@
 可以使用 JSON XML HTML 和 text 文本 等格式发送和收集数据
 AJAX 不是新的编程语言，是一种将现有的标准组合在一起使用的新方式
 
-## ajax 发送请求的经典步骤
+### ajax 发送请求的经典步骤
 1. 创建网络请求 ajax 对象（使用 XMLHttpRequest）
 2. 监听 XMLHttpRequest 对象状态的变化，或者监听 onload 事件（请求完成时触发）
 3. 配置网络请求（通过 open 方法）
@@ -44,7 +44,7 @@ xhr.open("get", url);
 xhr.send();
 ```
 
-## 同源策略
+### 同源策略
 浏览器的安全策略
 
 源 = 协议 + 域名 + 端口
@@ -59,7 +59,7 @@ const cors = require('koa2-cors');
 app.use(cors());
 ```
 
-## xhr 的 load 事件
+### xhr 的 load 事件
 
 ```js
 const xhr = new XMLHttpRequest();
@@ -81,7 +81,7 @@ xhr.send();
 // 先输出 2 再输出 1
 ```
 
-## 后端给前端 json 数据
+### 后端给前端 json 数据
 Content-Type: application/json
 需要将 json 串转化成对象使用
 后者设置 xhr.responseType = 'json' 这样就会自动的将返回的 json 转化成对象
@@ -94,13 +94,13 @@ xhr.onload = function () {
 xhr.responseType = 'json';
 ```
 
-## 后端给前端 xml 数据
+### 后端给前端 xml 数据
 Content-Type: application/xml
 
 通过 xhr.responseXML 获取 后端返回的 XML 数据
 
 
-## 后端响应不同的状态码
+### 后端响应不同的状态码
 | 状态 | 信息                                                 |
 | ---- | ---------------------------------------------------- |
 | 200  | 请求成功                                             |
@@ -116,11 +116,63 @@ Content-Type: application/xml
 xhr.status 可以获取到 httpCode 
 
 
-## get 传参
+### get 传参
 xhr.open('get', 'xxx?key=id&&key=id')
 
-## post 传递 urlencodeed 数据
-## post 传递 json 数据
-## post 传递 formData 数据
-## 传递多种形式的参数
-## 超时处理和自动取消请求
+### post 传递 urlencodeed 数据
+post 的传参，要将参数放在请求体里面
+Content-Type 告诉服务器传递的数据类型是什么类型
+ text/plan
+ x-www-from-urlencoded
+ json
+ formdata
+
+xrh.open('post',url);
+
+xhr.setRequestHeader('Content-Type','application/x-www-form-urlencoded'); // 设置请求头 Content-Type 类型
+xhr.send("key=value&key=value");
+
+### post 传递 json 数据
+xhr.setRequestHeader('Content-Type': 'aplication/json');
+xhr.send(JSON.stringify({'key':'value'}));
+
+### post 传递 formData 数据
+const formData = new FormData();
+formData.append(key,value);
+xhr.send(formData);
+
+### 传递多种形式的参数
+
+### 超时处理和自动取消请求
+xhr.timeout = 3000
+
+xhr.abort();
+
+## axios
+```js
+const promise1 = axios.request({
+  url: '',
+  method: 'get'
+});
+
+```
+
+### get 传参
+```js
+axios.get({
+  url:'xxx?key=value&key=value',
+  method:'get',
+});
+axios.get({
+  url: 'xxx',
+  method: 'get',
+  params: {
+    key: 'key',
+    value: 'value'
+  },
+});
+```
+
+### post 传参
+
+
