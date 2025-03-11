@@ -33,8 +33,9 @@ var ActiveEffect = class {
   }
 };
 function trackEffect(activeEffect2, keyDesMap) {
+  debugger;
   keyDesMap.set(activeEffect2, activeEffect2._trackId);
-  activeEffect2.depsKeyDepsMap[activeEffect2.depsKeyDepsMap.length++] = keyDesMap;
+  activeEffect2.depsKeyDepsMap[activeEffect2._depsKeyDepsMapLength++] = keyDesMap;
 }
 function triggerEffects(keyDepsMap) {
   for (let effect2 of keyDepsMap.keys()) {

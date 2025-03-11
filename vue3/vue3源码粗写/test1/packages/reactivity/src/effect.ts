@@ -40,15 +40,17 @@ class ActiveEffect implements ActiveEffectClass {
     // }
   };
 };
-
+// 收集包装的副作用函数，并且记录当前的副作用函数被哪些 key 收集了
 export function trackEffect(activeEffect: ActiveEffectClass, keyDesMap: KeyDepsMap) {
+  debugger
+  // 将当前的被包装的副作用行数，加入到当前的 key 的依赖 map 中
   keyDesMap.set(activeEffect, activeEffect._trackId);
   // 想要知道当前的 activeEffect 被哪些 keyDesMap 收集了
-
   activeEffect.depsKeyDepsMap[activeEffect._depsKeyDepsMapLength++] = keyDesMap;
 }
 
 export function triggerEffects(keyDepsMap: KeyDepsMap) {
+  // 触发 key 对应的 map 中的所有包装过的副作用函数
   for (let effect of keyDepsMap.keys()) {
     if (effect.scheduler) {
       effect.scheduler();

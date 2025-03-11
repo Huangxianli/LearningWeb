@@ -12,9 +12,8 @@ export function reactive(obj) {
   const proxy = new Proxy(obj, mutableHandlers);
   targetMap.set(obj, proxy);
   return proxy;
-
-
 };
+
 const mutableHandlers: ProxyHandler<object> = {
   get(target, key, receiver) {
     // 收集被包装过的当前 effect 内容
