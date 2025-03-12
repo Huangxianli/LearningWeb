@@ -4,6 +4,11 @@ function effect(fn, options) {
     _effect.run();
   });
   _effect.run();
+  if (options) {
+    Object.assign(_effect, options);
+  }
+  const effectRun = _effect.run.bind(_effect);
+  return effectRun;
 }
 var activeEffect = void 0;
 var activeEffectsStack = [];

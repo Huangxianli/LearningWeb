@@ -5,6 +5,11 @@ export function effect(fn, options?) {
     _effect.run();
   });
   _effect.run();
+  if (options) {
+    Object.assign(_effect, options);
+  }
+  const effectRun = _effect.run.bind(_effect);
+  return effectRun;
 };
 
 // 当前执行的副作用函数的包装函数
