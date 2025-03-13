@@ -174,5 +174,58 @@ axios.get({
 ```
 
 ### post 传参
+```js
+// 默认发送的是 json  串格式 Content-Type=application/json;charset=UTF-8
+axios.post(url,{
+  a:1
+});
 
+// Content-Type=application/x-www-form-urlencoded 要穿这种格式，需要传递设置请求头
+axios.post(
+  url, 
+  {}, // 注意，x-www-form-urlencoded 的入参是字符炸串的形式
+  {
+    hearder: {
+      "Content-Type": "application/x-www-form-urlencoded"
+    },
+  }) 
+```
+
+### axios 创建实例
+```js
+const axios = axios.create({
+  baseURL:'http://127.0.0.1:3000',
+  timeout: 3000,
+  header: {},
+});
+```
+
+### 请求拦截器和响应拦截器
+```js
+// 请求拦截器
+axios.interceptors.request.use(config=> {
+  
+  return 
+}, err=> {
+  return Promise.reject(err);
+});
+
+axios.interceptors.response.use(res=>{
+  return res
+}, err=> {
+
+})
+```
+
+### 手动取消请求
+```js
+let cancel = null;
+axios.get(url, {
+  cancelToken: new axios.CancelToken(c => {
+    cancel = c;
+  });
+});
+
+cancel(); // 这样就可以取消上面的请求
+ ```
 
