@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TS 与组合式 API</title>
+  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+
+</head>
+
+<body>
+  <div id="app1"></div>
+  <hr />
+  <script>
+    const { createApp, ref, defineComponent, propType } = Vue;
+    // 如果不是 <script setup>，要实现类型检车的话，要用 defineComponent 包裹组件
+    const Component1 = defineComponent({
+      props: {
+        prop1: {
+        }
+      },
+      setup () {
+      },
+    });
+    createApp({
+      components: {
+        Component1,
+      },
+      template: `
+      `,
+    }).mount('#app1');
+  </script>
+</body>
+
+</html>
