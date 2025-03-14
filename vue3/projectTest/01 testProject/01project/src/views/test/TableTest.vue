@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { reactive, ref } from 'vue';
-import type { Ref } from 'vue';
+import type { TableInstance } from 'element-plus';
 interface TableColInfo {
   label: string,
   prop: string,
@@ -39,7 +39,7 @@ for (let i = 0; i <= 134; i++) {
   };
   allTableData.push(row);
 }
-const tableData: Ref<TableRow[]> = ref([]);
+const tableData = ref<TableRow[]>([]);
 const setTableData = (pageSize: number, currentPage: number) => {
   tableData.value = allTableData.filter((item, index) => {
     return (index > pageSize * (currentPage - 1)) && (index <= pageSize * currentPage)
@@ -61,27 +61,64 @@ const handleSizeChange: (size: number) => void = size => {
 
 setTableData(pageSize.value, currentPage.value);
 
-const checkedId: Ref<number | string> = ref('');
+const checkedId = ref<number | string>('');
 const checkedChange: (row: TableRow) => void = (row) => {
   checkedId.value = row.id;
 }
 
+const tableRowClassName = ({ row, rowIndex }: { row: TableRow, rowIndex: number }): string => {
+  return rowIndex % 2 === 0 ? 'warn-row' : 'error-row';
+}
+
+const selectable = (row: TableRow, index: number
+): boolean => {
+  return index % 2 === 0;
+}
+
+const tableRef = ref<TableInstance>();
+const selectDisabledRow = () => {
+  const data = tableData.value.filter((item, index) => { return index % 2 !== 0 });
+  // debugger
+  data.forEach(row => {
+    tableRef.value!.toggleRowSelection(row, true, true);
+  });
+}
+const selectFirstRowRow = () => {
+  tableRef.value!.toggleRowSelection(tableData.value[0], true, true);
+}
 
 
 </script>
 
 <template>
   <section class="table-test">
-    <el-table :data="tableData" size="small" stripe highlight-current-row>
+    <div>
+      <el-button @click="selectDisabledRow">选择禁用的</el-button>
+      <el-button @click="selectFirstRowRow">选择第一个</el-button>
+    </div>
+    <el-table ref="tableRef" :data="tableData" size="small" :highlight-current-row="false"
+      :row-class-name="tableRowClassName">
+      <!-- row-class-name 最好不要和 stripe、highlight-current-row  一起使用 -->
       <el-table-column type="index" align="center" label="序号" width="50" show-overflow-tooltip></el-table-column>
-      <el-table-column type="selection" width="50" show-overflow-tooltip></el-table-column>
+      <el-table-column type="selection" :selectable="selectable" width="50" show-overflow-tooltip></el-table-column>
       <el-table-column label="选择" align="center" width="50">
         <template #default="{ row }">
           <el-radio size="small" :value="row.id" v-model="checkedId" @change="checkedChange(row)" />
         </template>
       </el-table-column>
+      <el-table-column label="一级表头">
+        <el-table-column label="二级表头1">
+        </el-table-column>
+        <el-table-column label="二级表头2">
+          <el-table-column label="三级表头1">
+          </el-table-column>
+          <el-table-column label="三级表头2">
+          </el-table-column>
+        </el-table-column>
+      </el-table-column>
       <el-table-column v-for="col in colsInfo" :key="col.prop" :prop="col.prop" :label="col.label" :width="col.width"
-        show-overflow-tooltip></el-table-column>
+        show-overflow-tooltip sortable></el-table-column>
+      <el-table-column label="操作" fixed="right"></el-table-column>
     </el-table>
     <div class="table-pagination-box">
       <el-pagination size="small" :total="allTableData.length" :page-sizes="[5, 10, 20, 50]" :crrent-page="currentPage"
@@ -125,5 +162,17 @@ const checkedChange: (row: TableRow) => void = (row) => {
   height: 100%;
   display: flex;
   flex-direction: column;
+}
+
+.table-test :deep(.warn-row) {
+  background-color: antiquewhite;
+}
+
+.table-test :deep(.warn-row) {
+  background-color: antiquewhite;
+}
+
+.table-test :deep(.error-row) {
+  background-color: red;
 }
 </style>
