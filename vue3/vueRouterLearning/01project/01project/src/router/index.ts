@@ -85,6 +85,9 @@ const routes: Array<RouteRecordRaw> = [
 ];
 
 const router: Router = createRouter({
+  linkActiveClass: 'router-link-active', // 默认的活跃路由的类名
+  linkExactActiveClass: 'router-link-exact-active', // 默认的精准活跃路由的类名
+  // 还可以 <RouterLink activeClass="" exactActiveClass="" > 进行设置
   history: createWebHistory(),
   routes,
 });
