@@ -1,11 +1,10 @@
 <script setup lang="ts">
 import { reactive, ref } from 'vue';
-import type { TableInstance } from 'element-plus';
 interface TableColInfo {
   label: string,
   prop: string,
   width?: number
-}
+};
 
 interface TableRow {
   id: number,
@@ -44,7 +43,7 @@ const setTableData = (pageSize: number, currentPage: number) => {
   tableData.value = allTableData.filter((item, index) => {
     return (index > pageSize * (currentPage - 1)) && (index <= pageSize * currentPage)
   })
-}
+};
 
 const currentPage = ref<number>(1);
 const handleCurrentChange: (current: number) => void = current => {
@@ -64,40 +63,47 @@ setTableData(pageSize.value, currentPage.value);
 const checkedId = ref<number | string>('');
 const checkedChange: (row: TableRow) => void = (row) => {
   checkedId.value = row.id;
-}
+};
 
 const tableRowClassName = ({ row, rowIndex }: { row: TableRow, rowIndex: number }): string => {
   return rowIndex % 2 === 0 ? 'warn-row' : 'error-row';
-}
+};
 
 const selectable = (row: TableRow, index: number
 ): boolean => {
   return index % 2 === 0;
-}
+};
 
 const tableRef = ref<TableInstance>();
 const selectDisabledRow = () => {
   const data = tableData.value.filter((item, index) => { return index % 2 !== 0 });
-  // debugger
   data.forEach(row => {
     tableRef.value!.toggleRowSelection(row, true, true);
   });
-}
+};
 const selectFirstRowRow = () => {
   tableRef.value!.toggleRowSelection(tableData.value[0], true, true);
-}
+};
 
+const sortInfo: { prop: string, order: string | null } = {
+  prop: '',
+  order: null,
+};
+const sortChange = (data: { prop: string, order: string | null }) => {
+  sortInfo.prop = data.prop;
+  sortInfo.order = data.order;
+}
 
 </script>
 
 <template>
   <section class="table-test">
-    <div>
+    <div class="table-header">
       <el-button @click="selectDisabledRow">选择禁用的</el-button>
       <el-button @click="selectFirstRowRow">选择第一个</el-button>
     </div>
     <el-table ref="tableRef" :data="tableData" size="small" :highlight-current-row="false"
-      :row-class-name="tableRowClassName">
+      :row-class-name="tableRowClassName" @sort-change="sortChange">
       <!-- row-class-name 最好不要和 stripe、highlight-current-row  一起使用 -->
       <el-table-column type="index" align="center" label="序号" width="50" show-overflow-tooltip></el-table-column>
       <el-table-column type="selection" :selectable="selectable" width="50" show-overflow-tooltip></el-table-column>
@@ -117,7 +123,7 @@ const selectFirstRowRow = () => {
         </el-table-column>
       </el-table-column>
       <el-table-column v-for="col in colsInfo" :key="col.prop" :prop="col.prop" :label="col.label" :width="col.width"
-        show-overflow-tooltip sortable></el-table-column>
+        show-overflow-tooltip sortable :sort-orders="['ascending', 'descending', null]"></el-table-column>
       <el-table-column label="操作" fixed="right"></el-table-column>
     </el-table>
     <div class="table-pagination-box">
@@ -130,6 +136,10 @@ const selectFirstRowRow = () => {
 </template>
 
 <style scoped>
+.table-header {
+  margin-bottom: 8px;
+}
+
 .table-pagination-box {
   margin-top: 12px;
 }
