@@ -17,16 +17,20 @@
       age: 'age',
     });
     effect(() => {
-      document.body.innerHTML = `${state.flag ? state.name : state.age + state.age}`;
+      document.body.innerHTML = `${state.flag ? state.age : state.name + state.age}`;
       console.log('执行了')
     });
 
-    // setTimeout(() => {
-    //   state.flag = true;
-    // });
     setTimeout(() => {
-      state.age = 1; // 按理来说，这一次的改变不应该触发副作用函数
+      state.flag = true;
+    });
+
+    setTimeout(() => {
+      state.age = 12;
     }, 1000);
+    // setTimeout(() => {
+    //   state.age = 1; // 按理来说，这一次的改变不应该触发副作用函数
+    // }, 1000);
   </script>
 
 </body>

@@ -8,6 +8,7 @@ function effect(fn, options) {
     Object.assign(_effect, options);
   }
   const effectRun = _effect.run.bind(_effect);
+  effectRun._effect = _effect;
   return effectRun;
 }
 var activeEffect = void 0;
@@ -50,6 +51,9 @@ function afterRunEffect(activeEffect2) {
     return;
   }
   for (let i = depLength; i < lastDepLength; i++) {
+    if (activeEffect2.depsKeyDepsMap[i].get(activeEffect2) === activeEffect2._trackId) {
+      continue;
+    }
     cleanKeyDep(activeEffect2.depsKeyDepsMap[i], activeEffect2);
   }
   activeEffect2.depsKeyDepsMap.length = depLength;

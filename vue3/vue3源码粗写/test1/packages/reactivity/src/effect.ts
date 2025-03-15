@@ -1,6 +1,6 @@
 import type { KeyDepsMap } from './reactiveEffect';
 
-export function effect(fn, options?) {
+export function effect(fn: () => any, options?: { scheduler?: () => any }) {
   const _effect = new ActiveEffect(fn, () => {
     _effect.run();
   });
@@ -9,6 +9,7 @@ export function effect(fn, options?) {
     Object.assign(_effect, options);
   }
   const effectRun = _effect.run.bind(_effect);
+  effectRun._effect = _effect;
   return effectRun;
 };
 // 当前执行的副作用函数的包装函数
@@ -56,7 +57,11 @@ function afterRunEffect(activeEffect: ActiveEffect) {
     return;
   }
   for (let i = depLength; i < lastDepLength; i++) {
-    cleanKeyDep(activeEffect.depsKeyDepsMap[i], activeEffect)
+    if (activeEffect.depsKeyDepsMap[i].get(activeEffect) === activeEffect._trackId) {
+      // 清除最后几个 key 的依赖的时候，防止在执行副作用函数中，最后几个 key 存在同名 key 在这次执行中已经收集了，但是在这个这次又被清除本轮 当前 key 收集好的依赖
+      continue;
+    }
+    cleanKeyDep(activeEffect.depsKeyDepsMap[i], activeEffect);
   }
   activeEffect.depsKeyDepsMap.length = depLength;
 }
@@ -68,6 +73,8 @@ function cleanKeyDep(KeyDepsMap: KeyDepsMap, activeEfffect: ActiveEffectClass) {
     KeyDepsMap.cleanup();
   }
 }
+
+
 
 // 为当前 key 收集包装的副作用函数，并且记录当前的副作用函数被哪些 key 收集了
 export function trackEffect(activeEffect: ActiveEffectClass, keyDepsMap: KeyDepsMap) {
