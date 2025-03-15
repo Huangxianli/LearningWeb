@@ -32,15 +32,47 @@ var ActiveEffect = class {
   run() {
     activeEffect = this;
     activeEffectsStack.push(activeEffect);
+    preRunEffect(this);
     this.fn();
+    afterRunEffect(this);
     activeEffectsStack.pop();
     activeEffect = activeEffectsStack[activeEffectsStack.length - 1];
   }
 };
-function trackEffect(activeEffect2, keyDesMap) {
-  debugger;
-  keyDesMap.set(activeEffect2, activeEffect2._trackId);
-  activeEffect2.depsKeyDepsMap[activeEffect2._depsKeyDepsMapLength++] = keyDesMap;
+function preRunEffect(activeEffect2) {
+  activeEffect2._trackId++;
+  activeEffect2._depsKeyDepsMapLength = 0;
+}
+function afterRunEffect(activeEffect2) {
+  const lastDepLength = activeEffect2.depsKeyDepsMap.length;
+  const depLength = activeEffect2._depsKeyDepsMapLength;
+  if (lastDepLength <= depLength) {
+    return;
+  }
+  for (let i = depLength; i < lastDepLength; i++) {
+    cleanKeyDep(activeEffect2.depsKeyDepsMap[i], activeEffect2);
+  }
+  activeEffect2.depsKeyDepsMap.length = depLength;
+}
+function cleanKeyDep(KeyDepsMap, activeEfffect) {
+  KeyDepsMap.delete(activeEfffect);
+  if (KeyDepsMap.size === 0) {
+    KeyDepsMap.cleanup();
+  }
+}
+function trackEffect(activeEffect2, keyDepsMap) {
+  if (activeEffect2._trackId !== keyDepsMap.get(activeEffect2)) {
+    keyDepsMap.set(activeEffect2, activeEffect2._trackId);
+    const oldKeysDepMap = activeEffect2.depsKeyDepsMap[activeEffect2._depsKeyDepsMapLength];
+    if (oldKeysDepMap !== keyDepsMap) {
+      activeEffect2.depsKeyDepsMap[activeEffect2._depsKeyDepsMapLength++] = keyDepsMap;
+      if (oldKeysDepMap) {
+        cleanKeyDep(oldKeysDepMap, activeEffect2);
+      }
+    } else {
+      activeEffect2._depsKeyDepsMapLength++;
+    }
+  }
 }
 function triggerEffects(keyDepsMap) {
   for (let effect2 of keyDepsMap.keys()) {
