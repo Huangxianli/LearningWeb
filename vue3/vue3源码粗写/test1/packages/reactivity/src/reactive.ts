@@ -1,8 +1,7 @@
 import { track, trigger } from './reactiveEffect';
 
 const targetMap = new WeakMap();
-
-export function reactive(obj) {
+function createReactiveObject(obj) {
   if (typeof obj !== 'object') {
     return obj;
   }
@@ -12,14 +11,21 @@ export function reactive(obj) {
   const proxy = new Proxy(obj, mutableHandlers);
   targetMap.set(obj, proxy);
   return proxy;
+}
+
+export function reactive(obj) {
+  return createReactiveObject(obj);
 };
 
 const mutableHandlers: ProxyHandler<object> = {
   get(target, key, receiver) {
     // 收集被包装过的当前 effect 内容
     track(target, key);
-    return Reflect.get(target, key, receiver);
-
+    const result = Reflect.get(target, key, receiver)
+    if (typeof result === 'object') {
+      return reactive(result)
+    }
+    return result;
   },
   set(target, key, value, receiver) {
     let oldValue = target[key];
@@ -30,4 +36,8 @@ const mutableHandlers: ProxyHandler<object> = {
     }
     return data;
   },
+};
+
+export function toReactive(value) {
+  return typeof value === 'object' ? reactive(value) : value;
 }

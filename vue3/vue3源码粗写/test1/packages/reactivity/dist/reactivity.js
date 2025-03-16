@@ -14,6 +14,7 @@ function effect(fn, options) {
 var activeEffect = void 0;
 var activeEffectsStack = [];
 var ActiveEffectClass = class {
+  // 用于控制防止进入死循环
   // abstract fn: () => void;
   constructor(fn, scheduler) {
     this.fn = fn;
@@ -29,12 +30,15 @@ var ActiveEffect = class {
     this.depsKeyDepsMap = [];
     // 用于收集当前的这个被包装的副作用函数被哪些 key 收集了，由于主要是为了拿到 key 对应的 keyDepsMap，所以直接存的就是 keyDepsMap
     this._depsKeyDepsMapLength = 0;
+    this._running = 0;
   }
   run() {
     activeEffect = this;
     activeEffectsStack.push(activeEffect);
     preRunEffect(this);
+    activeEffect._running++;
     this.fn();
+    activeEffect._running--;
     afterRunEffect(this);
     activeEffectsStack.pop();
     activeEffect = activeEffectsStack[activeEffectsStack.length - 1];
@@ -80,7 +84,7 @@ function trackEffect(activeEffect2, keyDepsMap) {
 }
 function triggerEffects(keyDepsMap) {
   for (let effect2 of keyDepsMap.keys()) {
-    if (effect2.scheduler) {
+    if (effect2.scheduler && !effect2._running) {
       effect2.scheduler();
     }
   }
@@ -123,7 +127,7 @@ function trigger(target, key, oldValue, value) {
 
 // packages/reactivity/src/reactive.ts
 var targetMap2 = /* @__PURE__ */ new WeakMap();
-function reactive(obj) {
+function createReactiveObject(obj) {
   if (typeof obj !== "object") {
     return obj;
   }
@@ -134,10 +138,17 @@ function reactive(obj) {
   targetMap2.set(obj, proxy);
   return proxy;
 }
+function reactive(obj) {
+  return createReactiveObject(obj);
+}
 var mutableHandlers = {
   get(target, key, receiver) {
     track(target, key);
-    return Reflect.get(target, key, receiver);
+    const result = Reflect.get(target, key, receiver);
+    if (typeof result === "object") {
+      return reactive(result);
+    }
+    return result;
   },
   set(target, key, value, receiver) {
     let oldValue = target[key];
@@ -148,11 +159,15 @@ var mutableHandlers = {
     return data;
   }
 };
+function toReactive(value) {
+  return typeof value === "object" ? reactive(value) : value;
+}
 export {
   ActiveEffectClass,
   activeEffect,
   effect,
   reactive,
+  toReactive,
   trackEffect,
   triggerEffects
 };
