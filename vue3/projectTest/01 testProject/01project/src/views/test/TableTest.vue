@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { reactive, ref } from 'vue';
+import type { TableInstance, TableColumnCtx } from 'element-plus';
 interface TableColInfo {
   label: string,
   prop: string,
@@ -94,6 +95,14 @@ const sortChange = (data: { prop: string, order: string | null }) => {
   sortInfo.order = data.order;
 }
 
+const filterMethod = (value: string, row: TableRow, column: TableColumnCtx<TableRow>) => {
+  // debugger
+
+}
+
+const filterChange = (filters: object) => {
+  filters;
+}
 </script>
 
 <template>
@@ -103,28 +112,41 @@ const sortChange = (data: { prop: string, order: string | null }) => {
       <el-button @click="selectFirstRowRow">选择第一个</el-button>
     </div>
     <el-table ref="tableRef" :data="tableData" size="small" :highlight-current-row="false"
-      :row-class-name="tableRowClassName" @sort-change="sortChange">
+      :row-class-name="tableRowClassName" @sort-change="sortChange" @filter-change="filterChange">
       <!-- row-class-name 最好不要和 stripe、highlight-current-row  一起使用 -->
+      <!-- 要使用 filter-change 事件，就要给列设置 column-key 属性，如果不设置的话，事件的参数的中的 key 是异常的 -->
       <el-table-column type="index" align="center" label="序号" width="50" show-overflow-tooltip></el-table-column>
       <el-table-column type="selection" :selectable="selectable" width="50" show-overflow-tooltip></el-table-column>
-      <el-table-column label="选择" align="center" width="50">
+      <el-table-column label="选择" prop="temp0" align="center" width="50">
         <template #default="{ row }">
           <el-radio size="small" :value="row.id" v-model="checkedId" @change="checkedChange(row)" />
         </template>
       </el-table-column>
-      <el-table-column label="一级表头">
-        <el-table-column label="二级表头1">
+      <el-table-column prop="temp1" label="一级表头">
+        <el-table-column prop="temp1_1" label="二级表头1">
         </el-table-column>
-        <el-table-column label="二级表头2">
-          <el-table-column label="三级表头1">
+        <el-table-column prop="temp1_2" label="二级表头2">
+          <el-table-column prop="temp1_2_1" label="三级表头1">
           </el-table-column>
-          <el-table-column label="三级表头2">
+          <el-table-column label="三级表头2" prop="temp1_2_2">
           </el-table-column>
         </el-table-column>
       </el-table-column>
       <el-table-column v-for="col in colsInfo" :key="col.prop" :prop="col.prop" :label="col.label" :width="col.width"
-        show-overflow-tooltip sortable :sort-orders="['ascending', 'descending', null]"></el-table-column>
-      <el-table-column label="操作" fixed="right"></el-table-column>
+        show-overflow-tooltip sortable :sort-orders="['ascending', 'descending', null]" :column-key="col.prop" :filters="[
+          { text: 'Home', value: 'Home' },
+          { text: 'Office', value: 'Office' },
+        ]"></el-table-column>
+      <el-table-column prop="temp" label="操作" fixed="right" :filters="[
+        { text: 'Home', value: 'Home' },
+        { text: 'Office', value: 'Office' },
+      ]">
+        <template #header="{ column, $index }">
+          <div>
+            {{ column }}-{{ $index }}
+          </div>
+        </template>
+      </el-table-column>
     </el-table>
     <div class="table-pagination-box">
       <el-pagination size="small" :total="allTableData.length" :page-sizes="[5, 10, 20, 50]" :crrent-page="currentPage"
