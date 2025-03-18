@@ -24,9 +24,9 @@ module.exports = {
               presets: [
                 '@babel/preset-env', // 已经定义好的插件集
               ],
-              /*presets: [
-                  '@babel/preset-typescript' // 如果这样写的话，就不需要额外的加 ts-loader 了
-                ], */
+              // presets: [
+              //   '@babel/preset-typescript' // 如果这样写的话，就不需要额外的加 ts-loader 了
+              // ],
             }
           },
           'ts-loader',

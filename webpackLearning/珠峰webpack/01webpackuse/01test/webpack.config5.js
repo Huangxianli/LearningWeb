@@ -1,5 +1,5 @@
 // 处理 css less sass 等资源
-// css-loader 支持处理 import @import url() 等方式导入的 css 文件和 资源文件
+// css-loader 支持处理 import @import url() 等方式导入的 css 文件和 资源文件，css-loader 会将 url 的方式转化成 require() 的方式，不生成文件或修改最终路径
 // postcss-loader 支持样式的兼容，自动的添加前缀，可以在 postcss.config.js 中进行配置
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin'); // ​主要用于自动生成 HTML 文件并动态注入 Webpack 打包后的静态资源（JS/CSS）​

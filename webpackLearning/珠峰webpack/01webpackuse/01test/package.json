@@ -10,7 +10,8 @@
     "test4": "webpack serve --config webpack.config4.js",
     "test5_1": "cross-env NODE_ENV=production webpack serve --config webpack.config5.js",
     "test5_2": "cross-env NODE_ENV=development webpack serve --config webpack.config5.js",
-    "test6": "webpack --config webpack.config6.js"
+    "test6": "webpack --config webpack.config6.js",
+    "test7": "webpack --config webpack.config7.js"
   },
   "keywords": [],
   "author": "",
