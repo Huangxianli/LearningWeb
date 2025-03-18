@@ -1,0 +1,11 @@
+@import './main5-1.css';
+
+.firstDiv {
+  background: url(../assets/img/image1.png);
+  height: 100px;
+}
+
+.secondDiv {
+  background: url(../assets/img/image2.png);
+  height: 100px;
+}

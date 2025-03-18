@@ -1,0 +1,18 @@
+/*!*******************************************************************!*\
+  !*** css ./node_modules/css-loader/dist/cjs.js!./src/main5-1.css ***!
+  \*******************************************************************/
+body {
+  color: red;
+}
+/*!*****************************************************************!*\
+  !*** css ./node_modules/css-loader/dist/cjs.js!./src/main5.css ***!
+  \*****************************************************************/
+.firstDiv {
+  background: url(ddf96543afdaa7e20fe5.png);
+  height: 100px;
+}
+
+.secondDiv {
+  background: url(503a4b0f09ba40e89a73.png);
+  height: 100px;
+}
