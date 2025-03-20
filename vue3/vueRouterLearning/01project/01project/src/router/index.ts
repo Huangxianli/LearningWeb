@@ -10,7 +10,8 @@ import Test1 from '@/views/test1/Test1.vue';
 import Test1Child1 from '@/views/test1/Test1Child1.vue';
 import Test2 from '@/views/test2/Test2.vue';
 import Test2Left from '@/views/test2/Test2Left.vue';
-import Test2Right from '@/views/test2/Test2Right.vue';
+const Test2Right = () => import(/* webpackChunkName: "name1" */'@/views/test2/Test2Right.vue'); // 这里会使用懒加载
+// 可以定义一个更加复杂的函数，只要返回的是一个 promise 就可以
 /**
  * 所有的路由都是不区分大小写的，并且能匹配带有或不带有尾部斜线的路由。例如，路由 /users 将匹配 /users、/users/、甚至 /Users/
  *  strict 为 true，不会匹配到最后的斜线
@@ -127,6 +128,11 @@ const router: Router = createRouter({
   // 还可以 <RouterLink activeClass="" exactActiveClass="" > 进行设置
   history: createWebHistory(),
   routes,
+  scrollBehavior(to, form, savedPosition) {
+    // 第三个参数只有在点击浏览器的前进或者后退的时候才有效
+    debugger
+    // return 期望滚动到的位置
+  },
 });
 
 

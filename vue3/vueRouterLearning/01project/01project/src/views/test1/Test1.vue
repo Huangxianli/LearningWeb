@@ -41,7 +41,11 @@ const handleClick2 = () => {
       <li>test1Child3</li>
     </ul>
     <div class="test1-content">
-      <router-view></router-view>
+      <router-view #default="{ Component }">
+        <keep-alive>
+          <component :is="Component"></component>
+        </keep-alive>
+      </router-view>
     </div>
   </div>
 </template>
