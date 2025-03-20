@@ -30,6 +30,7 @@ import TodoTotal from './TodoTotal.vue';
   border: 1px solid #ccc;
   border-radius: 5px;
   padding: 10px;
+  margin: 0 auto;
 }
 
 .todo-list-title {
