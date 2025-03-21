@@ -3,7 +3,7 @@ import router from './router/index';
 
 <template>
   <div class="container">
-    <section class="left-container">
+    <!-- <section class="left-container">
       <router-view>左侧的菜单</router-view>
     </section>
     <section class="right-container">
@@ -13,7 +13,9 @@ import router from './router/index';
       <div>
         <router-view>主要内容区</router-view>
       </div>
-    </section>
+    </section> -->
+    <router-view></router-view>
+
   </div>
 </template>
 
@@ -24,9 +26,11 @@ import router from './router/index';
   display: flex;
   flex-direction: row;
 }
+
 .left-container {
   height: 100%;
 }
+
 .right-container {
   height: 100%;
 }
