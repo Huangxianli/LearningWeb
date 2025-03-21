@@ -23,7 +23,7 @@ module.exports = {
       {
         test: /\.css$/,
         use: ['style-loader', 'css-loader'],
-      }
+      },
     ],
   },
   plugins: [
@@ -42,4 +42,4 @@ module.exports = {
   ],
   mode: 'development',
   devtool: false,
-}
+};

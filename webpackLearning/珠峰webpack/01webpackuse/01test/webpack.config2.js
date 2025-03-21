@@ -13,13 +13,17 @@ module.exports = {
   module: {
     rules: [
       {
-        test: /\.css$/,
-        use: ['style-loader', 'css-loader'], // 从后往前执行
-        // css-loader：将 css 代码转化成 js 代码
-        // style-loader：通过 style 标签将 css 动态的插入到 html 中
-      }
+        oneOf: [
+          {
+            test: /\.css$/, // 注意即使是匹配成功了，如果后续还有 test，则不会停止匹配，直到最后一个匹配成了才停止，全部匹配完了之后开始执行 loader，如果没有特定设置顺序，会从最后一个 loader 执行到第一个 loader，也就是说不特地设置，那么执行顺序一定是从后往前的
+            use: ['style-loader', 'css-loader'], // 从后往前执行
+            // css-loader：将 css 代码转化成 js 代码
+            // style-loader：通过 style 标签将 css 动态的插入到 html 中
+          },
+        ],
+      },
     ],
   },
   mode: 'development',
   devtool: false,
-}
+};

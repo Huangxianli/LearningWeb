@@ -15,7 +15,7 @@ module.exports = {
       {
         test: /\.png$/,
         type: 'asset/resource', // 生成单独的文件，并导出 URL
-        // type: 'asset/inline', // 导出资产的数据 URL（base64）
+        // type: 'asset/inline', // 导出资产的数据 URL（base64）（一定会变大）
         // type: 'asset/source', // 导出资产的源代码，将文件内容直接作为字符串内联到代码中
         // type: 'asset', // 根据文件大小限制，选择导出数据 URL 还是生成单独的文件
         // parser: {
@@ -24,16 +24,16 @@ module.exports = {
         //   },
         // },
         generator: {
-          filename: 'images/[name].[hash:8][ext]' // 输出路径
-        }
-      }
+          filename: 'images/[name].[hash:8][ext]', // 输出路径
+        },
+      },
     ],
   },
   plugins: [
     new HtmlWebpackPlugin({
       template: './src/index.html',
       filename: 'index.html',
-    })
+    }),
   ],
   mode: 'development',
   devtool: false,
