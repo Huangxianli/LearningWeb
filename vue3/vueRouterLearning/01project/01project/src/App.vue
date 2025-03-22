@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import { reactive } from 'vue';
-import type { BottomNavItem } from '@/componets/bottomNav/bottomNav'
+import type { BottomNavItem } from '@/componets/bottomNav/bottomNav';
 import BottomNav from '@/componets/bottomNav/BottomNav.vue';
 const bottomNavItems = reactive<BottomNavItem[]>([
   {
     icon: '',
     name: '我的',
-    routeName: 'home',
-    key: '2'
+    routeName: 'root',
+    key: '1'
   },
   {
     icon: '',

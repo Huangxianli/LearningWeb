@@ -6,6 +6,9 @@ const { navItem } = defineProps<{ navItem: BottomNavItem }>();
 
 const router = useRouter();
 const handleClick = () => {
+  navItem.routeName;
+  console.log(navItem.routeName);
+  debugger
   router.push({
     name: navItem.routeName
   })

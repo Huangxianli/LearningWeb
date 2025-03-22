@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>fetch</title>
+</head>
+
+<body>
+  <script>
+    fetch('http://ajax-base-api-t.itheima.net/api/getbooks')
+      .then(res => {
+        console.log(res);
+        return res.json();
+      }).then(res => {
+        console.log(res);
+      }).catch(err => {
+        console.log(err);
+      });
+
+
+    async function getData () {
+      const response = await fetch('http://ajax-base-api-t.itheima.net/api/getbooks');
+      const res = await response.json();
+      console.log(res);
+    };
+    getData();
+
+  </script>
+</body>
+
+</html>

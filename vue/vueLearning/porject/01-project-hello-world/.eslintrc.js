@@ -17,5 +17,9 @@ module.exports = {
   "rules": {
     "no-debugger": 0
   },
+  env: {
+    browser: true,
+    // ...其他配置
+  },
   parser: "vue-eslint-parser",
 };
