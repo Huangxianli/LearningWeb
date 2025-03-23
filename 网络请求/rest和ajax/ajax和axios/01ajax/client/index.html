@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ajax</title>
+</head>
+<body>
+  <button id="query-btn">点击ajax请求</button>
+  <button id="query-btn1">点击fetch请求</button>
+  <div id="data-div">
+    
+  </div>
+  <script>
+    const renderDiv = (data)=> {
+      let innerHtml = '<ul>';
+      for (let i = 0; i < data.length; i++) {
+        innerHtml += `<li>${data[i].name}-${data[i].age}-${data[i].gender}</li>`;
+      }
+      innerHtml += '</ul>';
+      document.getElementById('data-div').innerHTML = innerHtml;
+    }
+    const btn = document.getElementById('query-btn');
+    const xhr = new XMLHttpRequest();
+    xhr.open('get','http://localhost:3000/student');
+    // xhr.responseType = 'json'; // 如果设置了这一行，则会告知响应数据是 json，并且自动的将 xhr.response 转化成对象，没有的话，就要自己转
+    xhr.onreadystatechange = () => {
+      console.log('onreadystatechanges');
+      if (xhr.readyState === 2) {
+        // 调用了 send 方法，已经返回了响应头
+        console.log('已获取响应头');
+      } else if (xhr.readyState === 3) {
+        // 正在返回 body
+        console.log('正在返回');
+        console.log(JSON.parse(xhr.response)?.data);
+
+      } else if (xhr.readyState === 4) {
+        // 返回完了数据
+        console.log(JSON.parse(xhr.response)?.data);
+        renderDiv(JSON.parse(xhr.response)?.data);
+      }
+    };
+    xhr.onload= () => {
+      console.log('xhr.onload');
+      if (xhr.status === 200) {
+        // http 的状态码为 200
+        console.log(JSON.parse(xhr.response)?.data);
+      }
+    };
+    btn.onclick = () => {
+      xhr.send();
+    };
+
+
+    const btn1 = document.getElementById('query-btn1');
+    btn1.onclick = () => {
+      fetch('http://localhost:3000/student',{
+        method: 'get',
+      })
+        .then(async res => {
+          console.log(res); // res 中包含了 http 的响应的状态
+          if(res.code !== 200) {
+            return new Error('请求失败')
+          }
+          const data = await res.json(); // 这样获取到的数据就是去除 浏览器包裹的一层返回的数据
+          console.log(data);
+        }).catch(err => {
+          console.log(err);
+        });
+    };
+  </script>
+</body>
+</html>

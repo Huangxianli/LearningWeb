@@ -1,0 +1,14 @@
+[
+  {
+    "id": 1,
+    "name":"name1",
+    "gender":"男",
+    "age": 12
+  },
+  {
+    "id": 2,
+    "name":"name2",
+    "gender":"男",
+    "age": 12
+  }
+]

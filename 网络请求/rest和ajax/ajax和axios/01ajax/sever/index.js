@@ -1,8 +1,6 @@
 const path = require('path');
 const fs = require('fs');
 const express = require('express');
-const { ok } = require('assert');
-const { BADFAMILY } = require('dns');
 const app = express();
 
 const HTTP_STATUS = {
@@ -13,22 +11,25 @@ const HTTP_STATUS = {
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+app.use((req,res, next) => {
+  // 允许跨域
+  res.setHeader('Access-Control-Allow-Origin',"*");
+  next();
+});
 
 const fullFilePath = (filename) => {
   return path.resolve(__dirname, `../data/${filename}`);
 };
 
-const dataFilePath = fullFilePath('data');
+const dataFilePath = fullFilePath('data.json');
 
 const readFile =  (filePath) => {
-  return Promise((resolve, reject) => {
-    fs.readFile(filePath, 'utf-8', (err,fileData)=> {
-      if (fileData) {
-        return resolve(JSON.parse(fileData || '[]'));
-      }
+  return new Promise((resolve, reject) => {
+    fs.readFile(filePath, 'utf-8', (err, fileData)=> {
       if (err) {
         return reject(err);
       }
+      return resolve(JSON.parse(fileData || '[]'));
     })
   })
 };
@@ -65,6 +66,7 @@ const sendErrorResult = (res, code, errorInfo) => {
 app.get('/student', async (req, res)=> {
   try {
     const data = await readFile(dataFilePath);
+    console.log(data);
     sendSuccessResult(res, data);
   } catch(err) {
     sendErrorResult(res, HTTP_STATUS.SERVER_ERROR, err);
