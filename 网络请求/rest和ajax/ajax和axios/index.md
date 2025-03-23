@@ -17,3 +17,13 @@ sessionStorage.setItem("key", "value");
 
 localStorage 中存储的数据，不自己清空就不会丢失（所有同源页面共享数据）
 和 sessionStorage 相同的 api
+
+## axios
+
+基于 promise 的网络请求库，兼容了 node.js 和浏览器，同一条代码即可以在浏览器中运行又可以在 node.js 中运行。node.js 中使用原生的 http 模块，在浏览器中使用的是 XMLHttpRequest
+
+### get 请求
+
+```js
+axios.get();
+```
