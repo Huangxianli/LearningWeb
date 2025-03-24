@@ -1,0 +1,1 @@
+{"version":3,"file":"./js/main.b144dcaf.js","mappings":";;;;AAAA;AACA","sources":["webpack://04webpacksourcemap/./src/js/main.js"],"sourcesContent":["debugger;\r\nconsole.log('source-map');\r\n"],"names":[],"sourceRoot":""}
