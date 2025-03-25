@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="zh">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ercharts 第一次使用</title>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.6.0/dist/echarts.min.js"></script>
+  </head>
+  <body>
+    <!-- 为 ECharts 准备一个定义了宽高的 DOM -->
+    <div id="main" style="width: 600px; height: 400px"></div>
+    <button id="enlarge-btn">放大</button>
+    <button id="reduce-btn">缩小</button>
+
+    <!--
+    1. 实例化 echarts，准备容器 
+      const myEcharts = echarts.init(dom);
+    2. 准备配置项和数据
+      const option = {}
+    3. 指定数据传入 
+      myEcharts.setOption(option);
+     -->
+    <script type="text/javascript">
+      // 基于准备好的dom，初始化echarts实例
+      const container = document.getElementById('main');
+      var myChart = echarts.init(container, null, {
+        width: 600,
+        heigth: 400,
+      });
+
+      // 指定图表的配置项和数据
+      var option = {
+        title: {
+          text: 'ECharts 入门示例',
+        },
+        tooltip: {},
+        legend: {
+          data: ['销量'],
+        },
+        xAxis: {
+          data: ['衬衫', '羊毛衫', '雪纺衫', '裤子', '高跟鞋', '袜子'],
+        },
+        yAxis: {},
+        series: [
+          {
+            name: '销量',
+            type: 'bar',
+            data: [5, 20, 36, 10, 10, 20],
+          },
+        ],
+      };
+
+      // 使用刚指定的配置项和数据显示图表。
+      myChart.setOption(option);
+
+      // 改变图标的大小
+      const enlargeBtn = document.getElementById('enlarge-btn');
+      const reduceBtn = document.getElementById('reduce-btn');
+
+      const changeContainerSize = (isEnlarge = true) => {
+        return () => {
+          const height = isEnlarge
+            ? container.clientHeight * 2
+            : container.clientHeight / 2;
+          const width = isEnlarge
+            ? container.clientWidth * 2
+            : container.clientWidth / 2;
+          container.style.height = height + 'px';
+          container.style.width = width + 'px';
+          // 注意容器的大小要同步设置 reszie 里面要传递参数，不然宽度会有问题
+          myChart.resize({
+            width,
+            height,
+          });
+        };
+      };
+      // const enlargeFun =
+      const reduceFun = () => {
+        myChart.resize();
+      };
+
+      enlargeBtn.addEventListener('click', changeContainerSize(true));
+      reduceBtn.addEventListener('click', changeContainerSize(false));
+    </script>
+  </body>
+</html>
