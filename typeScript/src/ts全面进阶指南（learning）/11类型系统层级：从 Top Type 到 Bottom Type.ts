@@ -16,7 +16,7 @@ declare let b: string | number;
 function test1() {
   console.log('---test1---------------------------------------------');
 
-  // 第一种，使用 extends 关键字 来判断前面的是不是后面的子类型，<a 类型> extends <b 类型> 说明 <a 类型> 是 <b 类型> 的子类型，如果不成立不能说明 <b 类型> 是 <a 类型> 的子类型，也就是 extends 只能正向的看，不能反向的看
+  // 第一种，使用 extends 关键字 来判断前面的是不是后面的子类型，<a 类型> extends <b 类型> 说明 <a 类型> 是 <b 类型> 的子类型，如果不成立不能说明 <b 类型> 是 <a 类型> 的子类型，也就是 extends 只能正向的看，不能反向的看，而且注意，extends 没有传递性（应该说除去一些特殊的场景，应该还是有传递性的）
   type Result = 'huang' extends string ? 1 : 2; // Result 1
   type Result1 = 'huang' extends String ? 1 : 2; // Result1 1
 
@@ -37,7 +37,7 @@ function test2() {
 
   type Result1 = 'huang' extends string ? 1 : 2; // Result1 1
   type Result2 = 'huang' extends String ? 1 : 2; // Result2 1
-  // 注意 Object 类型是除了 null 和 undefined 之外的所有类型 object 是除了原始类型外的所有引用类型，{} 是和 Object 一样的，但是不能添加类型等
+  // 注意 Object 类型是除了 null 和 undefined 之外的所有类型 object 是除了原始类型外的所有引用类型，{} 是和 Object 一样的，但是不能添加属性等
 
   type Result3 = never extends Object ? 1 : 2; // Result3 1
   type Result4 = string extends String ? 1 : 2; // Result4 1
@@ -66,10 +66,11 @@ function test3_1() {
   console.log('---test3_1---------------------------------------------');
 
   // 只需要这个类型存在于联合类型里面就是联合类型的子类型
-  type Result1 = 1 extends 1 | string | 3 ? 1 : 2; // Result1 1 // 左边的是子类型，由此说明，子类型是更加的确切的
+  type Result1 = 1 extends 1 | string | 3 ? 1 : 2; // Result1 1 // 左边的是子类型，由此说明，子类型是更加的精确的
 
-  // 如果都是有一个类型组成的联合类型，那么这个联合类型是组成这个联合类型元素的基础类型的子类型
+  // 如果都是由同一类型组成的联合类型，那么这个联合类型是组成这个联合类型元素的基础类型的子类型
   type Result2 = 'q' | '' | '12' extends string ? 1 : 2; // Result2 1
+  type Result3 = 1 | '' | '12' extends string ? 1 : 2; // Result2 2 只要联合类型中的任何一个子类型不满足条件，extends 就会走 false 逻辑
 
 };
 
@@ -92,6 +93,15 @@ function test3_2() {
   type Result6 = Result5 extends object ? 1 : 2; // 1 
 
   type Result7 = object extends {} ? 1 : 2; // Result7 1
+
+  // string -> String -> object 
+  let test3_2_1: string = '';
+  let test3_2_2: String;
+  test3_2_2 = test3_2_1;
+  let test3_2_3: object;
+  test3_2_3 = test3_2_2;
+  // 如果是具有传递性的话，那么 test3_2_3 = test3_2_1; 不会报错（这个示例应该被当成特殊的示例）
+  // test3_2_3 = test3_2_1; // 会报错
 };
 
 /**
@@ -104,7 +114,7 @@ function test3_3() {
   console.log('---test3_3---------------------------------------------');
 
   // any extends 时，表现的是，any 让条件成立一部分，让条件不成立一部分，实际表现为，直接将返回条件类型组合成联合类型
-  type Result24 = any extends Object ? 1 : 2; // 1 | 2
+  type Result24 = any extends Object ? 1 : 2; // 1 | 2 （注意这里的逻辑和联合类型不一样，联合类型 extends 是只要联合类型中的任何一个子类型不满足就只走 false 的逻辑，any extends 是 true 和 false 的逻辑都走了 但是如果 extends 后面是 unknown 那配合 any 就有不同一点）
   // unknown 类型和 any 类型是不同的，它只能赋值给 unknown 类型和 any 类型 
   type Result25 = unknown extends Object ? 1 : 2; // 2
 

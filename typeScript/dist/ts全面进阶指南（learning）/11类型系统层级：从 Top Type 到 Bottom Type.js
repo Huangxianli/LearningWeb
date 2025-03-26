@@ -46,6 +46,14 @@ function test3_1() {
 function test3_2() {
     console.log('---test3_2---------------------------------------------');
     const a = '1223';
+    // string -> String -> object 
+    let test3_2_1 = '';
+    let test3_2_2;
+    test3_2_2 = test3_2_1;
+    let test3_2_3;
+    test3_2_3 = test3_2_2;
+    // 如果是具有传递性的话，那么 test3_2_3 = test3_2_1; 不会报错（这个示例应该被当成特殊的示例）
+    // test3_2_3 = test3_2_1; // 会报错
 }
 ;
 /**
