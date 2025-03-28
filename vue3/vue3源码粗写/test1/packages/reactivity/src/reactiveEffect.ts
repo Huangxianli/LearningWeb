@@ -2,12 +2,15 @@ import { activeEffect, trackEffect, triggerEffects } from './effect';
 
 import type { ActiveEffectClass as ActiveEffectClassType } from './effect';
 
-export type KeyDepsMap = Map<ActiveEffectClassType, ActiveEffectClassType['_trackId']> & {
-  cleanup?: () => void,
-  name?: string,
-}
-export type ObjectDepsMap = Map<string, KeyDepsMap>
-export type TargetMap = WeakMap<object, ObjectDepsMap>
+export type KeyDepsMap = Map<
+  ActiveEffectClassType,
+  ActiveEffectClassType['_trackId']
+> & {
+  cleanup?: () => void;
+  name?: string;
+};
+export type ObjectDepsMap = Map<string, KeyDepsMap>;
+export type TargetMap = WeakMap<object, ObjectDepsMap>;
 
 const targetMap: TargetMap = new WeakMap(); // 用于存放整个对象的依赖收集
 
@@ -30,7 +33,7 @@ export function track(target, key) {
     objectDepsMap.set(key, keyDepsMap);
   }
   trackEffect(activeEffect, keyDepsMap);
-};
+}
 
 // 写的时候，执行当前 key 收集的副作用函数
 export function trigger(target, key, oldValue, value) {
@@ -43,6 +46,9 @@ export function trigger(target, key, oldValue, value) {
   }
   const keyDepsMap = objectDepsMap.get(key);
   if (!keyDepsMap) {
+    return;
+  }
+  if (oldValue === value) {
     return;
   }
   triggerEffects(keyDepsMap);

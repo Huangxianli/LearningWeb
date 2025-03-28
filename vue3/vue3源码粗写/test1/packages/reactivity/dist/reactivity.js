@@ -14,7 +14,7 @@ function effect(fn, options) {
 var activeEffect = void 0;
 var activeEffectsStack = [];
 var ActiveEffectClass = class {
-  // 用于控制防止进入死循环
+  // 用于控制防止进入死循环（一个副作用函数里面又读又写）
   // abstract fn: () => void;
   constructor(fn, scheduler) {
     this.fn = fn;
@@ -120,6 +120,9 @@ function trigger(target, key, oldValue, value) {
   }
   const keyDepsMap = objectDepsMap.get(key);
   if (!keyDepsMap) {
+    return;
+  }
+  if (oldValue === value) {
     return;
   }
   triggerEffects(keyDepsMap);
