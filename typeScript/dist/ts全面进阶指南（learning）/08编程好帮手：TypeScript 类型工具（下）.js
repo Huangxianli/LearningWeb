@@ -1,4 +1,3 @@
-"use strict";
 function test() {
     console.log('---编程好帮手：TypeScript 类型工具（下）---------------------------------------------');
     // 类型的安全保障：类型查询操作符 类型守卫
@@ -142,3 +141,4 @@ function test3() {
     }; */
 }
 ;
+export default test;

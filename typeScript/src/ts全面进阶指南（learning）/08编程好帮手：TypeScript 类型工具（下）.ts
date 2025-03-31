@@ -178,3 +178,5 @@ function test3() {
     };
   }; */
 };
+
+export default test;
