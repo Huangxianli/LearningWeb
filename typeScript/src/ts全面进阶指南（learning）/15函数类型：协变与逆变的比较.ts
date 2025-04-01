@@ -7,13 +7,13 @@ function test(): void {
 }
 
 class Animal {
-  asPet(): void {}
+  asPet(): void { }
 }
 class Dog extends Animal {
-  bark(): void {}
+  bark(): void { }
 }
 class Corgi extends Dog {
-  cute(): void {}
+  cute(): void { }
 }
 
 /**

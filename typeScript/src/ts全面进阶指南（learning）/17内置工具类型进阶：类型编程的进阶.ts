@@ -4,6 +4,7 @@ function test(): void {
   );
 
   test1();
+  test2();
 }
 
 /**
@@ -41,17 +42,57 @@ function test1_1(): void {
   };
   type DeepNonNullable<T extends object> = {
     [K in keyof T]: T[K] extends object
-      ? DeepNonNullable<T[K]>
-      : T[K] extends null | undefined
-      ? never
-      : T[K];
+    ? DeepNonNullable<T[K]>
+    : T[K] extends null | undefined
+    ? never
+    : T[K];
   };
 }
 
+/**
+ * 基于已知属性进行部分修饰
+ * 
+ * 类型编程思路：将复杂的工具类型，拆解为由基础工具类型、类型工具的组合
+ * 拆分-处理-组合
+ */
 function test1_2(): void {
   console.log(
     '--- test1_2 基于已知属性进行部分修饰 ---------------------------------------------'
   );
+
+  // 抽取类型的部分字段为可选，其他字段保持原样
+  type MarKPropsAsOptionan<T, K extends keyof T> = Partial<Pick<T, K>> & Omit<T, K>;
+  type MarKPropsAsOptionan1<T extends object, K extends keyof T = keyof T> = Partial<Pick<T, K>> & Omit<T, K>;
+}
+
+/**
+ * 结构工具类型进阶
+ * 
+ * 基于键值类型的 Pick 与 Omit
+ * 子结构的互斥处理
+ */
+function test2(): void {
+  console.log('--- test2 结构工具类型进阶 ---------------------------------------------');
+
+  test2_1();
+
+
+}
+
+/**
+ * 基于键值类型的 Pick 与 Omit
+ * 拆分-处理-组合
+ * 拆分：基于期望的类型拿到所有次类型的属性
+ */
+function test2_1(): void {
+  console.log('--- test2_1 基于键值类型的 Pick 与 Omit ---------------------------------------------');
+
+  type FuncStruct = (...arg: any[]) => any;
+  type FunctionKeys<T extends object> = {
+    [K in keyof T]: T extends FuncStruct ? K : never;
+  }[keyof T];
+  // 重点是 里面返回的是 K 而非 T[K]，以及 [keyof T]
+  // 当索引类型查询中使用了一个联合类型时，会使用分布式条件类型的方式，将这个联合类型的成员依次进行访问，然后组合起来
 }
 
 export default test;
