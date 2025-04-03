@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>渲染机制</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+  </head>
+  <body>
+    <div id="root1"></div>
+    <script>
+      /**
+       * 讲述 一份模板如何转化成真实 DOM 节点，如何高效的更新这些节点
+       */
+
+      /**
+       * 虚拟 DOM：将目标多需要的 UI 通过数据结构“虚拟”的表示出来，保存在内存中，然后将真实的 DOM 与之保持同步
+       * 与其说虚拟 DOM 是一种具体的技术，不如说是一种模式，所以并没有一个标准的实现
+       */
+      const { createApp } = Vue;
+      createApp({
+        components: {},
+        setup() {},
+        template: ``,
+      }).mount('#root1');
+    </script>
+  </body>
+</html>
