@@ -2,7 +2,7 @@
 "version":3,
 "file":"script-min.js",
 "lineCount":1,
-"mappings":"AAAA,IAAIA,iBAAI,EAAR,CACIC,iBAAI,EADR,CAEIC,iBAAI,EAFR,CAGMC,iBAAIA,QAAA,EAAM,CACd,MAAO,EADO,CAHhB,CAMAC,oCAAe,CAAEJ,EAAAA,gBAAF,CAAKC,EAAAA,gBAAL,CAAQC,EAAAA,gBAAR,CAAWC,EAAAA,gBAAX,CANf,CAAAE,cAAA,EAMA,cAAA,QAAA,CAAA;",
+"mappings":"AAAA,IAAIA,EAAI,CACRA,EAAA,CAAI,EACJ,KAAIC,EAAI,CAAR,CACIC,EAAI;",
 "sources":["script.js"],
-"names":["a","b","c","d","$jscompDefaultExport","exports"]
+"names":["a","b","c"]
 }

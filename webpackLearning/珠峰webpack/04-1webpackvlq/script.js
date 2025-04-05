@@ -1,7 +1,4 @@
-let a = 12;
-let b = 13;
-let c = 14;
-const d = () => {
-  return 1 + 1;
-};
-export default { a, b, c, d };
+let a = 1;
+a = 12;
+let b = 2;
+let c = 3;
