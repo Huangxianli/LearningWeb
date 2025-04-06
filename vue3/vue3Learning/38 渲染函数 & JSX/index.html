@@ -10,6 +10,7 @@
 <body>
 
   <div id="root1"></div>
+  <div id="root2"></div>
   <script>
     const {createApp, h} = Vue;
 
@@ -40,7 +41,24 @@
       },
       template: `
       `
-    }).mount('#root1')
+    }).mount('#root1');
+
+    /**
+     * JSX / TSX
+     */
+
+    /**
+     * 案例
+     */
+    const ChildComponent2 = {
+      setup() {
+        return () => h();
+      },
+    };
+    createApp({
+      setup(){},
+      template: ``,
+    }).mount('#root2');
   </script>
 </body>
 </html>
