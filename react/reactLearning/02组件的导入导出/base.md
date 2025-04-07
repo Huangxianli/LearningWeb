@@ -1,11 +1,11 @@
-````js
-A:
-export default function AComponent () {};
-B:
-import AComponent from '';
+```js
+// A.js
+export default function AComponent() {}
+// B.js
+import AComponent from 'A.js';
 
-A:
-export function AComponent () {};
-B:
-import { AComponent } from '';
-```` 
+// A.js
+export function AComponent() {}
+// B.js
+import { AComponent } from 'A.js';
+```
