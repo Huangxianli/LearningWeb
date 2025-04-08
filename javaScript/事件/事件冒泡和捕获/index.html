@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="zh">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>事件冒泡和捕获</title>
+    <style>
+      #root1 {
+        width: 100px;
+        height: 100px;
+        background-color: red;
+      }
+      #child1-1 {
+        width: 50px;
+        height: 50px;
+        background-color: blue;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root1">
+      <div id="child1-1"></div>
+    </div>
+    <script>
+      const root1 = document.getElementById('root1');
+      const child1_1 = document.getElementById('child1-1');
+      /**
+       * 事件的传递流程：
+       * 捕获（从 window 开始向子传递）
+       * 目标元素（达到目标元素之后不会再向子元素传递）
+       * 冒泡（从目标元素到 window 向父传递）（可以事件委托的原因）
+       */
+
+      // 事件冒泡：一个事件发生在一个元素上，他首先会运行在该元素的处理程序，然后运行在其父元素的处理程序，依此类推，直到到达根元素（几乎所有的事件都会冒泡），直接写在 HTML 元素上都事件，在目标阶段和他的子元素事件冒泡到这个元素时会触发，在捕获阶段不会触发
+
+      const abortController = new AbortController();
+      root1.addEventListener(
+        'click',
+        function (e) {
+          console.log('root1 click');
+        },
+        {
+          capture: true,
+          once: false,
+          passive: false,
+          signal: abortController.signal,
+        }
+        // true
+      ); // 第三个参数也可以直接是一个布尔值
+      // capture: true 事件捕获阶段到达该元素时触发事件处理程序
+      // once: true 事件处理程序只会被调用一次
+      // passive: true 事件处理程序不会调用 preventDefault()，可以提高性能
+      // signal: abortController.signal 事件处理程序 在调用 abortController.cancel() 时被取消
+      child1_1.addEventListener(
+        'click',
+        function (e) {
+          console.log('child1-1 click');
+        },
+        {
+          capture: true,
+        }
+      );
+
+      /**
+       * event.stopPropagation()
+       * 阻止事件继续传递，既阻止继续向子元素传递，也阻止向父元素传递
+       */
+      root1.addEventListener(
+        'dblclick',
+        function (e) {
+          console.log('root1 dblclick');
+        },
+        false
+      );
+      child1_1.addEventListener(
+        'dblclick',
+        function (e) {
+          e.stopPropagation(); // 虽然该回调函数是在捕获阶段触发或者自己触发，但是阻止了向父元素传递，所以不会触发 root1 的事件处理程序
+          console.log('child1-1 dblclick');
+        },
+        true
+      );
+    </script>
+  </body>
+</html>
