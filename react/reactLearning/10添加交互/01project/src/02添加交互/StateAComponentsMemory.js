@@ -22,8 +22,8 @@ function NormalVar() {
         </button>
       </div>
       <div>
-        {/* 使用set函数修改state变量会触发组件的重新渲染 */}
-        {/* 重新渲染state变量的值会使用上一次的值，但是如果是先销毁再重新创建的话，就会使用原始值*/}
+        {/* 使用 set 函数修改 state 变量会触发组件的重新渲染 */}
+        {/* 重新渲染 state 变量的值会使用上一次的值，但是如果是先销毁再重新创建的话，就会使用原始值*/}
         <span>state变量{stateCount}</span>
         {/* 注意：一般在事件回调处理完之后才会触发重新渲染 */}
         <button
@@ -49,9 +49,10 @@ function StateVar() {
     <BoxBorder>
       <span>{count}</span>
       {/**
-       * 1、state变量会保留渲染间的值，但是如果是销毁了之后在出现则会重置为初始值
-       * 2、state的setter函数设置新值会触发再次渲染组件
+       * 1、state 变量会保留渲染间的值，但是如果是销毁了之后在出现则会重置为初始值
+       * 2、state 的 setter 函数设置新值会触发再次渲染组件
        */}
+      {/* 注意这里一次 statesetter 的调用会触发两次渲染，是应为开发环境用了 React 的严格模式，生产环境不会 */}
       <button
         onClick={() => {
           setCount(count + 1);
@@ -64,7 +65,7 @@ function StateVar() {
 }
 
 /**
- * @problem：为何hooks要在顶层使用（原理）
+ * @problem：为何 hooks 要在顶层使用（原理）
  * @answer：https://react.docschina.org/learn/state-a-components-memory#how-does-react-know-which-state-to-return
  */
 
