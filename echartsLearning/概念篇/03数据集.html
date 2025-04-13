@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="zh">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>数据集</title>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.6.0/dist/echarts.min.js"></script>
+
+    <style>
+      #container {
+        width: 600px;
+        height: 300px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="container"></div>
+    <script type="text/javascript">
+      const container = document.getElementById('container');
+      const myEchart = echarts.init(container, null, {
+        width: 600,
+        height: 300,
+      });
+      const option = {
+        title: {
+          text: 'ECharts 主题颜色',
+        },
+        tooltip: {},
+        legend: {
+          data: ['销量'],
+        },
+        xAxis: {
+          // data: ['衬衫', '羊毛衫', '雪纺衫', '裤子', '高跟鞋', '袜子'],
+          type: 'category', // 设置成这样的话，对应的是 dataset 的第一列
+        },
+        yAxis: {},
+        series: [
+          {
+            // name: '销量',
+            type: 'bar',
+            // data: [5, 20, 36, 10, 10, 20], // 之前是在这里面设置的
+          },
+        ],
+
+        dataset: {
+          // dimensions: ['product', '销量'],
+          // source: [
+          //   { product: '衬衫1', 销量: 5 },
+          //   { product: '羊毛衫', 销量: 20 },
+          //   { product: '雪纺衫', 销量: 36 },
+          //   { product: '裤子', 销量: 10 },
+          //   { product: '高跟鞋', 销量: 10 },
+          //   { product: '袜子', 销量: 20 },
+          // ],
+          source: [
+            ['product', '销量'],
+            ['衬衫', 5],
+            ['羊毛衫', 20],
+            ['雪纺衫', 36],
+            ['裤子', 10],
+            ['高跟鞋', 10],
+            ['袜子', 20],
+          ],
+        },
+        emphasis: {
+          // 高亮配置项
+        },
+      };
+      myEchart.setOption(option);
+    </script>
+  </body>
+</html>

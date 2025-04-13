@@ -11,25 +11,28 @@
     <div id="main" style="width: 600px; height: 400px"></div>
     <button id="enlarge-btn">放大</button>
     <button id="reduce-btn">缩小</button>
+    <button id="dispose-btn">销毁</button>
 
     <!--
     1. 实例化 echarts，准备容器 
       const myEcharts = echarts.init(dom);
     2. 准备配置项和数据
       const option = {}
-    3. 指定数据传入 
+    3. 指定数据传入并显示图标显示
       myEcharts.setOption(option);
+    4. 销毁实例
+      myEcharts.dispose(); // 注意，这里不会销毁容器是，只会销毁实例
      -->
     <script type="text/javascript">
       // 基于准备好的dom，初始化echarts实例
       const container = document.getElementById('main');
-      var myChart = echarts.init(container, null, {
+      const myChart = echarts.init(container, null, {
         width: 600,
         heigth: 400,
       });
 
       // 指定图表的配置项和数据
-      var option = {
+      const option = {
         title: {
           text: 'ECharts 入门示例',
         },
@@ -56,6 +59,7 @@
       // 改变图标的大小
       const enlargeBtn = document.getElementById('enlarge-btn');
       const reduceBtn = document.getElementById('reduce-btn');
+      const disposeBtn = document.getElementById('dispose-btn');
 
       const changeContainerSize = (isEnlarge = true) => {
         return () => {
@@ -74,13 +78,12 @@
           });
         };
       };
-      // const enlargeFun =
-      const reduceFun = () => {
-        myChart.resize();
-      };
 
       enlargeBtn.addEventListener('click', changeContainerSize(true));
       reduceBtn.addEventListener('click', changeContainerSize(false));
+      disposeBtn.addEventListener('click', () => {
+        myChart.dispose();
+      });
     </script>
   </body>
 </html>
