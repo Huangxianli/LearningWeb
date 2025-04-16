@@ -1,48 +1,43 @@
 <!DOCTYPE html>
 <html lang="zh">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>条件渲染</title>
 
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>条件渲染</title>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  </head>
 
-  <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
-  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
-  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-</head>
+  <body>
+    <div id="root"></div>
 
-<body>
-  <div id="root"></div>
-
-  <script type="text/babel">
-    /**
-     * 可以使用if 三目 && || 来进行条件渲染
-     * 注意 && || 为 0 的时候
-     */
-    function ChildComponent1 () {
-      const showItem = true;
-      if (showItem) {
+    <script type="text/babel">
+      /**
+       * 可以使用if 三目 && || 来进行条件渲染
+       * 注意 && || 为 0 的时候
+       */
+      function ChildComponent1() {
+        const showItem = true;
+        const showJsx = showItem ? <div>show ChildComponent1</div> : null;
+        return showJsx;
+      }
+      function ChildComponent2() {
+        const showItem = true;
+        return <>{showItem && <div>show ChildComponent2</div>}</>;
+      }
+      function RootComponent() {
         return (
           <>
-            <div>show ChildComponent1</div>
+            <ChildComponent1 />
+            <ChildComponent2 />
           </>
         );
-      } else {
-        return;
       }
-
-    };
-    function RootComponent () {
-      return (
-        <>
-          <ChildComponent1 />
-        </>
-      );
-    };
-    const container = document.getElementById('root');
-    const root = ReactDOM.createRoot(container);
-    root.render(<RootComponent />);
-  </script>
-</body>
-
+      const container = document.getElementById('root');
+      const root = ReactDOM.createRoot(container);
+      root.render(<RootComponent />);
+    </script>
+  </body>
 </html>

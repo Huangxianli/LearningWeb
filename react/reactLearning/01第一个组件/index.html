@@ -1,46 +1,42 @@
 <!DOCTYPE html>
 <html lang="zh">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>第一个组件</title>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
 
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>第一个组件</title>
-  <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
-  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  </head>
 
-  <!-- Don't use this in production: -->
-  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-</head>
+  <body>
+    <div id="root">第一个组件</div>
+    <script type="text/babel">
+      /**
+       * @problem：为何用 babel
+       * @answer：babel 会将 jsx 语法转换成 js 语法，react 只支持 js 语法
+       * @problem：组件为何大写开头
+       * @answer：因为 babel
+       * @problem：为何只允许有一个根节点
+       * @answer：最后都是调用 render 函数，只允许有一个根节点
+       */
 
-<body>
-  <div id="root">第一个组件</div>
-  <script type="text/babel">
-    /**
-     * @problem：为何用babel
-     * @problem：组件为何大写开头
-     * @problem：为何只允许有一个根节点
-     * @answer：最后都是调用render函数，只允许有一个根节点
-     */
+      /**
+       * 组件以大写字母开头，因为 react 中用 jsx 语法，babel 会对 jsx 进行编译，如果是小写的开头，会被认为是原生的标签，不存在的标签会报错（vue 和 react 都是这个原因）
+       * 返回 jsx 标签（只能有一个根组件）
+       */
+      function HelloWorld() {
+        // 没有加()，会忽略return下一行及其后面的内容
+        return <>Hello World</>;
+      }
 
-    /**
-     * 组件以大写字母开头，因为react中用jsx语法，babel会对jsx进行编译，如果是小写的开头，会被认为是原生的标签，不存在的标签会报错
-     * 返回jsx标签（只能有一个根组件）
-     */
-    function HelloWorld () {
-      // 没有加()，会忽略return下一行及其后面的内容
-      return (
-        <>Hello World</>
-      );
-    };
+      // 永远不要在组件中定义组件
 
-    // 永远不要在组件中定义组件
-
-    // 会以id为root的htmnl作为根节点，将内容渲染在其里面，会覆盖原有的内容
-    const container = document.getElementById('root');
-    const root = ReactDOM.createRoot(container);
-    root.render(<HelloWorld />);
-
-  </script>
-</body>
-
+      // 会以 id 为 root 的 html 作为根节点，将内容渲染在其里面，会覆盖原有的内容
+      const container = document.getElementById('root');
+      const root = ReactDOM.createRoot(container);
+      root.render(<HelloWorld />);
+    </script>
+  </body>
 </html>

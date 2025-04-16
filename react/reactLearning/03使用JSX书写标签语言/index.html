@@ -1,37 +1,40 @@
 <!DOCTYPE html>
 <html lang="zh">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>使用JSX书写标签语法</title>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <!-- Don't use this in production: -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  </head>
 
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>使用JSX书写标签语法</title>
-  <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
-  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
-  <!-- Don't use this in production: -->
-  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-</head>
+  <body>
+    <div id="root"></div>
+    <div id="root1"></div>
+    <script type="text/babel">
+      /**
+       * JSX规则
+       * 1、只能返回一个根组件，在底层，JSX其实是转化成了一个对象，无法在函数中返回多个对象，除非用数组包裹起来
+       * 2、标签必须闭合
+       * 3、使用小驼峰命名大部分的属性，JSX最终会变成JS，JSX中的属性会转化成JS对象中的键值对。JS对变量的命名有限制，例如不能用class这样的保留字
+       */
+      function RootComponent() {
+        return <>123</>;
+      }
 
-<body>
-  <div id="root"></div>
-  <script type="text/babel">
-    /**
-     * JSX规则
-     * 1、只能返回一个根组件，在底层，JSX其实是转化成了一个对象，无法在函数中返回多个对象，除非用数组包裹起来
-     * 2、标签必须闭合
-     * 3、使用小驼峰命名大部分的属性，JSX最终会变成JS，JSX中的属性会转化成JS对象中的键值对。JS对变量的命名有限制，例如不能用class这样的保留字
-     */
-    function RootComponent () {
-      return (
-        <>
-          123
-        </>
-      );
-    };
-
-    const container = document.getElementById('root');
-    const root = ReactDOM.createRoot(container);
-    root.render(<RootComponent />)
-  </script>
-</body>
-
+      const container = document.getElementById('root');
+      const root = ReactDOM.createRoot(container);
+      root.render(<RootComponent />);
+    </script>
+    <script>
+      // 不使用 babel，就不能使用 JSX 语法，要自己手动将 JSX 转化成 JS 语法
+      function ChildComponent2() {
+        return React.createElement('div', null, '这里没有使用 babel');
+      }
+      const root1 = ReactDOM.createRoot(document.getElementById('root1'));
+      root1.render(React.createElement(ChildComponent2, null, null));
+    </script>
+  </body>
 </html>

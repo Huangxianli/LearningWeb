@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>渲染机制</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+  </head>
+  <body>
+    <div id="root1"></div>
+    <script>
+      /**
+       * 讲述 一份模板如何转化成真实 DOM 节点，如何高效的更新这些节点
+       */
+
+      /**
+       * 虚拟 DOM：将目标多需要的 UI 通过数据结构“虚拟”的表示出来，保存在内存中，然后将真实的 DOM 与之保持同步
+       * 与其说虚拟 DOM 是一种具体的技术，不如说是一种模式，所以并没有一个标准的实现
+       * 虚拟 DOM 是一个纯 JS 对象
+       * 
+       * 运行时渲染器 遍历整个虚拟 DOM 树，构建出真实的 DOM 树，这个过程称之为 挂载
+       * 比较两个虚拟 DOM 树，找出区别，并更新到真实的 DOM 树上，称之为 更新
+       */
+
+      /**
+       * 渲染管线
+       * Vue 组件挂载时：
+       * 1. 编译：Vue 模板被编译成渲染函数（用来返回虚拟 DOM 的函数），可以在构建时完成，也可以在运行时编译器完成
+       * 2. 挂载：运行时渲染器调用渲染函数，遍历返回的虚拟 DOM 树，基于其创建实际的 DOM 节点，会作为 响应式副作用 执行，追踪其中用到的所有响应式依赖
+       * 3. 更新：依赖改变的时候，副作用函数会重新执行，会创建一个新的虚拟 DOM 树，运行时编译器遍历这颗新树，与旧树比较，将必要的更新应用到真实的 DOM 上
+       */
+
+      /**
+       * 模板 vs. 渲染函数
+       * 模板会被预编译成虚拟 DOM 渲染函数，也可以直接编写渲染函数
+       * 为什么默认推荐使用模板：
+       * 1. 更贴近 HTML 
+       * 2. 确定的语法，更容易对模板做静态分析，使得 Vue 模板编译器能够应用许多的编译时优化来提升虚拟 DOM 的性能表现
+       */
+
+      /**
+       * 带编译时信息的虚拟 DOM
+       * 1. 缓存金泰内容（模板中有部分内容是不带任何动态绑定的）
+       * 2. 更新类型标记（对于单个有动态绑定的元素，可以推断出大量的信息）
+       * 3. 树结构打平
+       */
+      const ChildComponent1 = {
+        props: {
+          test: ''
+        },
+        setup(props) {
+          return {
+            props,
+          }
+        },
+        template: `
+          <div>
+            <!-- 这里的两个 div 会被缓存 -->
+            <div>foo</div>
+            <div>data</div>
+            <div>{{props.test}}</div>
+          </div>
+        `,
+      };
+      const { createApp } = Vue;
+      createApp({
+        components: {
+          ChildComponent1,
+        },
+        setup() {},
+        template: `
+          <ChildComponent1 test="test" />
+        `,
+      }).mount('#root1');
+    </script>
+  </body>
+</html>

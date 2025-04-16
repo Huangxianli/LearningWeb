@@ -1,47 +1,46 @@
 <!DOCTYPE html>
 <html lang="zh">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>在JSX中通过大括号使用JS</title>
 
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>在JSX中通过大括号使用JS</title>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  </head>
 
-  <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
-  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
-  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-</head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      /**
+       * 在 {} 中编写 js 的场景
+       * 1、用作 JSX 标签内的文本
+       * 2、用作紧跟在 = 后面的属性
+       */
 
-<body>
-  <div id="root"></div>
-  <script type="text/babel">
-    /**
-     * 在{}中编写js的场景
-     * 1、用作JSX 标签内 的 文本
-     * 2、用作紧跟在=后面的属性
-     */
-
-    function RootComponent () {
-      return (
-        <>
-          <ChildComponent1 />
-        </>
-      );
-    };
-    function ChildComponent1 () {
-      const spanContent = 'span中的内容';
-      const className = 'span-class'
-      return (
-        <>
-          <span className={className} style={{ color: 'red' }}>{spanContent}</span>
-        </>
-      );
-    };
-    const container = document.getElementById('root');
-    const root = ReactDOM.createRoot(container);
-    root.render(<RootComponent />);
-  </script>
-
-
-</body>
-
+      function RootComponent() {
+        return (
+          <>
+            <ChildComponent1 />
+          </>
+        );
+      }
+      function ChildComponent1() {
+        const spanContent = 'span中的内容';
+        const className = 'span-class';
+        return (
+          <>
+            {/* 注意，style 本身就是一个对象 */}
+            <span className={className} style={{ color: 'red' }}>
+              {spanContent}
+            </span>
+          </>
+        );
+      }
+      const container = document.getElementById('root');
+      const root = ReactDOM.createRoot(container);
+      root.render(<RootComponent />);
+    </script>
+  </body>
 </html>

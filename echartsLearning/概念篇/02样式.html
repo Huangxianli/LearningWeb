@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="zh">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>样式</title>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.6.0/dist/echarts.min.js"></script>
+    <script src="./02.js"></script>
+  </head>
+  <body>
+    <div id="container" style="width: 600px; height: 400px"></div>
+    <script type="text/javascript">
+      const container = document.getElementById('container');
+      // 颜色主题
+      // echarts.registerTheme('themeName', themeConfig); // 注册主题
+      const myEchart = echarts.init(container, 'chalk', {
+        width: 600,
+        heigth: 300,
+      });
+      const option = {
+        title: {
+          text: 'ECharts 主题颜色',
+        },
+        tooltip: {},
+        legend: {
+          data: ['销量'],
+        },
+        xAxis: {
+          data: ['衬衫', '羊毛衫', '雪纺衫', '裤子', '高跟鞋', '袜子'],
+        },
+        yAxis: {},
+        series: [
+          {
+            name: '销量',
+            type: 'bar',
+            data: [5, 20, 36, 10, 10, 20],
+          },
+        ],
+        emphasis: {
+          // 高亮配置项
+        },
+      };
+      myEchart.setOption(option);
+    </script>
+  </body>
+</html>

@@ -14,7 +14,7 @@ function effect(fn, options) {
 var activeEffect = void 0;
 var activeEffectsStack = [];
 var ActiveEffectClass = class {
-  // 用于控制防止进入死循环
+  // 用于控制防止进入死循环（一个副作用函数里面又读又写）
   // abstract fn: () => void;
   constructor(fn, scheduler) {
     this.fn = fn;
@@ -122,17 +122,28 @@ function trigger(target, key, oldValue, value) {
   if (!keyDepsMap) {
     return;
   }
+  if (oldValue === value) {
+    return;
+  }
   triggerEffects(keyDepsMap);
 }
+
+// packages/reactivity/src/utils.ts
+var isObject = (data) => {
+  return typeof data === "object" && data !== null;
+};
 
 // packages/reactivity/src/reactive.ts
 var targetMap2 = /* @__PURE__ */ new WeakMap();
 function createReactiveObject(obj) {
-  if (typeof obj !== "object") {
+  if (isObject(obj)) {
     return obj;
   }
   if (targetMap2.get(obj)) {
     return targetMap2.get(obj);
+  }
+  if (obj["__v_isReactive" /* IS_REACTIVE */]) {
+    return obj;
   }
   const proxy = new Proxy(obj, mutableHandlers);
   targetMap2.set(obj, proxy);
@@ -143,6 +154,9 @@ function reactive(obj) {
 }
 var mutableHandlers = {
   get(target, key, receiver) {
+    if (key === "__v_isReactive" /* IS_REACTIVE */) {
+      return true;
+    }
     track(target, key);
     const result = Reflect.get(target, key, receiver);
     if (typeof result === "object") {
@@ -160,7 +174,7 @@ var mutableHandlers = {
   }
 };
 function toReactive(value) {
-  return typeof value === "object" ? reactive(value) : value;
+  return isObject(value) ? reactive(value) : value;
 }
 export {
   ActiveEffectClass,

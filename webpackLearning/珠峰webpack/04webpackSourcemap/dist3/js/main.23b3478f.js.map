@@ -1,0 +1,1 @@
+{"version":3,"file":"./js/main.23b3478f.js","mappings":";;;;AAAA;AACA;AACA;AACA","sources":["webpack://04webpacksourcemap/./src/js/main.js"],"sourcesContent":["debugger;\r\nconst a = () => {};\r\nwindow.a.b;\r\nconsole.log('source-map');\r\n"],"names":[],"sourceRoot":""}

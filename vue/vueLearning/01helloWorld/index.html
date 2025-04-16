@@ -1,70 +1,77 @@
 <!DOCTYPE html>
 <html lang="zh">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>hello World</title>
+  </head>
 
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>hello World</title>
-</head>
+  <body>
+    <div id="root"></div>
+    <div id="elRoot"></div>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+    <script>
+      /**
+       * el 或者 $mount() 决定了 目标 DOM 是什么
+       * 是否有 template 或 render 决定了生成的内容是替换掉目标 DOM 还是插入到目标 DOM 中，如果都没有的话，就是使用原有的目标元素，只要其中一个有，就会覆盖掉整个目标元素
+       */
 
-<body>
-  <div id="root"></div>
-  <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
-  <script>
-    /**
-     * el 或者 $mount() 决定了 目标 DOM
-     * template 和 render 决定了生成的内容是替换掉目标 DOM 还是插入到目标 DOM 中
-     */
+      // 如果没有 el 属性，需要使用 $mount() 方法指定需要挂载的地方
+      /* const vm = new Vue({
+        template: '<div>Hello World</div>',
+      }).$mount('#root'); */
 
-    // 如果没有 el 属性，需要使用 $mount() 方法指定需要挂载的地方
-    const vm = new Vue({
-      template: '<div>Hello World</div>',
-    }).$mount('#root');
+      /**
+       * 当 el 和 $mount() 同时存在的时候，el 的优先级更高
+       * 因为在 created 之后，是先去看 el 是存在，不存在就等待 $mount() 执行，然后再去看 template，当有 el 的时候，就不会去看 $mount() 了，所以 el 的优先级比 $mount() 高
+       */
+      /*  new Vue({
+        el: '#elRoot',
+        template: `
+          <div>测试 el 的优先级和 $mount 的优先级</div>
+        `,
+      }).$mount('#root'); // 这里写了相当于没写 */
 
-
-
-    /*
-        // 如果有 template 的话，将 template 转化成 render 函数，生成的内容会替换掉 el 指定的 dom
-        const vm = new Vue({ // 创建一个Vue实例
-          el: '#root', // 有el属性的话，会在html中查找对应的内容，将生成的vue实例将挂载到对应DOM上
-          template: `<div>Hello World</div>`, // 声明了 template 的话，该模板会 替换 挂载的元素，挂载的元素都将被忽略，除非模板内容有分发插槽
-        });
-     */
-
-    /*
-        // 有 render 函数的话，会将 render 函数生成的内容替换掉 el 指定的 dom
-        const vm = new Vue({
-          el: '#root',
-          render: h => h(
-            'div',
-            'Hello World'
-          )
-        });
-     */
-
-    /*
-      // 即使 render 函数中传入的是空，也会将 el 指定的 dom 替换掉
-      const vm = new Vue({
+      /**
+       * template 和 render 函数都存在的时候，render 函数的优先级更高
+       * 找到挂载目标之后，去找是否有 render 函数，如果没有就去找 template，如果都没有就去找目标挂载 DOM 的 outerHtml，然后转化成 render 函数，再去执行 beforeMount 声明钩子，执行 render 函数，生成虚 vnode，vnode 再去生成真实 DOM $el，再替换掉目标元素 el
+       */
+      new Vue({
         el: '#root',
-        render: h => h()
+        template: '<div>这是 template</div>',
+        render: (h) => h('div', '这是 render'),
       });
-    */
 
-    /*
-        // 如果没有传入 templat 或者 render 函数的时候，就不会替换掉 el 指定的 dom
-        const vm = new Vue({
-          el: '#root',
-          created () {
-            console.log('created');
-          },
-          mounted () {
-            // 注意这里执行了，说明挂载了
-            console.log('mounted');
-          },
-        });
-     */
-  </script>
+      // 如果有 template 的话，将 template 转化成 render 函数，生成的内容会替换掉 el 指定的 dom
+      /* const vm = new Vue({
+        // 创建一个Vue实例
+        el: '#root', // 有el属性的话，会在html中查找对应的内容，将生成的vue实例将挂载到对应DOM上
+        template: `<div>Hello World</div>`, // 声明了 template 的话，该模板会 替换 挂载的元素，挂载的元素都将被忽略，除非模板内容有分发插槽
+      }); */
 
-</body>
+      // 有 render 函数的话，会将 render 函数生成的内容替换掉 el 指定的 dom
+      /* const vm = new Vue({
+        el: '#root',
+        render: (h) => h('div', 'Hello World'),
+      }); */
 
+      // 即使 render 函数中传入的是空，也会将 el 指定的 dom 替换掉
+      /* const vm = new Vue({
+        el: '#root',
+        render: (h) => h(),
+      }); */
+
+      // 如果没有传入 templat 或者 render 函数的时候，就不会替换掉 el 指定的 dom
+      /* new Vue({
+        el: '#root',
+        created() {
+          console.log('created');
+        },
+        mounted() {
+          // 注意这里执行了，说明挂载了
+          console.log('mounted');
+        },
+      }); */
+    </script>
+  </body>
 </html>

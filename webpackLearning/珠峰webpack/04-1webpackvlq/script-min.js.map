@@ -1,0 +1,8 @@
+{
+"version":3,
+"file":"script-min.js",
+"lineCount":1,
+"mappings":"AAAA,IAAIA,EAAI,CACRA,EAAA,CAAI,EACJ,KAAIC,EAAI,CAAR,CACIC,EAAI;",
+"sources":["script.js"],
+"names":["a","b","c"]
+}
