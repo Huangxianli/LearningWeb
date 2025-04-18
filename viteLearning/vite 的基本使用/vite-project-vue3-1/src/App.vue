@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import HelloJsx from './components/HelloJSX';
+import HelloWorld from './components/HelloWorld.vue';
 </script>
 
 <template>
   <HelloJsx></HelloJsx>
+  <HelloWorld></HelloWorld>
 </template>
 
 <style scoped>

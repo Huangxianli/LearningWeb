@@ -110,3 +110,23 @@ import className1 from 'main.module.css';
 ### css-pre-processors （less sass 这些）
 
 在 vite 中是天然支持的，只需要自己下载对应的库就可以
+
+## typescript 的集成
+
+Vite 本身就已经支持了 ts，_只编译，不校验_，开发环境中 Vite 使用的是 esbuild（本身支持 ts 语法）
+为什么不放在一起？
+编译只需要在每个文件的基础上进行，类型检查就要了解整个模块图。如果讲检查加入到 Vite 管道里面，会损害 Vite 的速度优势
+
+- 构建校时验：在构建的时候生产版本的时候，手动的 `tsc --noEmit`
+- 开发时校验：在一个单独的进程中 `tsc --noEmit --watch`，也可以直接使用 `vite-plugin-checker`
+
+```json
+// tsconfig.json
+{
+  "compilerOption": {
+    "isolatedModules": true //
+  }
+}
+```
+
+## Vite 中处理静态资源的方法
