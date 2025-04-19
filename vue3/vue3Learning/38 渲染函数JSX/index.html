@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="zh">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>渲染函数 & JSX</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  </head>
+  <body>
+    <div id="root1"></div>
+    <div id="root2"></div>
+    <div id="root3"></div>
+    <div id="app4"></div>
+    <script>
+      const { createApp, h, ref, computed } = Vue;
+
+      /**
+       * 基本用法
+       *
+       */
+      const vnode = h(
+        'div', // vnode.type
+        {
+          // vnode.props
+          id: 'vnode1',
+          onClick: () => {},
+          class: 'vnode1',
+          '.name': '', // 强制作为 prop，对应 name.prop
+          '^width': 100, // 强制作为 attr，对应 width.attr
+        },
+        'vnode1' // vnode.children
+      );
+      const ChildComponent1 = {
+        setup() {
+          return () => vnode; // 确保返回的是一个函数而不是一个值！setup() 函数在每个组件中只会被调用一次，而返回的渲染函数将会被调用多次。
+        },
+      };
+      createApp({
+        components: {
+          ChildComponent1,
+        },
+        template: `
+      `,
+      }).mount('#root1');
+
+      /**
+       * JSX / TSX
+       */
+
+      /**
+       * 案例
+       */
+      const ChildComponent2 = {
+        setup(props, { slots }) {
+          // 注意，slots 要从这里传递过来
+          const showText = ref(true);
+          const text = computed(() => (showText.value ? 'text' : ''));
+          const clickButton = () => {
+            showText.value = !showText.value;
+          };
+          const clickButtonOnce = () => {
+            console.log('clickButtonOnce');
+          };
+          return () =>
+            h('div', [
+              h(
+                'button',
+                {
+                  onClick: clickButton,
+                  onClickOnce: clickButtonOnce, // 在绑定的时候，将修饰符添加到事件后面可以起到相同的效果
+                },
+                '切换显示'
+              ),
+              h('br'),
+              text.value, // 在渲染函数中，不会自动的解构出来
+              h(
+                'div',
+                [1, 2, 3, 4].map((item, index) => [h('span', index), h('br')])
+              ),
+              h('hr'),
+              h(
+                ChildComponent3,
+                {
+                  name: '传入',
+                },
+                // () => '默认插槽'
+                {
+                  default: () => '默认插槽',
+                  content: ({ i }) => `content 插槽 - ${i}`,
+                }
+              ),
+              h('hr'),
+              h('div', [
+                h('div', slots.default?.() ?? '插槽默认内容'),
+                h(
+                  'div',
+                  slots.content?.({
+                    // 作用域插槽传递给父组件的参数和值
+                    ChildComponent2ContentSlot: 'ChildComponent2ContentSlot',
+                  }) ?? 'content 插槽默认内容'
+                ),
+              ]),
+            ]);
+        },
+      };
+
+      const ChildComponent3 = {
+        props: {
+          name: {
+            type: String,
+            default: '',
+          },
+        },
+        template: `
+          <div>
+            ChildComponent3-name-prop: {{name}}
+          </div>
+          <div>
+            <slot name="default">
+              ChildComponent3-default-slot
+            </slot>
+          </div>
+          <div>
+            <slot name="content" v-bind="{i: '12'}">
+              ChildComponent3-content-slot
+            </slot>
+          </div>
+        `,
+      };
+      createApp({
+        components: { ChildComponent2 },
+        setup() {},
+        template: `<ChildComponent2 />`,
+      }).mount('#root2');
+
+      /**
+       * 函数式组件
+       * 没有任何状态的组件，很像纯函数：接受 props，返回 vnode
+       *  函数式组件在渲染过程中不会创建组件实例（没有 this），不会触发常规的组件生命周期钩子
+       */
+      function ChildComponent4(props, { slots, attrs, emit }) {
+        return h('div', 'childComponent4');
+      }
+      ChildComponent4.props = {
+        // 如果没有这样声明，会当成 attrs
+        name: {
+          type: String,
+          default: 'childComponent4',
+        },
+      };
+      ChildComponent4.emit = ['click'];
+      ChildComponent4.inheritAttrs = false;
+      createApp({
+        components: {
+          ChildComponent4,
+        },
+        setup() {
+          return () =>
+            h(ChildComponent4, { id: 'childComponent4' }, 'childComponent4');
+        },
+      }).mount('#root3');
+    </script>
+
+    <script type="text/babel">
+      Babel.registerPreset('presetVue', {
+        presets: [[Babel.availablePresets['env']]],
+        plugins: [
+          // 添加一些基本的转换插件
+          [
+            Babel.availablePlugins['transform-react-jsx'],
+            {
+              pragma: 'h',
+              pragmaFrag: 'Fragment',
+            },
+          ],
+        ],
+      });
+    </script>
+    <script type="text/babel" data-presets="presetVue">
+      createApp({
+        setup() {
+          return () => <div>jsx 的写法</div>; // 注意要 return 一个函数
+        },
+      }).mount('#app4');
+    </script>
+  </body>
+</html>
