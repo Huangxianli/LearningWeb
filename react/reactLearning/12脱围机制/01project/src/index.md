@@ -9,3 +9,5 @@
 # [响应式 Effect 的生命周期](./LifecycleOfReactiveEffects/响应式%20Effect%20的声明周期.md#响应式%20Effect%20的声明周期)
 
 # [将事件从 Effect 中分开](./removingEffectDependencies/将事件从%20Effect%20中分开.md)
+
+# [使用自定义 Hook 复用逻辑](./reusingLogicWithCustomHooks/index.js)
