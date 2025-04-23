@@ -14,6 +14,7 @@
     <div id="root2"></div>
     <div id="root3"></div>
     <div id="app4"></div>
+    <div id="app5"></div>
     <script>
       const { createApp, h, ref, computed } = Vue;
 
@@ -185,6 +186,23 @@
           return () => <div>jsx 的写法</div>; // 注意要 return 一个函数
         },
       }).mount('#app4');
+
+      createApp({
+        setup() {
+          const count = ref(0);
+          const clickHandler = () => {
+            count.value++;
+          };
+          return () => (
+            <div>
+              <hr />
+              <button onClick={clickHandler}>按钮</button>
+              <div>{count.value}</div>
+              {/* ref 在这里要使用 .value，没有自动的解构 */}
+            </div>
+          );
+        },
+      }).mount('#app5');
     </script>
   </body>
 </html>
