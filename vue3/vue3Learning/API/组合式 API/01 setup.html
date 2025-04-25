@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="zh">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>组合式api setup()</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+  </head>
+  <body>
+    <div id="root1"></div>
+    <div id="root2"></div>
+    <script type="text/x-template" id="childComponent1">
+      <div>{{count}}</div>
+      <div>{{count1}}</div>
+      <button @click="clickHandler">增加</button>
+    </script>
+
+    <script>
+      const { createApp, ref } = Vue;
+      /**
+       * 组合式 API：setup()
+       * setup() 钩子是在组件中使用组合式 API 的入口，通常只在一下情况下使用
+       * 1. 需要在非单文件组件中使用组合式 API 时
+       * 2. 需要在基于选项式 API 的组件中集成基于组合式 API 的组件时
+       */
+      createApp({
+        setup() {
+          return {};
+        },
+        template: `
+          <div>
+            在非单文件组件中使用组合式 API
+          </div>
+          `,
+      }).mount('#root1');
+
+      createApp({
+        setup() {
+          const count = ref(0);
+          function clickHandler() {
+            // 这里的 clickHandler 会覆盖掉 methods 中的同名函数
+            count.value += 2;
+            // this.count1 += 2; // setup 执行的时候组件实例还没有被创建，不能访问到
+          }
+          return { count, clickHandler };
+        },
+        data() {
+          return {
+            count1: 0,
+          };
+        },
+        methods: {
+          clickHandler() {
+            this.count1++;
+            this.count++;
+          },
+        },
+        template: '#childComponent1',
+      }).mount('#root2');
+    </script>
+  </body>
+</html>
