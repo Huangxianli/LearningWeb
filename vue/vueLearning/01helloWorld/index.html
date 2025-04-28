@@ -13,7 +13,7 @@
     <script>
       /**
        * el 或者 $mount() 决定了 目标 DOM 是什么
-       * 是否有 template 或 render 决定了生成的内容是替换掉目标 DOM 还是插入到目标 DOM 中，如果都没有的话，就是使用原有的目标元素，只要其中一个有，就会覆盖掉整个目标元素
+       * 是否有 template 或 render 决定了生成的内容是替换掉目标 DOM 还是插入到目标 DOM 中，如果都没有的话，就是使用原有的目标元素，只要其中一个有，就会覆盖掉整个目标元素（注意是覆盖掉整个元素，而不是元素的子元素）
        */
 
       // 如果没有 el 属性，需要使用 $mount() 方法指定需要挂载的地方
@@ -36,11 +36,11 @@
        * template 和 render 函数都存在的时候，render 函数的优先级更高
        * 找到挂载目标之后，去找是否有 render 函数，如果没有就去找 template，如果都没有就去找目标挂载 DOM 的 outerHtml，然后转化成 render 函数，再去执行 beforeMount 声明钩子，执行 render 函数，生成虚 vnode，vnode 再去生成真实 DOM $el，再替换掉目标元素 el
        */
-      new Vue({
+      /* new Vue({
         el: '#root',
         template: '<div>这是 template</div>',
         render: (h) => h('div', '这是 render'),
-      });
+      }); */
 
       // 如果有 template 的话，将 template 转化成 render 函数，生成的内容会替换掉 el 指定的 dom
       /* const vm = new Vue({
