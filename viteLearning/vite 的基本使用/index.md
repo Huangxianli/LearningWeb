@@ -49,7 +49,19 @@ Webpack 的编译入口一般是一个 js 文件，将所有的内容编译完�
 Vite 的编译入口必须是一个 html 文件，这个和他的编译快是有关的，加载 html 文件，通过 `<script>` 标签会去加载 js 文件，然后在对这个 js 文件进行编译
 
 会自动的下载并引入和使用 `@vitejs/plugin-vue`
-但是要注意，这个并不支持 Vue jsx 的写法，要自己额外下载其他的插件 `@vitejs/plugin-vue-jsx`
+但是要注意，这个并不支持 Vue jsx 的写法，要自己额外下载其他的插件 `@vitejs/plugin-vue-jsx`，这个插件也支持 `tsx`
+同时在 vite.config.ts 中配置
+
+要注意 ts 的这两个配置
+"jsx": "preserve",
+"jsxImportSource": "vue", // 会自动导入 Vue 的 JSX 工厂函数和类型，使用 jsx 语法的时候，不会报错 返回值为 any
+
+```js
+import vueJsx from '@vitejs/plugin-vue-jsx';
+export default {
+  plugins: [vue(), vueJsx()],
+};
+```
 
 ## Vite 构建 Vue2 项目
 
@@ -92,13 +104,17 @@ Vite 本身会启动一个本地的 server，去获取路径对应的文件，�
 
 ## Vite 中使用 CSS 的各种功能
 
+导入 .css 文件会把内容插入到 `<style>` 标签中，也有 HMR 支持
+
 推荐使用 原生的 `css variable（css 原生变量）`
 
-内部已经集成了 `postsss` （兼容性处理）
+内部已经集成了 `postcss` （兼容性处理）
 在根目录下创建 `postcss.config.js`
+CSS 最小化压缩将会在 postcss 之后运行，并使用 `build.cssTarget` 选项
 
 ```js
 module.exports = {
+  // 这个只是开发调试方便
   // pulgins: [require('@postcss-plugins/console')], // 在编译 css 文件的时候进行输出
 };
 ```
@@ -130,7 +146,7 @@ export default defineConfig({
 
 ### css-modules
 
-只需要在定义类文件的时候 `xxx.module.css` 就会自动的识别为 css-modules
+只需要在定义文件的时候 `xxx.module.css` 就会自动的识别为 css-modules
 
 ```css
 /* main.module.css */
@@ -146,24 +162,36 @@ import className1 from 'main.module.css';
 </>;
 ```
 
+如果 css.modules.localsConvention: 'camelCaseOnly' 下划线->小驼峰的格式转化，可以使用按照名称导入
+
+```jsx
+// apply_color -> applyColor
+import { applyColor } from 'main.module.css';
+<>
+  <div className={applyColor}></div>
+</>;
+```
+
 ### css-pre-processors （less sass 这些）
 
 在 vite 中是天然支持的，只需要自己下载对应的库就可以
 
 ## typescript 的集成
 
-Vite 本身就已经支持了 ts，开发环境中 Vite 使用的是 esbuild（本身支持 ts 语法），但是要注意 Vite 对 ts _只编译，不校验_
+Vite 本身就已经支持了 .ts，开发环境中 Vite 使用的是 esbuild（本身支持 ts 语法），但是要注意 Vite 对 ts _只编译，不校验_
 为什么不放在一起？
 编译只需要在每个文件的基础上进行，类型检查就要了解整个模块图。如果讲检查加入到 Vite 管道里面，会损害 Vite 的速度优势
 
 - 构建时校验：在构建的时候生产版本的时候，手动的 `tsc --noEmit` （build: tsc --noEmit && vite build），这样在打包构建的时候，会先去校验 ts 是否正确，如果要支持校验 vue 文件中的 ts，要先 `npm install vue-tsc`，同时打包语句加上 `vue-tsc --noEmit &&`
 - 开发时校验：在一个单独的进程中 `tsc --noEmit --watch`，也可以直接使用 `vite-plugin-checker`
 
+Vite 会是用 `esbuild` 将 ts 文件转义到 js，速度是 tsc 的 20~30 倍。同时 HMR 更新反应到浏览器的事件小于 50ms
+
 ```json
 // tsconfig.json
 {
   "compilerOption": {
-    "isolatedModules": true // 在 vite 的项目里面都推荐使用，将部分打包的错误提前到开发阶段
+    "isolatedModules": true // 在 vite 的项目里面都推荐使用，esbuild 只执行没有类型信息的转译，它并不支持某些特性，如 const enum 和隐式类型导入，配置为 true 将部分打包的错误提前到开发阶段
   }
 }
 ```

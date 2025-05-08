@@ -5,10 +5,12 @@ import vueJsx from '@vitejs/plugin-vue-jsx';
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [vue(), vueJsx()],
-  resolve: {
-    alias: {
-      '@styles': '/src/styles',
-      '@': '/src',
-    },
+  build: {
+    sourcemap: true,
   },
+  // css: {
+  //   modules: {
+  //     localsConvention: 'camelCaseOnly',
+  //   },
+  // },
 });

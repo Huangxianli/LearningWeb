@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import HelloJsx from './components/HelloJSX';
-import HelloWorld from './components/HelloWorld.vue';
+import HelloJsx from '@/components/HelloJSX';
+import HelloWorld from '@/components/HelloWorld.vue';
 </script>
 
 <template>
