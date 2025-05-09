@@ -1,99 +1,129 @@
 <!DOCTYPE html>
 <html lang="zh">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>09表单输入绑定</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+  </head>
 
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>09表单输入绑定</title>
-  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+  <body>
+    <div id="app1"></div>
+    <hr />
+    <div id="app2"></div>
+    <hr />
+    <div id="app3"></div>
+    <hr />
+    <div id="app4"></div>
+    <script>
+      const { createApp, ref, reactive, h } = Vue;
 
-</head>
+      /**
+       * 手动实现数据和 input 的绑定
+       */
+      createApp({
+        setup() {
+          const inputValue = ref('');
+          const inputHandler = (e) => {
+            inputValue.value = e.target.value;
+          };
+          return {
+            inputValue,
+            inputHandler,
+          };
+        },
+        template: `
+          <div>{{inputValue}}</div>
+          <input :value="inputValue" @input="inputHandler" />
+        `,
+      }).mount('#app1');
 
-<body>
-  <div id="app1"></div>
-  <hr />
-  <div id="app2"></div>
-  <hr />
-  <div id="app3"></div>
-  <script>
-    const { createApp, ref, reactive } = Vue;
+      /**
+       * 文字输入类的 <input type="text" /> <textarea> 的默认使用的是 value 属性和  input 事件
+       * 点击选择类的 <input type="checkbox" /> <input type="radio" /> 默认使用的是 checked 属性 和 change 事件
+       * 下拉选择类 <select> 默认使用的是 value 属性和 change 事件
+       */
+      createApp({
+        setup() {
+          const inputValue = ref('');
+          return {
+            inputValue,
+          };
+        },
+        template: `
+          <div>{{inputValue}}</div>
+          <input v-model="inputValue" />
+        `,
+      }).mount('#app2');
 
-    /**
-     * 手动实现数据和 input 的绑定
-     */
-    createApp({
-      setup () {
-        const inputValue = ref('');
-        const inputHandler = e => {
-          inputValue.value = e.target.value;
-        };
-        return {
-          inputValue,
-          inputHandler,
-        };
-      },
-      template: `
-        <div>{{inputValue}}</div>
-        <input :value="inputValue" @input="inputHandler" />
-      `,
-    }).mount('#app1');
+      /**
+       * 多选的情况
+       */
+      createApp({
+        setup() {
+          const reactiveArr = reactive([]); // 如果不修改 reactiveArr 指向的地址是会维持这个数组的响应式的
+          const clickHandler = () => {
+            reactiveArr.push('1');
+          };
 
-    /**
-     * 文字输入类的 <input type="text" /> <textarea> 的默认使用的是 value 属性和  input 事件
-     * 点击选择类的 <input type="checkbox" /> <input type="radio" /> 默认使用的是 checked 属性 和 change 事件
-     * 下拉选择类 <select> 默认使用的是 value 属性和 change 事件
-     */
-    createApp({
-      setup () {
-        const inputValue = ref('');
-        return {
-          inputValue,
-        };
-      },
-      template: `
-        <div>{{inputValue}}</div>
-        <input v-model="inputValue" />
-      `,
-    }).mount('#app2');
+          const checkValues = ref([]); // 注意这里了是数组，不能使用 reactive，要使用 ref，说明 v-model 会修改这个数组指向的地址
+          return {
+            reactiveArr,
+            clickHandler,
+            checkValues,
+          };
+        },
+        template: `
+          <div>
+            <div>{{reactiveArr}}</div>
+            <button @click="clickHandler">点击压入</button>
+            <div>选中的内容：{{checkValues}}</div>
+            <label>
+              选项一
+            <input type="checkbox" value="one" v-model="checkValues" />
+            </label>
+            <label>
+              选项二
+            <input type="checkbox" value="two" v-model="checkValues" />
+            </label>
+            <label>
+              选项三
+            <input type="checkbox" value="three" v-model="checkValues" />
+            </label>
+          </div>
+        `,
+      }).mount('#app3');
 
+      createApp({
+        components: {
+          ChildComponent2,
+        },
+        setup() {
+          const time = ref(0);
+          setInterval(() => {
+            time.value++;
+          }, 1000);
+          return {
+            time,
+          };
+        },
+        template: `
+          <div>{{time}}</div>
+          <!-- 这里的表现和 react 是一样的，如果没有 key 的话，组件重新渲染的时候，会复用 input，这样的话，input 中的内容不会被清空掉（还要注意绑定了 v-model 的情况） -->
+          <input />
+          <ChildComponent2 :time="time"/>
+        `,
+      }).mount('#app4');
 
-    /**
-     * 多选的情况
-     */
-    createApp({
-      setup () {
-        const reactiveArr = reactive([]); // 如果不修改 reactiveArr 指向的地址是会维持这个数组的响应式的
-        const clickHandler = () => { reactiveArr.push('1') };
-
-        const checkValues = ref([]); // 注意这里了是数组，不能使用 reactive，要使用 ref，说明 v-model 会修改这个数组指向的地址
-        return {
-          reactiveArr,
-          clickHandler,
-          checkValues,
-        }
-      },
-      template: `
-        <div>
-          <div>{{reactiveArr}}</div>
-          <button @click="clickHandler">点击压入</button>
-          <div>选中的内容：{{checkValues}}</div>
-          <label>
-            选项一
-           <input type="checkbox" value="one" v-model="checkValues" />
-          </label>
-          <label>
-            选项二
-           <input type="checkbox" value="two" v-model="checkValues" />
-          </label>
-          <label>
-            选项三
-           <input type="checkbox" value="three" v-model="checkValues" />
-          </label>
-        </div>
-      `,
-    }).mount('#app3');
-  </script>
-
-</body>
-
+      function ChildComponent2(prop) {
+        // 只有在传入了 prop，并且依赖了传入的 prop 的时候，每次 prop 更新函数才会重新执行，和 react 不同，react 是无论是否传入，是否依赖，只要父组件重新渲染，子组件就会重新渲染
+        // 如果只是纯展示没有涉及到状态，那么，那么适合使用函数式组件
+        console.log('执行了 ChildComponent1');
+        return h('div', [
+          h('label', 'ChildComponent1' + prop.time),
+          h('input'),
+        ]);
+      }
+    </script>
+  </body>
 </html>
