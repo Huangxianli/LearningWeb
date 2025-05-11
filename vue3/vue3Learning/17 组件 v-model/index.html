@@ -17,20 +17,25 @@
     <div id="app4"></div>
 
     <script>
-      const { createApp, ref } = Vue;
+      const { createApp, ref, defineModel, watchEffect } = Vue;
 
       /**
        * Vue3.4 之后的推荐写法是
-       * 在子组件中 const model = defineModel() 生成一个 ref 对象，model.value 接收的是父组件传递的 modelValue，同时修改 model 的时候，会自动执行 $emit('update:modelValue', model.value)
+       * 在子组件中 const model = defineModel() 生成一个 ref 对象，model.value 接收的是父组件传递的 modelValu，当他被子组件变更，会触发复组件绑定值的一起更新
        * 会被解析为：
        * 一个名为 modelValue 的 prop，本地 ref 的值与其同步；
        * 一个名为 update:modelValue 的事件，当本地 ref 的值发生变更时触发。
        *
+       * Vue3.4 之前的写法是
+       * const props = defineProps(['modelValue'])
+       * const emit = defineEmits(['update:modelValue'])
+       *
        *
        * const model = defineModel({
        *  required: true, // 使用该组件的时候，必须要加上 v-model
-       *  default: 0, // 默认值为0，但是注意，这个0不会反作用到使用 父组件和该组件 v-model 绑定的对象上
+       *  default: 0, // 默认值为 0，但是注意，这个 0 不会反作用到使用 父组件和该组件 v-model 绑定的对象上
        * })
+       * 注意：defineModel() 只能在 SFC 的 <script setup> 中使用，
        */
       const Component1 = {
         emits: ['update:modelValue'],
@@ -44,6 +49,26 @@
           <input :value="modelValue" @input="$emit('update:modelValue', $event.target.value)" />
         `,
       };
+      // const Component1 = {
+      //   setup() {
+      //     const model = defineModel({ // 注意 defineModel 在 html 中和在 SFC <script setup> 中表现有所不同
+      //       type: String,
+      //       default: '',
+      //     });
+      //     const inputHandler = (e) => {
+      //       model.value = e.target.value;
+      //       console.log(e.target.value);
+      //     };
+      //     return {
+      //       model1,
+      //       inputHandler,
+      //     };
+      //   },
+      //   template: `
+      //     <input :value="model" @input="inputHandler" />
+      //     <!-- <input v-model="model" /> -->
+      //   `,
+      // };
       createApp({
         components: {
           Component1,
@@ -51,6 +76,9 @@
         setup() {
           const inputValue = ref('');
           const inputValue1 = ref('');
+          watchEffect(() => {
+            console.log('parent value:', inputValue.value);
+          });
 
           return {
             inputValue,
