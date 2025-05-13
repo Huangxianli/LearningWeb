@@ -8,6 +8,18 @@
 
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <style>
+      .jsx_table {
+        border-collapse: collapse;
+        border: 1px solid red;
+        width: 200px;
+      }
+      .jsx_table th,
+      td {
+        border: 1px solid red;
+      }
+    </style>
   </head>
   <body>
     <div id="root1"></div>
@@ -16,7 +28,7 @@
     <div id="app4"></div>
     <div id="app5"></div>
     <script>
-      const { createApp, h, ref, computed } = Vue;
+      const { createApp, h, ref, computed, defineComponent } = Vue;
 
       /**
        * 基本用法
@@ -187,7 +199,50 @@
         },
       }).mount('#app4');
 
+      const ChildComponent6 = defineComponent({
+        setup() {
+          const showInput = ref(false);
+          const changeShowInput = () => {
+            showInput.value = !showInput.value;
+          };
+
+          const dataList = [];
+          Array.from({ length: 10 }).forEach((item, index) => {
+            dataList.push({
+              id: index,
+              name: `name-${index}`,
+              age: index,
+            });
+          });
+          return () => (
+            <div>
+              <button onClick={changeShowInput}>切换显示</button>
+              <br />
+              {showInput.value ? <input /> : ''}
+              <table class="jsx_table">
+                <thead>
+                  <tr>
+                    <th>姓名</th>
+                    <th>年龄</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {dataList.map((item) => (
+                    <tr id={item.id}>
+                      <td>{item.name}</td>
+                      <td>{item.age}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          );
+        },
+      });
       createApp({
+        components: {
+          ChildComponent6,
+        },
         setup() {
           const count = ref(0);
           const clickHandler = () => {
@@ -196,9 +251,10 @@
           return () => (
             <div>
               <hr />
-              <button onClick={clickHandler}>按钮</button>
+              <button onClick={clickHandler}>按钮1</button>
               <div>{count.value}</div>
               {/* ref 在这里要使用 .value，没有自动的解构 */}
+              <ChildComponent6 />
             </div>
           );
         },
