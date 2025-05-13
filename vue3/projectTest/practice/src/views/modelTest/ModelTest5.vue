@@ -48,7 +48,7 @@ const focusHandler = () => {
 </script>
 
 <template>
-  <div>
+  <el-card>
     <input
       type="text"
       :value="inputValue"
@@ -76,7 +76,7 @@ const focusHandler = () => {
       </div>
       <div v-else class="no-data">暂无数据</div>
     </div>
-  </div>
+  </el-card>
 </template>
 
 <style scoped>

@@ -18,10 +18,10 @@ const modelValue = defineModel('modelName', {
 </script>
 
 <template>
-  <div>
+  <el-card>
     <div>input 绑定的值：{{ modelValue }}</div>
     <input type="text" v-model="modelValue" />
-  </div>
+  </el-card>
 </template>
 
 <style scoped></style>

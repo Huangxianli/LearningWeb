@@ -13,10 +13,10 @@ const [modelValue1, modifiers] = defineModel('modelName1', {
 </script>
 
 <template>
-  <div>
+  <el-card>
     <div>input 绑定的值：{{ modelValue1 }}</div>
     <input type="text" v-model="modelValue1" />
-  </div>
+  </el-card>
 </template>
 
 <style scoped></style>

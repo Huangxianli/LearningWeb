@@ -1,20 +1,20 @@
 <script setup lang="ts">
-const modelValue = defineModel({
-  required: true,
+import { defineModel } from 'vue';
+const modelValue = defineModel('modelName', {
   type: String,
+  required: true,
 });
-// const emits = defineEmits(['update:modelValue']);
-// defineModel 会在 modelValue 变化的时候，自动的 emit('update:modelValue', modelValue); 不需要再手动的写
 </script>
 
 <template>
-  <div>
+  <el-card>
     <div>input 绑定的值：{{ modelValue }}</div>
     <input
+      type="text"
       :value="modelValue"
       @input="modelValue = ($event.target as HTMLInputElement).value"
     />
-  </div>
+  </el-card>
 </template>
 
 <style scoped></style>
