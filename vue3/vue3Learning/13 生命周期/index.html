@@ -50,6 +50,7 @@
       <div>{{count}}</div>
       <button @click="addCount">增加</button>
       <Component4Child1 :count="count"/>
+      <div><button @click="unMountApp4">卸载</button></div>
     </script>
     <script type="text/x-template" id="component-4-child-1">
       <div>component-4-child-1</div>
@@ -266,6 +267,26 @@
 
       /**
        * 父子组件的生命周期钩子调用顺序
+       *
+       * 首次渲染的
+       * 父的 setup
+       * 父的 onBeforeMount
+       * 子的 setup
+       * 子的 onBeforeMount
+       * 子的 onMounted
+       * 父的 onMounted
+       *
+       * 更新父的响应式数据（如果子没有使用 props 接收，则不会进入子的 update 系列）
+       * 父的 onBeforeUpdate
+       * 子的 onBeforeUpdate
+       * 子的 onUpdated
+       * 父的 onUpdated
+       *
+       * 卸载
+       * 父的 onBeforeUnmount
+       * 子的 onBeforeUnmount
+       * 子的 onUnmounted
+       * 父的 onUnmounted
        */
       const Component4Child1 = defineComponent({
         props: {
@@ -306,14 +327,11 @@
               '--- component-4-child-1 onBeforeUmnount-----------------------'
             );
           });
-          onMounted(() => {
+          onUnmounted(() => {
             console.log(
-              '--- component-4-child-1 onMounted-----------------------'
+              '--- component-4-child-1 onUnmounted-----------------------'
             );
           });
-          return {
-            // count: props.count,
-          };
         },
         template: '#component-4-child-1',
       });
@@ -340,17 +358,22 @@
               '--- component4 onBeforeUmnount-----------------------'
             );
           });
-          onMounted(() => {
-            console.log('--- component4 onMounted-----------------------');
+          onUnmounted(() => {
+            console.log('--- component4 onUnmounted-----------------------');
           });
 
           const count = ref(0);
           const addCount = () => {
             count.value++;
           };
+
+          const unMountApp4 = () => {
+            app4.unmount();
+          };
           return {
             count,
             addCount,
+            unMountApp4,
           };
         },
         template: '#component4',
