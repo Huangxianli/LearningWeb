@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="zh">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>生命周期</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+  </head>
+  <body>
+    <div id="app1"></div>
+    <script type="text/x-template" id="component1">
+      <div>component1</div>
+      <button @click="clickHandler">切换显示</button>
+      <div v-if="showText">内容</div>
+    </script>
+    <hr />
+
+    <div id="app2"></div>
+    <script type="text/x-template" id="component2">
+      <div>component2</div>
+      <input type="text" ref="inputRef" v-model="inputModel">
+      <div>input 绑定的 v-model：{{inputModel}}</div>
+      <div><button @click="unmountApp">卸载该应用</button></div>
+      <div><button @click="changeCurrentComp">切换组件</button></div>
+      <keep-alive>
+        <component :is="currentComp"></component>
+      </keep-alive>
+    </script>
+    <script type="text/x-template" id="component2-child-1">
+      <div>component2-child-1</div>
+    </script>
+    <script type="text/x-template" id="component2-child-2">
+      <div>component2-child-2</div>
+    </script>
+    <hr />
+
+    <div id="app3"></div>
+    <script type="text/x-template" id="component3">
+      <button @click="changeKey">修改key</button>
+      <Component3Child1 :key="randomKey"></Component3Child1>
+    </script>
+    <script type="text/x-template" id="component3-child-1">
+      <div>component3-child-1</div>
+    </script>
+    <hr />
+
+    <div id="app4"></div>
+    <script type="text/x-template" id="component4">
+      <div>component4</div>
+      <div>{{count}}</div>
+      <button @click="addCount">增加</button>
+      <Component4Child1 :count="count"/>
+    </script>
+    <script type="text/x-template" id="component-4-child-1">
+      <div>component-4-child-1</div>
+      <div>{{count}}</div>
+    </script>
+
+    <script>
+      const {
+        createApp,
+        defineComponent,
+        ref,
+        defineProps,
+        useTemplateRef,
+        onBeforeMount,
+        onMounted,
+        onBeforeUpdate,
+        onUpdated,
+        onBeforeUnmount,
+        onUnmounted,
+        onActivated,
+        onDeactivated,
+      } = Vue;
+
+      /**
+       * 声明周期回调钩子都应该在组件的 setup() 阶段被同步调用
+       */
+      createApp({
+        setup() {
+          const showText = ref(false);
+          const clickHandler = () => {
+            showText.value = !showText.value;
+            if (showText.value) {
+              onMounted(() => {
+                // 声明周期钩子不是放在 setup 中同步执行，控制台会给出警告
+                console.log('---app1 onMounted-------');
+              });
+            }
+          };
+          return {
+            showText,
+            clickHandler,
+          };
+        },
+        template: '#component1',
+      }).mount('#app1');
+
+      /**
+       * onBeforeMount 组件挂载前调用
+       * onMounted 组件挂载后调用
+       * onBeforeUpdate 直接或者间接运用在 dom 上的响应式数据发生改变的时候调用，在 dom 重新渲染前调用
+       * onUpdated 直接或者间接运用在 dom 上的响应式数据发生改变的时候调用，在 dom 重新渲染后调用
+       * onBeforeUnMount 组件卸载前调用
+       * onUnMount 组件卸载时调用
+       *
+       * onActivated 和 <keep-alive> 有关
+       * onDeactivated 和 <keep-alive> 有关
+       * 切换组件一般是由父组件的一个响应式数据改变，映射到 <component> 的 is 上
+       * 声明周期回调一般是 父的 onBeforeUpdate -> 之前活跃的子的 onDeactivated -> 现在活跃的子的 onActivated -> 父的 onUpdated
+       *
+       * onErrorCaptured
+       *
+       */
+      const Component2Child1 = defineComponent({
+        setup() {
+          onActivated(() => {
+            console.log(
+              '--- compoent2-child1 onActivated --------------------------'
+            );
+          });
+          onDeactivated(() => {
+            console.log(
+              '--- compoent2-child1 onDeactivated --------------------------'
+            );
+          });
+        },
+        template: '#component2-child-1',
+      });
+      const Component2Child2 = defineComponent({
+        setup() {
+          onActivated(() => {
+            console.log(
+              '--- compoent2-child2 onActivated --------------------------'
+            );
+          });
+          onDeactivated(() => {
+            console.log(
+              '--- compoent2-child2 onDeactivated --------------------------'
+            );
+          });
+        },
+        template: '#component2-child-2',
+      });
+      const app2 = createApp({
+        components: {
+          Component2Child1,
+          Component2Child2,
+        },
+        setup() {
+          console.log('--- #app2 setup ---------------------');
+
+          const inputRef = useTemplateRef('inputRef');
+          const inputModel = ref('');
+          const unUseToDOM = ref(0);
+          const timer = setInterval(() => {
+            unUseToDOM.value = unUseToDOM.value + 1;
+            console.log('interval unUseToDom.value', unUseToDOM.value);
+            if (unUseToDOM.value === 10) {
+              clearInterval(timer);
+            }
+          }, 1000);
+
+          onBeforeMount(() => {
+            console.log('--- #app2 onBeforeMount ---------------------');
+            console.log('inputRef.value', inputRef.value); // null 这个时候还获取不到 DOM
+          });
+          onMounted(() => {
+            console.log('--- #app2 onMounted ---------------------');
+            console.log('inputRef.value', inputRef.value); // <input ...>
+          });
+          onBeforeUpdate(() => {
+            console.log('--- #app2 onBeforeUpdate ---------------------');
+            console.log('inputModel.value', inputModel.value); // 每次修改 inputModel 都会触发该回调，获取的是最新的值，在 DOM 更新前触发。修改的值，要在 DOM 上直接或者间接响应式的使用了，不然不会触发该回调
+          });
+          onUpdated(() => {
+            console.log('--- #app2 onUpdated ---------------------');
+            console.log('inputModel.value', inputModel.value); // 每次修改 inputModel 都会触发该回调，获取的是最新的值，在 DOM 更新后触发。修改的值，要在 DOM 上直接或者间接响应式的使用了，不然不会触发该回调
+          });
+          onBeforeUnmount(() => {
+            console.log('--- #app2 onBeforeUnmount ---------------------');
+            if (timer) {
+              clearInterval(timer);
+            }
+          });
+          onUnmounted(() => {
+            console.log('--- #app2 onUnmounted ---------------------');
+          });
+
+          const unmountApp = () => {
+            // 注意 app2 保存的内容应该是 vue 实例，而不是 vue 挂载后返回的值
+            app2.unmount();
+          };
+
+          const currentComp = ref('Component2Child1');
+          let compIndex = 0;
+          const compName = ['Component2Child1', 'Component2Child2'];
+          const changeCurrentComp = () => {
+            compIndex = (compIndex + 1 + 2) % 2;
+            currentComp.value = compName[compIndex];
+          };
+
+          return {
+            inputModel,
+            unUseToDOM,
+            unmountApp,
+            currentComp,
+            changeCurrentComp,
+          };
+        },
+        template: '#component2',
+      });
+      app2.mount('#app2');
+
+      /**
+       * key 的改变会也会触发 onBeforeUnmount 和 onUnmounted
+       *
+       * 注意打印顺序
+       * --- component-3-child-1 onBeforeUnmount --------------------------
+       * --- component-3-child-1 onBeforeMount --------------------------
+       * --- component-3-child-1 onUnmounted --------------------------
+       * --- component-3-child-1 onMounted --------------------------
+       */
+      const Component3Child1 = defineComponent({
+        setup() {
+          onBeforeMount(() => {
+            console.log(
+              '--- component-3-child-1 onBeforeMount --------------------------'
+            );
+          });
+          onMounted(() => {
+            console.log(
+              '--- component-3-child-1 onMounted --------------------------'
+            );
+          });
+
+          onBeforeUnmount(() => {
+            console.log(
+              '--- component-3-child-1 onBeforeUnmount --------------------------'
+            );
+          });
+          onUnmounted(() => {
+            console.log(
+              '--- component-3-child-1 onUnmounted --------------------------'
+            );
+          });
+        },
+        template: '#component3-child-1',
+      });
+      createApp({
+        components: {
+          Component3Child1,
+        },
+        setup() {
+          const randomKey = ref(Math.random());
+          const changeKey = () => {
+            randomKey.value = Math.random();
+          };
+          return {
+            randomKey,
+            changeKey,
+          };
+        },
+        template: '#component3',
+      }).mount('#app3');
+
+      /**
+       * 父子组件的生命周期钩子调用顺序
+       */
+      const Component4Child1 = defineComponent({
+        props: {
+          count: {
+            type: Number,
+          },
+        },
+        setup() {
+          // const props = defineProps({ // 注意 defineProps 是一个编译器宏，不能在 setup 函数中使用
+          //   count: {
+          //     type: Number,
+          //     required: true,
+          //   },
+          // });
+          console.log('--- component-4-child-1 setup-----------------------');
+          onBeforeMount(() => {
+            console.log(
+              '--- component-4-child-1 onBeforeMount-----------------------'
+            );
+          });
+          onMounted(() => {
+            console.log(
+              '--- component-4-child-1 onMounted-----------------------'
+            );
+          });
+          onBeforeUpdate(() => {
+            console.log(
+              '--- component-4-child-1 onBeforeUpdate-----------------------'
+            );
+          });
+          onUpdated(() => {
+            console.log(
+              '--- component-4-child-1 onUpdated-----------------------'
+            );
+          });
+          onBeforeUnmount(() => {
+            console.log(
+              '--- component-4-child-1 onBeforeUmnount-----------------------'
+            );
+          });
+          onMounted(() => {
+            console.log(
+              '--- component-4-child-1 onMounted-----------------------'
+            );
+          });
+          return {
+            // count: props.count,
+          };
+        },
+        template: '#component-4-child-1',
+      });
+      const app4 = createApp({
+        components: {
+          Component4Child1,
+        },
+        setup() {
+          console.log('--- component4 setup-----------------------');
+          onBeforeMount(() => {
+            console.log('--- component4 onBeforeMount-----------------------');
+          });
+          onMounted(() => {
+            console.log('--- component4 onMounted-----------------------');
+          });
+          onBeforeUpdate(() => {
+            console.log('--- component4 onBeforeUpdate-----------------------');
+          });
+          onUpdated(() => {
+            console.log('--- component4 onUpdated-----------------------');
+          });
+          onBeforeUnmount(() => {
+            console.log(
+              '--- component4 onBeforeUmnount-----------------------'
+            );
+          });
+          onMounted(() => {
+            console.log('--- component4 onMounted-----------------------');
+          });
+
+          const count = ref(0);
+          const addCount = () => {
+            count.value++;
+          };
+          return {
+            count,
+            addCount,
+          };
+        },
+        template: '#component4',
+      });
+      app4.mount('#app4');
+    </script>
+  </body>
+</html>
