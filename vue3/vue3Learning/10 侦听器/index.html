@@ -408,7 +408,7 @@
       /**
        * 清理副作用
        * onWatcherCleanup() 用来注册一个清理函数，当侦听器失效并准备重新运行的时候会被调用
-       * 注意只能在 watch watchEffect 的同步执行期间执行
+       * 注意只能在 watch watchEffect 回调函数的的同步执行期间调用，不能在 await 后调用 onWatcherCleanup
        *
        * watch 回调的第三个参数、watchEffect 回调的第一个参数 用来替代 onWatcherCleanup 方法；如果使用回调中的这个参数，就不受异步的影响
        *

@@ -8,15 +8,49 @@
   </head>
   <body>
     <div id="root1"></div>
+    <hr />
+
     <div id="root2"></div>
     <script type="text/x-template" id="childComponent1">
+      <!-- 从模板中访问 setup 函数中返回的 ref 时，会自动的解包 -->
       <div>{{count}}</div>
       <div>{{count1}}</div>
       <button @click="clickHandler">增加</button>
     </script>
+    <hr />
+
+    <div id="app3"></div>
+    <script type="text/x-template" id="component3">
+      <div>component3</div>
+      <div>{{count}}</div>
+      <button @click="addCount">增加</button>
+      <Component3Child1 :count="count" />
+    </script>
+    <script type="text/x-template" id="componet-3-child-1">
+      <div>{{count}}</div>
+    </script>
+    <hr />
+
+    <div id="app4"></div>
+    <script type="text/x-template" id="component4">
+      <div>component4</div>
+      <div>{{count}}</div>
+      <Component4Child1 :addCount="addCount" axxx="axxx" @input="input" ref="componentRef" />
+      <div><button @click="focusComponentInput">聚焦</button></div>
+    </script>
+    <script type="text/x-template" id="component-4-child-1">
+      <div>component-4-child-1</div>
+      <div><button @click="addCount">增加</button></div>
+      <input @input="inputHandler" ref="inputRef" />
+    </script>
+    <hr />
+
+    <div id="app5"></div>
+    <!-- <script type="text/x-template" id="component5"></script>
+    <script type="text/x-template" id="component-5-child-1"></script> -->
 
     <script>
-      const { createApp, ref } = Vue;
+      const { createApp, defineComponent, h, ref, toRef, useTemplateRef } = Vue;
       /**
        * 组合式 API：setup()
        * setup() 钩子是在组件中使用组合式 API 的入口，通常只在一下情况下使用
@@ -25,6 +59,9 @@
        */
       createApp({
         setup() {
+          // setup 函数 return 的对象会暴露给模板和组件实例
+          // setup 函数本身没有对当前组件实例发访问权，this 会是 undefined
+          // setup 应该是同步的，唯一可以使用 async setup() 的情况是 Suspens 组件的后裔
           return {};
         },
         template: `
@@ -34,6 +71,10 @@
           `,
       }).mount('#root1');
 
+      /**
+       * setup 和选项式的优先级
+       * setup 中的优先级更高
+       */
       createApp({
         setup() {
           const count = ref(0);
@@ -46,6 +87,7 @@
         },
         data() {
           return {
+            count: 2,
             count1: 0,
           };
         },
@@ -57,6 +99,134 @@
         },
         template: '#childComponent1',
       }).mount('#root2');
+
+      /**
+       * props 要在 props 选项中声明，这样组件才知道哪些传入的内容是 prop
+       * props 在 setup 中要访问的话，要通过 setup 的第一个参数来来访问，注意，如果结构的话，可能会失去响应式
+       * template 中访问 props，只要在 props 声明了，就可以直接访问
+       * setup 函数中调用 defineProps() 返回的是 undefined
+       */
+      const Component3Child1 = defineComponent({
+        props: {
+          // 使用 setup 函数的形式，要使用这种方式进行声明哪些内容是 props
+          count: {
+            type: Number,
+          },
+        },
+        setup(prop) {
+          // count; // 注意在 setup 函数中，count 即使在 props 中声明了，也不能直接这样访问，要通过 setup 的第一个参数 prop 来访问，而且 setup 函数中不支持 defineProps()，调用返回的数据是空
+          return {
+            count: toRef(prop, 'count'), // 注意，这里如果直接 prop.count，我们会发现 prop 是响应式的，prop.count 不是，所以要这样结构，或者直接将 prop 暴露出去，或者 return 中不用加 count，由于 props 选项中声明了，template 可以直接使用 count
+          };
+        },
+        template: '#componet-3-child-1',
+      });
+      createApp({
+        components: {
+          Component3Child1,
+        },
+        setup() {
+          const count = ref(0);
+          const addCount = () => {
+            count.value++;
+          };
+          return {
+            count,
+            addCount,
+          };
+        },
+        template: '#component3',
+      }).mount('#app3');
+
+      /**
+       * setup 上下文
+       * setup 函数第二个参数 context = { attrs, slots, emit, expose }
+       */
+      const Component4Child1 = defineComponent({
+        props: {
+          addCount: {
+            type: Function,
+            default: () => undefined,
+          },
+        },
+        setup(props, context) {
+          console.log(context.attrs); // ref 和 声明成 props 的会被排除掉
+          console.log(context.slots); // 插槽
+          console.log(context.emit);
+          console.log(context.expose);
+          const inputHandler = (e) => {
+            context.emit('input', e.target.value);
+          };
+
+          const inputRef = useTemplateRef('inputRef');
+          const inputFocus = () => {
+            inputRef.value.focus();
+          };
+          context.expose({ inputFocus });
+
+          return {
+            inputHandler,
+          };
+        },
+        template: '#component-4-child-1',
+      });
+      createApp({
+        components: {
+          Component4Child1,
+        },
+        setup() {
+          const count = ref(0);
+          const addCount = () => {
+            count.value++;
+          };
+          const input = (value) => {
+            console.log(value);
+          };
+
+          const componentRef = useTemplateRef('componentRef');
+          const focusComponentInput = () => {
+            componentRef.value.inputFocus();
+          };
+          return {
+            count,
+            addCount,
+            input,
+            focusComponentInput,
+          };
+        },
+        template: '#component4',
+      }).mount('#app4');
+
+      /**
+       * 与渲染函数一起使用
+       * setup 可以返回一个 渲染函数
+       */
+      createApp({
+        setup() {
+          // const inputRef = useTemplateRef('inputRef');
+          const inputRef = ref(null);
+          const inputFocus = () => {
+            inputRef.value.focus();
+          };
+          return () =>
+            h('div', [
+              h('input', {
+                // ref: 'inputRef', // 配套 useTemplateRef 来使用
+                ref: (el) => {
+                  inputRef.value = el;
+                },
+              }),
+              h('div'),
+              h(
+                'button',
+                {
+                  onclick: inputFocus,
+                },
+                '聚焦'
+              ),
+            ]);
+        },
+      }).mount('#app5');
     </script>
   </body>
 </html>
