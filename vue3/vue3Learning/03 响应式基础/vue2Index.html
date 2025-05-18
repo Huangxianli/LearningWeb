@@ -1,80 +1,80 @@
 <!DOCTYPE html>
 <html lang="zh">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>和vue3的比对</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+  </head>
 
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>和vue3的比对</title>
-  <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+  <body>
+    <div id="app"></div>
+    <hr />
+    <div id="app2"></div>
+    <script>
+      // 测试 vue2 中是否会出现非响应式数据改变，响应式数据更新之后，触发页面更新，视图上非响应式数据是否会读取最新值
+      // vue2 和 vue3 的表现不一样， vue2 只要触发视图的更新，读取的当前的模板中依赖的数据就是最新的——这个结论是有问题的，如果 vue3 中，如果是渲染函数，也是一样的结果
+      let message1 = 'hello';
+      new Vue({
+        data() {
+          return {
+            message2: 'world',
+          };
+        },
+        render(h) {
+          return h('div', [
+            h('div', message1),
+            h(
+              'button',
+              {
+                on: {
+                  click() {
+                    message1 += `~`;
+                  },
+                },
+              },
+              '点击'
+            ),
+            h('div', this.message2),
+            h(
+              'button',
+              {
+                on: {
+                  click: () => {
+                    this.message2 += `~`;
+                  },
+                },
+              },
+              '点击'
+            ),
+          ]);
+        },
+      }).$mount('#app');
 
-</head>
-
-<body>
-  <div id="app"></div>
-  <hr />
-  <div id="app2"></div>
-  <script>
-    // 测试Vue2中是否会出现非响应式数据改变，响应式数据更新之后，触发页面更新，但是视图上的非响应式数据却没有更新的情况,
-    // vue2 和 vue3 的表现不一样， vue2只要触发视图的更新，读取的当前的模板中依赖的数据就是最新的
-    let message1 = 'hello';
-    new Vue({
-      data () {
-        return {
-          message2: 'world',
-        }
-      },
-      render (h) {
-        return h('div', [
-          h(
-            'button',
-            {
-              on: {
-                click () {
-                  message1 += `~`;
-                }
-              }
-            }, '点击'
-          ),
-          h('div', message1),
-          h('button',
-            {
-              on: {
-                click: () => {
-                  this.message2 += `~`;
-                }
-              }
-            },
-            '点击'),
-          h('div', this.message2)
-        ])
-      }
-    }).$mount('#app')
-
-    new Vue({
-      el: '#app2',
-      data () {
-        return {
-          set1: new Set([1, 2, 3]),
-        };
-      },
-      created () {
-        console.log(this.set1);
-      },
-      methods: {
-        changeSet1 () {
-          this.set1.add(Math.random()); // vue2 由于是使用 Object.defineProperty() 的方式来实现响应式的，所以不支持 Map Set 等数据类型，但是 Vue3 中是支持的
+      new Vue({
+        el: '#app2',
+        data() {
+          return {
+            set1: new Set([1, 2, 3]),
+          };
+        },
+        created() {
           console.log(this.set1);
         },
-      },
-      template: `
-      <div>
-        <div>{{Array.from(set1)}}</div>
-        <!-- Vue2 的模板中不支持 ...扩展运算符 -->
-        <button @click="changeSet1">修改set1的值</button>
-      </div>
-      `,
-    });
-  </script>
-</body>
-
+        methods: {
+          changeSet1() {
+            this.set1.add(Math.random()); // vue2 由于是使用 Object.defineProperty() 的方式来实现响应式的，所以不支持 Map Set 等数据类型，但是 Vue3 中是支持的
+            console.log(this.set1);
+          },
+        },
+        template: `
+          <div>
+            <div>{{Array.from(set1)}}</div>
+            <!-- Vue2 的模板中不支持 ...扩展运算符 -->
+            <button @click="changeSet1">修改set1的值</button>
+          </div>
+        `,
+      });
+    </script>
+  </body>
 </html>
