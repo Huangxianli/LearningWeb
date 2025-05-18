@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="zh">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>响应式 API：工具函数</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+  </head>
+  <body>
+    <div id="app1"></div>
+    <script type="text/x-template" id="component1">
+      <div>component</div>
+    </script>
+    <hr />
+
+    <div id="app2"></div>
+    <script type="text/x-template" id="component2">
+      <div>component2</div>
+    </script>
+    <hr />
+
+    <div id="app3"></div>
+    <script type="text/x-template" id="component3">
+      <div>component3</div>
+    </script>
+    <hr />
+
+    <div id="app4"></div>
+    <script type="text/x-template" id="component4">
+      <div>component4</div>
+      <div>{{refToValue.count}}</div>
+    </script>
+    <hr />
+
+    <div id="app5"></div>
+    <script type="text/x-template" id="component5">
+      <div>component5</div>
+    </script>
+    <hr />
+
+    <div id="app6"></div>
+    <script type="text/x-template" id="component6">
+      <div>component6</div>
+    </script>
+    <hr />
+
+    <hr />
+
+    <div id="app8"></div>
+    <script type="text/x-template" id="component8">
+      <div>component8</div>
+    </script>
+
+    <script>
+      const {
+        createApp,
+        ref,
+        reactive,
+        computed,
+        isRef,
+        unref,
+        toRef,
+        toValue,
+        toRefs,
+        isProxy,
+        isReactive,
+        isReadonly,
+      } = Vue;
+
+      /**
+       * isRef
+       * 检查某个值是否为 ref
+       */
+      createApp({
+        setup() {
+          console.log('---component1-------------------------------');
+          const ref1 = ref(0);
+          const reactive1 = reactive({});
+          const obj = {};
+          const number = 1;
+          console.log('isRef ref1', isRef(ref1)); // true
+          console.log('isRef reactive1', isRef(reactive1)); // false
+          console.log('isRef obj', isRef(obj)); // false
+          console.log('isRef number', isRef(number)); // false
+        },
+        template: '#component1',
+      }).mount('#app1');
+
+      /**
+       * unref
+       * 如果参数是 ref 则返回内部值，否则返回参数本身
+       *  val = isRef(val) ? val.value : val
+       */
+      createApp({
+        setup() {
+          console.log('--- component2 ---------------------');
+          const obj = {
+            data: ref(''),
+          };
+          const ref1 = ref(obj);
+          const unref1 = unref(ref1);
+          console.log('unref1', unref1);
+          console.log(unref1 === obj); // false 注意，这里 ref1 是 obj 经过 ref(obj) 后的产物，ref1.value 本身就不等于 obj，unref1 等价的是 ref1,.value
+          console.log(unref1 === ref1.value); // true
+        },
+        template: '#component2',
+      }).mount('#app2');
+
+      /**
+       * toRef
+       * 将值、refs 或者 getters 规范为 refs
+       *
+       * 也可以基于响应式属性对象上的一个属性，创建一个对应的 ref。这样创建的 ref 与其原属性保持同步：改变源或者生成的属性的值将同步更新
+       *
+       * 经常和 props 结合使用 toRef(props, propsName)
+       * 为了防止直接修改 props，可以使用 toRef(() => props.propName)
+       */
+      createApp({
+        setup() {
+          console.log('--- component3 -----------------------------');
+          const reactive1 = reactive({
+            foo: 1,
+            bar: 2,
+          });
+          const fooRef = toRef(reactive1, 'foo');
+          reactive1.foo++;
+          console.log('fooRef.value', fooRef.value); // 2
+          fooRef.value++;
+          console.log('reactive1.foo', reactive1.foo); // 3 注意  reactive1.foo 和 fooRef.value 是同步修改的
+
+          const obj = {
+            bar: 1,
+          };
+          const barRef = toRef(obj, 'bar');
+          barRef.value++;
+          console.log('obj.bar', obj.bar); // 2
+          obj.bar++;
+          console.log('barRef.value', barRef.value); // 3 注意，这里即使是非响应式的对象转化的也是 同步修改的
+
+          let number = 1;
+          const numberRef = toRef(number);
+          number++;
+          console.log('numberRef.value', numberRef.value); // 1
+          numberRef.value++;
+          console.log('number', number); // 2 这种直接传入一个非引用值，两边的修改不是同步的
+
+          const originRef = ref({});
+          const targetRef = toRef(originRef);
+          console.log('originRef === targetRef', originRef === targetRef); // true 如果传入的是 ref，那么会直接返回该 ref
+
+          const data = {
+            name: 0,
+          };
+          const getter1 = () => data.name;
+          const getterRef = toRef(getter1);
+          data.name++;
+          console.log('getterRef.value', getterRef.value); // 1
+          getterRef.value++;
+          console.log('data.name', data.name); // 1
+          console.log('getterRef.value', getterRef.value); // 1 注意这里修改没有生效，toRef(getter) 得到的 ref 是不能修改的，只能单方面的修改 getter 中的来源，来触发 getterRef 的变化，反过来不生效
+        },
+        template: '#component3',
+      }).mount('#app3');
+
+      /**
+       * toValue
+       * 将值、refs 或 getters 规范为值
+       *
+       * 如果是 reactive 会返回原值
+       */
+      createApp({
+        setup() {
+          console.log('--- component4 ----------------------');
+          const reactive1 = reactive({
+            count: 0,
+          });
+          const reactiveToValue = toValue(reactive1);
+          console.log('reactiveToValue', reactiveToValue); // 依旧是 proxy 对象
+          console.log(
+            'reactiveToValue === reactive1',
+            reactiveToValue === reactive1
+          ); // true
+
+          const ref1 = ref({
+            count: 0,
+          });
+          const refToValue = toValue(ref1);
+          console.log('refToValue', refToValue); // 得到的是 ref1.value
+          console.log('refToValue === ref1.value', refToValue === ref1.value); // true
+          setTimeout(() => {
+            refToValue.count++;
+          }, 2000);
+
+          const getter = () => ref1.value;
+          const getterToValue = toValue(getter);
+          console.log('getterToValue', getterToValue); // 会直接获取值
+          ref1.value = {};
+          console.log('getterToValue', getterToValue); // 不会因为 ref1 的改变而重新读取
+
+          return {
+            refToValue,
+          };
+        },
+        template: '#component4',
+      }).mount('#app4');
+
+      /**
+       * toRefs
+       * 将一个响应式对象转化成为一个普通对象，这个普通对象的每个属性都是指向源对象相应属性的 ref，每个单独的 ref 都是由 toRef() 创建的，所以，源对象的属性和生成的对象的属性是相互影响的
+       */
+      createApp({
+        setup() {
+          console.log('--- component5 ---------------------------------');
+          const reactive1 = reactive({
+            count: 1,
+            obj: {
+              count1: 1,
+            },
+          });
+          const reactiveToRefs = toRefs(reactive1);
+          console.log('reactiveToRefs', reactiveToRefs); // 普通对象，不是 proxy 对象
+          console.log(reactiveToRefs.obj.value.count1); // 1 只对第一层转化成 ref
+          reactive1.count++;
+          console.log('reactiveToRef.count.value', reactiveToRefs.count.value); // 2
+          reactiveToRefs.count.value++;
+          console.log('reactive1.count', reactive1.count); // 3 由于属性是由 toRef 转化成 ref 的，所以和原对象的属性是相互影响的
+
+          const ref1 = ref({
+            count: 1,
+          });
+          const refToRefs = toRefs(ref1.value); // 注意，如果是一个 ref，要将 value 转化的话，要传入 .value，不能直接传入 ref
+          console.log('refToRefs', refToRefs);
+          ref1.value.count++;
+          console.log('refToRefs.count.value', refToRefs.count.value); // 2
+        },
+        template: '#component5',
+      }).mount('#app5');
+
+      /**
+       * isProxy
+       * 检查一个对象是否是 reactive readonly shallowReactive shallowReadonly 创建的代理
+       */
+      createApp({
+        setup() {},
+        template: '#component6',
+      }).mount('#app6');
+
+      /**
+       * isReactive
+       * 检查一个对象是否是有 reactive 或 shallowReactive 创建的代理
+       */
+
+      /**
+       * isReadonly
+       * 检查传入的值是否为只读对象
+       * 只读对象的属性是可以更改的，但是不能通过传入的对象直接赋值
+       *
+       * readonly shallowReadonly 创建的代理都是只读的
+       */
+      createApp({
+        setup() {
+          console.log('--- component8 ---------------------------------');
+          const ref1 = ref({
+            count: 1,
+          });
+          const computed1 = computed(() => ref1.value.count);
+          const computedIsReadonly = isReadonly(computed1);
+          const computedValueIsReadonly = isReadonly(computed.value);
+          console.log('computedIsReadonly', computedIsReadonly); // true
+          console.log('computedValueIsReadonly', computedValueIsReadonly); // false
+        },
+        template: '#component8',
+      }).mount('#app8');
+    </script>
+  </body>
+</html>
