@@ -1,116 +1,120 @@
 <!DOCTYPE html>
 <html lang="zh">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>06条件渲染</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+  </head>
 
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>06条件渲染</title>
-  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+  <body>
+    <div id="app1"></div>
+    <hr />
+    <div id="app2"></div>
+    <hr />
+    <div id="app3"></div>
+    <script>
+      const { createApp, ref, reactive, computed } = Vue;
 
-</head>
+      /**
+       * v-show 控制的是 display 属性为 none，v-if 是直接将元素从 DMO 中移除了
+       */
+      createApp({
+        setup() {
+          console.log('--- app1 ----------------------------');
+          const show = ref(true);
+          const clickhandler = () => {
+            show.value = !show.value;
+          };
 
-<body>
-  <div id="app1"></div>
-  <hr />
-  <div id="app2"></div>
-  <hr />
-  <div id="app3"></div>
-  <script>
-    const { createApp, ref, reactive, computed } = Vue;
+          return {
+            show,
+            clickhandler,
+          };
+        },
+        template: `
+          <div>app1</div>
+          <div style="height: 48px">
+            <div v-if="show">使用 v-if</div>
+            <div v-show="show">使用 v-show</div>
+          </div>
+          <button @click="clickhandler">切换显示状态</button>
+        `,
+      }).mount('#app1');
 
-    /**
-     * v-show 控制的是 display 属性，v-if 是直接将元素从 DMO 中移除了
-     */
-    createApp({
-      setup () {
-        const show = ref(true);
-        const clickhandler = () => {
-          show.value = !show.value;
-        };
+      /**
+       * 在 Vue3 中 v-if 的优先级是高于 v-for 的，所以，如果 v-if 和 v-for 一起使用的时候，v-if 中是拿不到 v-for 循环出来的内容
+       */
+      createApp({
+        setup() {
+          console.log('--- app2 ----------------------------------');
+          const showList = ref(false);
+          const list = reactive([
+            { id: 1, name: '一', show: false },
+            { id: 2, name: '二', show: true },
+            { id: 3, name: '三', show: true },
+          ]);
+          const getName = (item) => {
+            console.log('执行了 getName 方法');
+            return item.name;
+          };
+          const clickHandler = () => {
+            showList.value = !showList.value;
+          };
+          const getList = () => {
+            console.log('执行了 getList 方法');
+            return list;
+          };
+          const itemShow = (item) => {
+            console.log('执行了 itemShow 方法');
+            return item?.show;
+          };
 
-        return {
-          show,
-          clickhandler
-        };
-      },
-      template: `
-        <div v-if="show">使用 v-if</div>
-        <div v-show="show">使用 v-show</div>
-        <button @click="clickhandler">切换显示状态</button>
+          return {
+            showList,
+            list,
+            getList,
+            itemShow,
+            clickHandler,
+          };
+        },
+        template: `
+          <div>app2</div>
+          <div>v-if 和 v-for 的优先级</div>
+          <button @click="clickHandler">切换显示</button>
+          <ul>
+            <!-- <li v-if="true" v-for="item in getList()" :key="item.id">{{item.name}}</li> -->
+            <li v-if="itemShow(item)" v-for="item in getList()" :key="item.id">{{item.name}}</li>
+            <!-- 注意，如果使用这种写法，itemShow 方法传入的 item 是 undefined，说明 v-if 是在 v-for 之前执行的，v-if 的优先级要高于 v-for，这个和 Vue2 中的表现是相反的 -->
+          </ul>
       `,
-    }).mount('#app1');
+      }).mount('#app2');
 
-    /**
-     * 在 Vue3 中 v-if 的优先级是高于 v-for 的，所以，如果 v-if 和 v-for 一起使用的时候，v-if 中是拿不到 v-for 循环出来的内容
-     */
-    createApp({
-      setup () {
-        const showList = ref(false);
-        const list = reactive([
-          { id: 1, name: '一', show: false },
-          { id: 2, name: '二', show: true },
-          { id: 3, name: '三', show: true },
-        ]);
-        const getName = (item) => {
-          console.log('执行了 getName 方法');
-          return item.name;
-        };
-        const clickHandler = () => {
-          showList.value = !showList.value;
-        };
-        const getList = () => {
-          console.log('执行了 getList 方法');
-          return list;
-        };
-        const itemShow = item => {
-          console.log('执行了 itemShow 方法');
-          return item.show;
-        };
-
-        return {
-          showList,
-          list,
-          getList,
-          itemShow,
-          clickHandler,
-        };
-      },
-      template: `
-        <div>v-if 和 v-for 的优先级</div>
-        <button @click="clickHandler">切换显示</button>
-        <ul>
-          <li v-if="true" v-for="item in getList()" :key="item.id">{{item.name}}</li>
-          <!--<li v-if="itemShow(item)" v-for="item in getList()" :key="item.id">{{item.name}}</li>-->
-          <!-- 注意，如果使用这种写法，itemShow 方法传入的 item 是 undefined，说明 v-if 是在 v-for 之前执行的，v-if 的优先级要高于 v-for，这个和 Vue2 中的表现是相反的 -->
-        </ul>
-      `,
-    }).mount('#app2');
-
-    /**
-     * 
-     */
-    createApp({
-      setup () {
-        const list = reactive([
-          { id: 1, name: '1', show: false },
-          { id: 2, name: '2', show: true },
-          { id: 3, name: '3', show: true },
-        ]);
-        const filterList = computed(() => {
-          return list.filter(item => item.show);
-        })
-        return {
-          filterList
-        };
-      },
-      template: `
-        <ul>
-          <li v-for="item in filterList" :key="item.key" >{{item.name}}</li>
-        </ul>
-      `,
-    }).mount('#app3');
-  </script>
-
-</body>
-
+      /**
+       * v-for 中有一些项不显示的，推荐的写法，提前过滤 list，让 newList 里面只有会显示的 item
+       */
+      createApp({
+        setup() {
+          console.log('--- app3 -----------------------------------');
+          const list = reactive([
+            { id: 1, name: '1', show: false },
+            { id: 2, name: '2', show: true },
+            { id: 3, name: '3', show: true },
+          ]);
+          const filterList = computed(() => {
+            return list.filter((item) => item.show);
+          });
+          return {
+            filterList,
+          };
+        },
+        template: `
+          <div>app3</div>
+          <ul>
+            <li v-for="item in filterList" :key="item.key" >{{item.name}}</li>
+          </ul>
+        `,
+      }).mount('#app3');
+    </script>
+  </body>
 </html>
