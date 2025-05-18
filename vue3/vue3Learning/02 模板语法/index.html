@@ -1,53 +1,48 @@
 <!DOCTYPE html>
 <html lang="zh">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>模板语法</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+  </head>
 
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>模板语法</title>
-  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+  <body>
+    <div id="app"></div>
+    <div id="app1"></div>
+    <div id="app2"></div>
+    <script>
+      const { createApp } = Vue;
+      createApp({
+        setup() {
+          const message = 'template中的文本插值';
+          return {
+            message,
+          };
+        },
+        template: `<div>{{message}}</div>`,
+      }).mount('#app');
 
-</head>
+      createApp({
+        setup() {
+          const htmlData = '<div style="color: red">htmlData</div>';
+          return {
+            htmlData,
+          };
+        },
+        template: '<div v-html="htmlData"></div>',
+        // 如果是用户输入的内容，不要用 v-html。或者是先进行转义之后再使用 v-html
+      }).mount('#app1');
 
-<body>
-  <div id="app"></div>
-  <div id="app1"></div>
-  <div id="app2"></div>
-  <script>
-    const { createApp } = Vue;
-    createApp({
-      template: `<div>{{message}}</div>`,
-      setup () {
-        const message = 'template中的文本插值';
-        return {
-          message,
-        }
-      }
-    }).mount('#app');
-
-    createApp({
-      template: '<div v-html="htmlData"></div>',
-      // 如果是用户输入的内容，不要用 v-html。或者是先进行转义之后再使用 v-html
-      setup () {
-        const htmlData = '<div style="color: red">htmlData</div>';
-        return {
-          htmlData,
-        };
-      },
-    }).mount('#app1');
-
-    createApp({
-      template: `<div :id>attribute绑定</div>`,
-      // 这种同名简写语法只能在 Vue3.4 之后才能使用
-      setup () {
-        return {
-          id: 'idName',
-        }
-      },
-    }).mount('#app2');
-
-  </script>
-
-</body>
-
+      createApp({
+        setup() {
+          return {
+            id: 'idName',
+          };
+        },
+        template: `<div :id>attribute绑定</div>`,
+        // 这种同名简写语法只能在 Vue3.4 之后才能使用
+      }).mount('#app2');
+    </script>
+  </body>
 </html>

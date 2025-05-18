@@ -1,214 +1,224 @@
 <!DOCTYPE html>
 <html lang="zh">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>03响应式基础</title>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+  </head>
 
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>03响应式基础</title>
-  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
-</head>
+  <body>
+    <div id="app1"></div>
+    <hr />
+    <div id="app2"></div>
+    <hr />
+    <div id="app3"></div>
+    <hr />
+    <div id="app4"></div>
+    <hr />
+    <div id="app5"></div>
+    <hr />
+    <div id="app6"></div>
+    <script type="text/babel">
+      const { createApp, h, ref, reactive } = Vue;
 
-<body>
-  <div id="app"></div>
-  <hr />
-  <div id="app2"></div>
-  <hr />
-  <div id="app3"></div>
-  <hr />
-  <div id="app4"></div>
-  <hr />
-  <div id="app5"></div>
-  <hr />
-  <div id="app6"></div>
-  <script type="text/babel">
-    const { createApp, h, ref, reactive } = Vue;
+      createApp({
+        setup() {
+          // setup 函数是在实例创建之前，props 解析完成之后，beforeCreate 之前执行，而且只会执行一次，并且只会执行一次，不会随着组件的重新渲染而重新执行
+          console.log('--- app1 -----------------------------------');
+          let message1 = 'hello';
+          const message2 = ref('world');
+          const clickHandler1 = () => {
+            message1 += '~';
+            console.log('app1 message1', message1);
+          };
+          const clickHandler2 = () => {
+            message2.value += '~'; // 好奇怪，这里的变化，只会触发下面部分的更新，message1 对应的部分不会被更新（return 的message1 是一个基本类型，模板中获取的就是单纯的值）
+          };
+          return {
+            message1,
+            message2,
+            clickHandler1,
+            clickHandler2,
+          };
+        },
+        template: `
+          <div>app1</div>
+          <button @click="clickHandler1">修改</button>
+          {{console.log(1)}}
+          <div>{{message1}}</div>
+          <!-- 组合式 api 的 template 里面可以读取到自己定义的变量，但是选项式 api 的写法读取不到 -->
+          <button @click="clickHandler2">修改</button>
+          <div>{{message2}}</div>
+        `,
+      }).mount('#app1');
 
-    createApp({
-      template: `
-        <button @click="clickHandler1">修改</button>
-        {{console.log(1)}}
-        <div>{{message1}}</div>
-        <!-- 组合式 api 的 template 里面可以读取到自己定义的变量，但是选项式 api 的写法读取不到 -->
-        <button @click="clickHandler2">修改</button>
-        <div>{{message2}}</div>
-      `,
-      setup () { // setup 函数是在实例创建之前，props 解析完成之后，beforeCreate 之前执行，而且只会执行一次，并且只会执行一次，不会随着组件的重新渲染而重新执行
-        let message1 = 'hello';
-        const message2 = ref('world');
-        const clickHandler1 = () => {
-          message1 += '~';
-          console.log(message1);
-        };
-        const clickHandler2 = () => {
-          message2.value += '~'; // 好奇怪，这里的变化，只会触发下面部分的更新，message1 对应的部分不会被更新（return 的message1 是一个基本类型，模板中获取的就是单纯的值）
-        };
-        return {
-          message1,
-          message2,
-          clickHandler1,
-          clickHandler2
-        };
-      },
-    }).mount('#app');
+      createApp({
+        setup() {
+          console.log('--- app2 -----------------------------------');
+          let message1 = 'hello';
+          const message2 = ref('world');
 
-    createApp({
-      setup () {
-        let message1 = 'hello';
-        const message2 = ref('world');
+          const clickHandler1 = () => {
+            message1 += '~';
+            console.log('app2 message1', message1);
+          };
 
-        const clickHandler1 = () => {
-          message1 += '~';
-          console.log(message1);
-        };
+          const clickHandler2 = () => {
+            message2.value += '~';
+          };
 
-        const clickHandler2 = () => {
-          message2.value += '~';
-        };
+          // 返回渲染函数，每次响应式数据发生改变的时候，返回的函数就会重新执行，这种写法只要视图更新，视图中的变量得到的就是最新的数据（利用闭包），无论是否是响应式数据
+          return () =>
+            h('div', null, [
+              h('div', 'app2'),
+              h('button', { onClick: clickHandler1 }, '修改'),
+              h('div', null, message1),
+              h('button', { onClick: clickHandler2 }, '修改'),
+              h('div', null, message2.value),
+            ]);
+        },
+      }).mount('#app2');
 
-        // 返回渲染函数，每次响应式数据发生改变的时候，返回的函数就会重新执行，这种写法只要视图更新，视图中的变量得到的就是最新的数据（利用闭包），无论是否是响应式数据
-        return () => h('div', null, [
-          h('button', { onClick: clickHandler1 }, '修改'),
-          h('div', null, message1),
-          h('button', { onClick: clickHandler2 }, '修改'),
-          h('div', null, message2.value),
-        ]);
-      }
-    }).mount('#app2');
+      const app3 = createApp({
+        setup() {
+          console.log('--- app3 -----------------------------------');
+          let message1 = 'hello';
+          const message2 = ref('world');
+          const clickHandler1 = () => {
+            message1 += '~';
+            console.log('app3 message1', message1);
+          };
+          const clickHandler2 = () => {
+            message2.value += '~';
+          };
+          return () => (
+            // 如果要支持 vue3 jsx写法，要加 babel 以及其他的插件
+            <div>
+              <div>app3</div>
+              <button onClick={clickHandler1}>修改</button>
+              <div>{message1}</div>
+              <button onClick={clickHandler2}>修改</button>
+              <div>{message2.value}</div>
+            </div>
+          );
+        },
+      });
+      // app3.mount('#app3');
 
-    const app3 = createApp({
-      setup () {
-        let message1 = 'hello';
-        const message2 = ref('world');
-        const clickHandler1 = () => {
-          message1 += '~';
-          console.log(message1);
-        };
-        const clickHandler2 = () => {
-          message2.value += '~';
-        };
-        return () => (
-          // 如果要支持 vue3 jsx写法，要加 babel 以及其他的插件
-          <div>
-            <button onClick={clickHandler1} >修改</button >
-            <div>{message1}</div>
-            <button onClick={clickHandler2} >修改</button >
-            <div>{message2.value}</div>
-          </div >
-        );
-      },
-    });
-    // app3.mount('#app3');
+      /**
+       * ref()
+       * ref() 会将传入的内容包裹成一个对象，并且将传入的内容赋值给对象的 value 属性，利用新生成的对象的 getter setter 来处理
+       *
+       * ref() 如果接收的是一个 ref 对象，那么返回值就是原来的哪个 ref 对象，不会再包一层
+       */
+      const app4 = createApp({
+        setup() {
+          console.log('--- app4 -----------------------------------');
+          // 没有挂载（执行 mount）就不会执行 setup 函数
+          const clicks = ref(0);
+          console.log('app4-clicks', clicks); // RefImpl {dep: Dep, __v_isRef: true, __v_isShallow: false, _rawValue: 0, _value: 0, value: 0} ref 变量的类型是 RefImpl，传入的内容会在 value 上
+          const clicks2 = ref(clicks);
+          console.log('app4 clicks === clicks2', clicks === clicks2); // true
+        },
+        template: `<div>app4</div>`,
+      });
+      app4.mount('#app4');
 
-    /**
-     * ref()
-     * ref() 会将传入的内容包裹成一个对象，并且将传入的内容赋值给对象的 value 属性，利用新生成的对象的 getter setter 来处理
-     * 
-     * ref() 如果接收的是一个 ref 对象，那么返回值就是原来的哪个 ref 对象，不会再包一层
-     */
-    const app4 = createApp({
-      template: ``,
-      setup () { // 没有挂载（执行 mount）就不会执行 setup 函数
-        const clicks = ref(0);
-        console.log('app4-clicks', clicks); // RefImpl {dep: Dep, __v_isRef: true, __v_isShallow: false, _rawValue: 0, _value: 0, value: 0} ref 变量的类型是 RefImpl，传入的内容会在 value 上
-        const clicks2 = ref(clicks);
-        console.log(clicks === clicks2); // true
-      },
-    });
-    app4.mount('#app4');
-
-    /**
-     * reactive 也可以将数据转化成响应式数据，和 ref 不同，reactive 是将数据用 Proxy 代理
-     * 不能直接代理 基础数据类型
-     * 不能对 reactive 获取到的变量进行这个的覆盖赋值
-     * 如果结构赋值之后，被结构出来的内容不具备响应式（只是在解构出来的值是原始数据类型的时候才是这样的）
-     * 
-     * 和 Vue2 不同，Set 和 Map 等类型的数据，其中一项修改了，也会触发重新渲染
-     * 
-     * 如果已经是 reactive 对象 再进行 reactive 那么得到的对象还是原来那个
-     */
-    const app5 = createApp({
-      template: `
-      <div>点击了：{{count.clicks}} 次</div>
-      <button @click="increat">增加</button>
-      <div>测试结构出来的内容是否还具响应式</div>
-      <div>{{clicks1.clicks}}</div>
-      <button @click="increat1">增加</button>
-      <div>{{Array.from(set1)}}</div>
-      <button @click="changeSet1">修改 Set 的值</button>
-      `,
-      setup () {
-        const count = reactive({
-          clicks: 0
-        });
-        const increat = function () {
-          count.clicks++;
-        };
-
-        const count1 = reactive({
-          clicks: {
+      /**
+       * reactive 也可以将数据转化成响应式数据，和 ref 不同，reactive 是将数据用 Proxy 代理
+       * 不能直接代理 基础数据类型
+       * 不能对 reactive 获取到的变量进行这个的覆盖赋值
+       * 如果结构赋值之后，被结构出来的内容不具备响应式（只是在解构出来的值是原始数据类型的时候才是这样的）
+       *
+       * 和 Vue2 不同，Set 和 Map 等类型的数据，其中一项修改了，也会触发重新渲染
+       *
+       * 如果已经是 reactive 对象 再进行 reactive 那么得到的对象还是原来那个
+       */
+      const app5 = createApp({
+        setup() {
+          console.log('--- app5 -----------------------------------');
+          const count = reactive({
             clicks: 0,
-          }
-        });
-        let { clicks: clicks1 } = count1;
-        const increat1 = function () {
-          clicks1.clicks++;
-          console.log(count1);
-          console.log(clicks1);
-        };
+          });
+          const increat = function () {
+            count.clicks++;
+          };
 
-        const set1 = reactive(new Set([1, 2, 3]));
-        const changeSet1 = function () {
-          set1.add(Math.random());
-        };
-        const set2 = reactive(set1);
-        console.log(set1 === set2); // true
-        return {
-          count,
-          increat,
-          clicks1,
-          increat1,
-          set1,
-          changeSet1,
-        };
-      },
-    });
-    app5.mount('#app5');
+          const count1 = reactive({
+            clicks: {
+              clicks: 0,
+            },
+          });
+          let { clicks: clicks1 } = count1;
+          const increat1 = function () {
+            clicks1.clicks++;
+            console.log('app5 count1', count1);
+            console.log('app5 clicks1', clicks1);
+          };
 
-    /**
-     * 当一个 ref 作为 reactive/ref 变量的属性的时候，即使是在 setup 中，访问不需要 .value，会自动的进行解包，但是如果他的上一层是数组或者是原生的集合中，需要手动的解包
-     */
-    const app6 = createApp({
-      template: ``,
-      setup () {
-        const count = ref(0);
-        const state = reactive({
-          count,
-        });
-        const countTemp = state.count; // reactive 里面的 ref 属性，在访问的时候，不需要使用 .value 访问，会自动的解包
-        console.log(countTemp); // 0
+          const set1 = reactive(new Set([1, 2, 3]));
+          const changeSet1 = function () {
+            set1.add(Math.random());
+          };
+          const set2 = reactive(set1);
+          console.log('app5 set1 === set2', set1 === set2); // true
+          return {
+            count,
+            increat,
+            clicks1,
+            increat1,
+            set1,
+            changeSet1,
+          };
+        },
+        template: `
+          <div>app5</div>
+          <div>点击了：{{count.clicks}} 次</div>
+          <button @click="increat">增加</button>
+          <div>测试结构出来的内容是否还具响应式</div>
+          <div>{{clicks1.clicks}}</div>
+          <button @click="increat1">增加</button>
+          <div>{{Array.from(set1)}}</div>
+          <button @click="changeSet1">修改 Set 的值</button>
+        `,
+      });
+      app5.mount('#app5');
 
-        const count1 = ref(0);
-        const state1 = ref({
-          count1
-        });
-        const countTemp1 = state1.value.count1; // ref 里面的 ref 属性，在访问的时候也会自动的解包
-        console.log(countTemp1);
+      /**
+       * 当一个 ref 作为 reactive/ref 变量的属性的时候，即使是在 setup 中，访问不需要 .value，会自动的进行解包，但是如果他的上一层是数组或者是原生的集合中，需要手动的解包
+       */
+      const app6 = createApp({
+        setup() {
+          console.log('--- app6 -----------------------------------');
+          const count = ref(0);
+          const state = reactive({
+            count,
+          });
+          const countTemp = state.count; // reactive 里面的 ref 属性，在访问的时候，不需要使用 .value 访问，会自动的解包
+          console.log('app6 countTemp', countTemp); // 0
 
-        const count2 = ref(0);
-        const state2 = reactive([count2]);
-        const countTemp2 = state2[0];
-        console.log(countTemp2); // RefImpl {dep: Dep, __v_isRef: true, __v_isShallow: false, _rawValue: 0, _value: 0}
-        console.log(countTemp2.value); // 0
+          const count1 = ref(0);
+          const state1 = ref({
+            count1,
+          });
+          const countTemp1 = state1.value.count1; // ref 里面的 ref 属性，在访问的时候也会自动的解包
+          console.log('app6 countTemp1', countTemp1);
 
-        state2[1] = reactive({
-          count: ref(0),
-        });
-        console.log(state2[1].count); // 0 这里因为 count 的上层是一个对象，而不是 array 所以，会自动的解包
-      },
-    }).mount('#app6');
+          const count2 = ref(0);
+          const state2 = reactive([count2]);
+          const countTemp2 = state2[0];
+          console.log('app6 countTemp2', countTemp2); // RefImpl {dep: Dep, __v_isRef: true, __v_isShallow: false, _rawValue: 0, _value: 0}
+          console.log('app6 countTemp2.value', countTemp2.value); // 0
 
-  </script>
-</body>
-
+          state2[1] = reactive({
+            count: ref(0),
+          });
+          console.log('app6 state2[1].count', state2[1].count); // 0 这里因为 count 的上层是一个对象，而不是 array 所以，会自动的解包
+        },
+        template: `<div>app6</div>`,
+      }).mount('#app6');
+    </script>
+  </body>
 </html>
