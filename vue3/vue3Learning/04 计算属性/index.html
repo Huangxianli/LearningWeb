@@ -1,154 +1,182 @@
 <!DOCTYPE html>
 <html lang="zh">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>04计算属性</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+  </head>
 
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>04计算属性</title>
-  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+  <body>
+    <div id="app1"></div>
+    <hr />
+    <div id="app2"></div>
+    <hr />
+    <div id="app3"></div>
+    <hr />
+    <div id="app4"></div>
+    <script>
+      const { createApp, computed, ref, reactive, nextTick } = Vue;
 
-</head>
+      /**
+       * computed 得到的是一个 ref 对象，访问的时候，要加上 .value 来访问
+       */
+      createApp({
+        template: `
+          <div>app1</div>
+          <div>测试 computed</div>
+        `,
+        setup() {
+          console.log('--- app1 ---------------------------');
+          const computed1 = computed(() => 'huang');
+          console.log(computed1.value); //  huang
 
-<body>
-  <div id="app1"></div>
-  <hr />
-  <div id="app2"></div>
-  <hr />
-  <div id="app3"></div>
-  <hr />
-  <div id="app4"></div>
-  <script>
-    const { createApp, computed, ref, reactive, nextTick } = Vue;
-
-    /**
-     * computed 得到的是一个 ref 对象，访问的时候，要加上 .value 来访问
-     */
-    createApp({
-      template: `
-        <div>测试 computed</div>
-      `,
-      setup () {
-        const computed1 = computed(() => 'huang');
-        console.log(computed1.value); //  huang
-
-        const state1 = ref({
-          computed1,
-        });
-        console.log(state1.value.computed1); // huang 也和将 ref 赋值给 ref/reactive 对象的属性一样，后续在访问的时候，会自动的解包
-      },
-    }).mount('#app1');
-
-    /**
-     * computed 依赖的是响应式数据，如果不是响应式数据的变化，不会触发 computed 的变化
-     * 如果 computed 没有直接或者间接的在 template 上使用，那么即使改变了其依赖项，也不会重新的触发 computed 的 getter 函数
-     */
-    createApp({
-      template: `
-        <div>computed 基础使用</div>
-        <div>{{arrLength}}</div>
-        <button @click="clickHandler">点击增加</button>
-        <div>computed 中依赖的是非响应式的数据</div>
-        <div>{{arr1Length}}</div>
-        <button @click="clickHandler1">点击增加</button>
-        <div>computed 没有被直接或者间接的在 template 中使用，不会触发 computed 的 getter 函数</div>
-        <button @click="clickHandler2">点击增加</button>
-      `,
-      setup () {
-        const arr = reactive([]);
-        const arrLength = computed(() => arr.length);
-        const clickHandler = () => {
-          arr.push(1);
-        };
-
-        const arr1 = [];
-        const arr1Length = computed(() => arr1.length);
-        const clickHandler1 = () => { arr1.push(1); }; // 由于这里依赖的是非响应式数据 arr1，即使 arr1 发生了改变也无法触发computed arr1Length 的变动
-
-        const arr2 = reactive([]);
-        const arr2Length = computed(() => {
-          console.log('触发了 arr2Length');
-          return arr2.length;
-        });
-        const clickHandler2 = () => {
-          arr2.push(1);
-        };
-
-        return {
-          arrLength,
-          clickHandler,
-          arr1Length,
-          clickHandler1,
-          clickHandler2
-        };
-      },
-    }).mount('#app2');
-
-
-    /**
-     * computed getter 函数的第一个参数是上一次该 computed 的值
-     */
-    createApp({
-      template: `
-        <div>computed getter 函数的第一个参数是上一次更新时的值</div>
-        <div>{{computed1}}</div>
-        <button @click="clickHandler1">点击增加</div>
-      `,
-      setup () {
-        const clicks1 = ref(0);
-        const computed1 = computed(oldValue => {
-          console.log('进入了 computed1 的 getter 函数');
-          if (clicks1.value < 3) {
-            return clicks1.value;
-          };
-          return oldValue;
-        });
-        const clickHandler1 = () => {
-          clicks1.value += 1;
-          nextTick(() => {
-            console.log(computed1.value);
+          const state1 = ref({
+            computed1,
           });
-        };
+          console.log(state1.value.computed1); // huang 也和将 ref 赋值给 ref/reactive 对象的属性一样，后续在访问的时候，会自动的解包
+        },
+      }).mount('#app1');
 
-        return {
-          computed1,
-          clickHandler1
-        };
-      },
-    }).mount('#app3')
+      /**
+       * computed 依赖的是响应式数据，如果不是响应式数据的变化，不会触发 computed 的变化
+       * 如果 computed 没有直接或者间接的在 template 上使用，那么即使改变了其依赖项，也不会重新的触发 computed 的 getter 函数
+       */
+      createApp({
+        template: `
+          <div>app2</div>
+          <div>computed 基础使用</div>
+          <div>{{arrLength}}</div>
+          <button @click="clickHandler">点击增加</button>
+          <div>computed 中依赖的是非响应式的数据</div>
+          <div>{{arr1Length}}</div>
+          <button @click="clickHandler1">点击增加</button>
+          <div>computed 没有被直接或者间接的在 template 中使用，不会触发 computed 的 getter 函数</div>
+          <button @click="clickHandler2">点击增加</button>
+        `,
+        setup() {
+          console.log('--- app2 -----------------------------');
+          const arr = reactive([]);
+          const arrLength = computed(() => arr.length, {
+            // 第二个参数是用来调试的一个对象
+            onTrack(e) {
+              console.log('onTrack app2');
+            },
+            onTigger(e) {
+              console.log('onTrigger app2');
+            },
+          });
+          const clickHandler = () => {
+            arr.push(1);
+          };
 
-    /**
-     * computed 也可以赋值
-     * computed 的 getter 函数应该是一个无副作用的函数
-     * 
-     * 不建议直接修改 comoputed 的值，应该通过修改 computed 依赖的响应式数据触发 computed 的变化
-     */
+          const arr1 = [];
+          const arr1Length = computed(() => arr1.length);
+          const clickHandler1 = () => {
+            arr1.push(1);
+          }; // 由于这里依赖的是非响应式数据 arr1，即使 arr1 发生了改变也无法触发computed arr1Length 的变动
 
-    createApp({
-      template: `
-        <div>手动的设置 computed</div>
-        <div>{{computed1}}</div>
-        <button @click="clickHandler1">computed 增加</button>
-      `,
-      setup () {
-        const clicks1 = ref(0);
-        const computed1 = computed({
-          get (oldValue) { // get 函数中接收的上一次的值
-            return clicks1.value;
-          },
-          set (newValue) {
-            clicks1.value = newValue;
-          },
-        });
-        const clickHandler1 = () => {
-          computed1.value += 1;
-        }
-        return {
-          computed1,
-          clickHandler1
-        };
-      },
-    }).mount('#app4')
-  </script>
-</body>
+          const arr2 = reactive([]);
+          const arr2Length = computed(() => {
+            console.log('触发了 arr2Length');
+            return arr2.length;
+          });
+          const clickHandler2 = () => {
+            arr2.push(1);
+          };
 
+          return {
+            arrLength,
+            clickHandler,
+            arr1Length,
+            clickHandler1,
+            clickHandler2,
+          };
+        },
+      }).mount('#app2');
+
+      /**
+       * computed getter 函数的第一个参数是上一次该 computed 的值
+       */
+      createApp({
+        template: `
+          <div>app3</div>
+          <div>computed getter 函数的第一个参数是上一次更新时的值</div>
+          <div>{{computed1}}</div>
+          <button @click="clickHandler1">点击增加</button>
+        `,
+        setup() {
+          console.log('--- app3 ------------------');
+          const clicks1 = ref(0);
+          const computed1 = computed((oldValue) => {
+            console.log('进入了 computed1 的 getter 函数');
+            if (clicks1.value < 3) {
+              return clicks1.value;
+            }
+            return oldValue;
+          });
+          const clickHandler1 = () => {
+            clicks1.value += 1;
+            nextTick(() => {
+              console.log(computed1.value);
+            });
+          };
+
+          return {
+            computed1,
+            clickHandler1,
+          };
+        },
+      }).mount('#app3');
+
+      /**
+       * computed 也可以赋值
+       * computed 的 getter 函数应该是一个无副作用的函数
+       * 即使是使用了 setter，computed 还是有缓存的
+       *
+       * 不建议直接修改 computed 的值，应该通过修改 computed 依赖的响应式数据触发 computed 的变化
+       */
+
+      createApp({
+        template: `
+          <div>app4</div>
+          <div>手动的设置 computed</div>
+          <div>{{computed1}}</div>
+          <div>{{computed1 + 1}}</div>
+          <button @click="clickHandler1">computed 增加</button>
+        `,
+        setup() {
+          console.log('--- app4 -------------------------------------');
+          const clicks1 = ref(0);
+          const computed1 = computed(
+            {
+              get(oldValue) {
+                // get 函数中接收的上一次的值
+                console.log('app4 computed getter'); // 即使一次渲染中，读了两次该 computed，但是由于在两次读的区间，依赖的响应式属性没有发生改变，所以，一次渲染中，只会打印一次
+                return clicks1.value;
+              },
+              set(newValue) {
+                clicks1.value = newValue;
+              },
+            },
+            {
+              onTrack(e) {
+                console.log('app4 computed track', e);
+              },
+              onTrigger(e) {
+                console.log('app4 computed trigger', e);
+              },
+            }
+          );
+          const clickHandler1 = () => {
+            computed1.value += 1;
+          };
+          return {
+            computed1,
+            clickHandler1,
+          };
+        },
+      }).mount('#app4');
+    </script>
+  </body>
 </html>
