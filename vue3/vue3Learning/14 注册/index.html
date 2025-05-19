@@ -1,69 +1,71 @@
 <!DOCTYPE html>
 <html lang="zh">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>14 注册</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+  </head>
 
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>注册</title>
-  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
-</head>
+  <body>
+    <div id="app1"></div>
+    <hr />
+    <div id="app2"></div>
 
-<body>
-  <div id="app1"></div>
-  <hr />
-  <div id="app2"></div>
+    <script type="module">
+      import Component2 from './Component2.js';
+      const { createApp } = Vue;
 
-  <script type="module">
-    import Component2 from "./Component2.js";
-    const { createApp } = Vue;
-
-    /**
-     * 全局注册
-     * app.component(componentName, component)
-     */
-    const app = createApp({
-      components: {
-        Component2,
-      },
-      template: `
+      /**
+       * 全局注册
+       * app.component(componentName, component)
+       */
+      const app = createApp({
+        components: {
+          Component2,
+        },
+        template: `
         <div>
           <Component2 />
         </div>
       `,
-    });
+      });
 
-    const Component1 = {
-      setup () {
-      },
-      template: '<div>这是全局注册的组件 Component1</div>'
-    };
-    app.component('Component1', Component1);
+      const Component1 = {
+        setup() {},
+        template: `
+          <div>app1</div>
+          <div>这是全局注册的组件 Component1</div>
+        `,
+      };
+      app.component('Component1', Component1);
 
-    app.mount('#app1');
+      app.mount('#app1');
 
-
-    /**
-     * 局部注册
-     * 如果是在 <script setup> 中，只要引入组件文件就可以直接在模板中使用
-     * 如果不是在 <script setup> 中，那么需要在 components 中注册组件
-     */
-    const Component3 = {
-      setup () { },
-      template: '<div>这是局部注册的组件 Component3</div>'
-    };
-    createApp({
-      components: { // 有使用的不是 <script setup> 的，需要在这里进行注册
-        Component3,
-      },
-      setup () { },
-      template: `
-        <div>
-          <Component3 />
-        </div>
-      `,
-    }).mount('#app2');
-
-  </script>
-</body>
-
+      /**
+       * 局部注册
+       * 如果是在 <script setup> 中，只要引入组件文件就可以直接在模板中使用
+       * 如果不是在 <script setup> 中，那么需要在 components 中注册组件
+       */
+      const Component3 = {
+        setup() {},
+        template: `
+          <div>这是局部注册的组件 Component3</div>
+        `,
+      };
+      createApp({
+        components: {
+          // 有使用的不是 <script setup> 的，需要在这里进行注册
+          Component3,
+        },
+        setup() {},
+        template: `
+          <div>app2</div>
+          <div>
+            <Component3 />
+          </div>
+        `,
+      }).mount('#app2');
+    </script>
+  </body>
 </html>

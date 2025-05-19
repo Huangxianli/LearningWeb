@@ -1,84 +1,88 @@
 <!DOCTYPE html>
 <html lang="zh">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>08事件处理</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+  </head>
 
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>08事件处理</title>
-  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
-</head>
+  <body>
+    <div id="app1"></div>
+    <hr />
+    <div id="app2"></div>
+    <hr />
+    <div id="app3"></div>
+    <script>
+      const { createApp, ref, reactive } = Vue;
 
-<body>
-  <div id="app1"></div>
-  <hr />
-  <div id="app2"></div>
-  <hr />
-  <div id="app3"></div>
-  <script>
-    const { createApp, ref, reactive } = Vue;
+      /**
+       * 在事件绑定中，在绑定的时候，如果没有特地的处理传递的参数，那么默认第一个参数是事件的 event 对象
+       */
+      createApp({
+        setup() {
+          console.log('--- app1 -------------------------------');
+          const clickHandler = (e) => {
+            console.log('app1 clickHandler e', e); // PointerEvent {isTrusted: true, _vts: 1738852450295, pointerId: 1, width: 1, height: 1, …}
+          };
+          return {
+            clickHandler,
+          };
+        },
+        template: `
+          <div>app1</div>
+          <div>
+            <button @click="clickHandler">点击</button>
+          </div>
+        `,
+      }).mount('#app1');
 
-    /**
-     * 在事件绑定中，在绑定的时候，如果没有特地的处理传递的参数，那么默认第一个参数是事件的 event 对象
-     */
-    createApp({
-      setup () {
-        const clickHandler = e => {
-          console.log(e); // PointerEvent {isTrusted: true, _vts: 1738852450295, pointerId: 1, width: 1, height: 1, …}
-        };
-        return {
-          clickHandler,
-        };
-      },
-      template: `
-        <div>
-          <button @click="clickHandler">点击</button>
-        </div>
-      `,
-    }).mount('#app1');
+      /**
+       * 内联的写法，不太推荐在 template 中写事件中的具体逻辑
+       */
+      createApp({
+        setup() {
+          console.log('--- app2 -------------------------------');
+          const clicks = ref(0);
+          return {
+            clicks,
+          };
+        },
+        template: `
+          <div>app2</div>
+          <div>
+            <div>{{clicks}}</div>
+            <button @click="clicks ++">按钮</button>
+            <button @click="console.log('app2 $event', $event)">按钮</button>
+            <button @click="e => {console.log('app2 e', e)}">按钮</button>
+          </div>
+        `,
+      }).mount('#app2');
 
-    /**
-     * 内联的写法，不太推荐在 template 中写事件中的具体逻辑
-     */
-    createApp({
-      setup () {
-        const clicks = ref(0);
-        return {
-          clicks,
-        };
-      },
-      template: `
-        <div>
-          <div>{{clicks}}</div>
-          <button @click="clicks ++">按钮</button>
-          <button @click="console.log($event)">按钮</button>
-          <button @click="e => {console.log(e)}">按钮</button>
-        </div>
-      `,
-    }).mount('#app2');
-
-    /**
-     * 事件绑定的时候加上 ()，并不会直接的掉用该方法，这个和 React 是有却别的
-     */
-    createApp({
-      setup () {
-        const show = ref('');
-        const clickHandler = value => {
-          show.value = show.value + value;
-        };
-        return {
-          show,
-          clickHandler,
-        };
-      },
-      template: `
-        <div>
-          <div>{{show}}</div>
-          <button @click="clickHandler('1')">点击</button>
-          <!-- 绑定的是方法的调用，但是在编译的时候不会直接调用，还是在事件触发的时候才会调用 -->
-        </div>
-      `,
-    }).mount('#app3');
-  </script>
-</body>
-
+      /**
+       * 事件绑定的时候加上 ()，并不会直接的掉用该方法，这个和 React 是有却别的
+       */
+      createApp({
+        setup() {
+          console.log('--- app3 -------------------------------');
+          const show = ref('1');
+          const clickHandler = (value) => {
+            show.value = show.value + value;
+          };
+          return {
+            show,
+            clickHandler,
+          };
+        },
+        template: `
+          <div>app3</div>
+          <div>
+            <div>{{show}}</div>
+            <button @click="clickHandler('1')">点击</button>
+            <!-- 绑定的是方法的调用，但是在编译的时候不会直接调用，还是在事件触发的时候才会调用 -->
+          </div>
+        `,
+      }).mount('#app3');
+    </script>
+  </body>
 </html>

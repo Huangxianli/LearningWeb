@@ -1,101 +1,174 @@
 <!DOCTYPE html>
 <html lang="zh">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>11 模板引用</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+  </head>
 
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>模板引用</title>
-  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
-</head>
+  <body>
+    <div id="app1"></div>
+    <hr />
+    <div id="app2"></div>
+    <hr />
+    <div id="app3"></div>
+    <hr />
+    <div id="app4"></div>
 
-<body>
-  <div id="app1"></div>
-  <hr />
-  <div id="app2"></div>
-  <hr />
-  <div id="app3"></div>
+    <script>
+      const {
+        createApp,
+        ref,
+        reactive,
+        useTemplateRef,
+        nextTick,
+        onMounted,
+        defineExpose,
+      } = Vue;
 
-  <script>
-    const { createApp, ref, reactive, useTemplateRef, nextTick } = Vue;
+      /**
+       * 在某些情况下，仍然需要对 DOM 进行访问，可以使用 ref attribute
+       * 注意是在挂载之后才能访问到具体的值
+       * 可以在 onMounted 或者 nextTick 中访问到 refDOM
+       */
+      createApp({
+        setup() {
+          console.log('--- app1 ------------------------------');
+          const inputRef = useTemplateRef('input-ref'); // 3.5.0 版本之后，可以使用 useTemplateRef
+          nextTick(() => {
+            // 注意 nectTick 的回调是在 onMounted 的回调之后执行的
+            console.log('app1 nextTick inputRef.value', inputRef.value); // <input>
+            inputRef.value.focus();
+          });
 
-    /**
-     * 在某些情况下，仍然需要对 DOM 进行访问，可以使用 ref attribute
-     * 注意是在挂载之后才能访问到具体的值
-     */
-    createApp({
-      setup () {
-        const inputRef = useTemplateRef('input-ref'); // 3.5.0 版本之后，可以使用 useTemplateRef
-        nextTick(() => {
-          console.log(inputRef.value); // <input>
-          inputRef.value.focus();
-        });
+          const inputRef1 = ref(null); // 3.5.0 版本之前，可以使用 ref
+          nextTick(() => {
+            console.log('app1 nextTick inputRef1.value', inputRef1.value); // <input>
+            inputRef1.value.focus();
+          });
 
-        const inputRef1 = ref(null); // 3.5.0 版本之前，可以使用 ref
-        nextTick(() => {
-          console.log(inputRef1.value); // <input>
-          inputRef1.value.focus();
-        });
+          console.log('app1 setup inputRef.value', inputRef.value); // null
+          console.log('app1 setup inputRef1.value', inputRef1.value); // null
+          onMounted(() => {
+            console.log('app1 onMounted inputRef.value', inputRef.value); // <input>
+            console.log('app1 onMounted inputRef1.value', inputRef1.value); // <input>
+          });
 
-        return {
-          // inputRef,
-          inputRef1, // 确保这里 return 出去，否则模板中无法访问
-        }
-      },
+          return {
+            // inputRef, 使用 useTemplateRef 声明的 refDOM 可以不 return
+            inputRef1, // 确保这里 return 出去，否则模板中无法访问
+          };
+        },
+        template: `
+          <div>app1</div>
+          <label>
+            <input ref="input-ref"/>
+          </label>
+          <br />
+          <label>
+            <input ref="inputRef1"/>
+          </label>
+        `,
+      }).mount('#app1');
 
-      template: `
-        <label>
-          <input ref="input-ref"/>
-        </label>
-        <br />
-        <label>
-          <input ref="inputRef1"/>
-        </label>
-      `,
-    }).mount('#app1');
+      /**
+       * ref attribute 结合 v-for 使用
+       * 注意 得到的 ref 数组不一定和原数组是相同的顺序
+       * 应该尽量避免使用数组，可以自己定义 map 来进行值的接收
+       */
+      createApp({
+        setup() {
+          console.log('--- app2 ------------------------------');
+          const inputRef = useTemplateRef('input-ref');
+          nextTick(() => {
+            console.log('app2 inputRef.value', inputRef.value); // Proxy(Array) {0: input, 1: input, 2: input}
+          });
 
-    /**
-     * ref attribute 结合 v-for使用
-     * 注意 得到的 ref 数组不一定和原数组是相同的顺序
-     */
-    createApp({
-      setup () {
-        const inputRef = useTemplateRef('input-ref');
-        nextTick(() => {
-          console.log(inputRef.value); // Proxy(Array) {0: input, 1: input, 2: input}
-        });
+          const inputRef1 = ref(null);
+          nextTick(() => {
+            console.log('app2 inputRef1.value', inputRef1.value); // Proxy(Array) {0: input, 1: input, 2: input}
+          });
+          return {
+            inputRef1,
+          };
+        },
+        template: `
+          <div>app2</div>
+          <input v-for="item in 3" :key="item"  ref="input-ref"/>
+          <br />
+          <input v-for="item in 3" :key="item"  ref="inputRef1"/>
+        `,
+      }).mount('#app2');
 
-        const inputRef1 = ref(null);
-        nextTick(() => {
-          console.log(inputRef1.value); // Proxy(Array) {0: input, 1: input, 2: input}
-        });
-        return {
-          inputRef1,
-        }
-      },
-      template: `
-        <input v-for="item in 3" :key="item"  ref="input-ref"/>
-        <br />
-        <input v-for="item in 3" :key="item"  ref="inputRef1"/>
-      `,
-    }).mount('#app2');
+      /**
+       * 函数模板引用
+       */
+      createApp({
+        setup() {
+          console.log('--- app3 ------------------------------');
+          const refDOMs = new Map();
+          onMounted(() => {
+            console.log('app3 refDOMs.get(4)', refDOMs.get(4)); // <input>
+          });
 
-    /**
-     * 函数模板引用
-     */
-    createApp({
-      setup () {
-        return {};
-      },
-      template: `
-      `,
-    }).mount('#app3');
+          const focus3 = () => {
+            refDOMs.get(3).focus();
+          };
+          return {
+            refDOMs,
+            focus3,
+          };
+        },
+        template: `
+          <div>app3</div>
+          <input v-for="item in 10" :placeholder="item" :key="item" :ref="el=>{if(el){refDOMs.set(item, el)}else{refDOM.delete(item)}}" />
+          <div><button @click="focus3">聚焦3</button></div>
+        `,
+      }).mount('#app3');
 
-    /**
-     * 组件模板引用
-     */
-
-
-  </script>
-</body>
-
+      /**
+       * 组件模板引用
+       * 获取到的是组件实例
+       */
+      const Component4 = {
+        setup() {
+          const refDOM = useTemplateRef('inputRef');
+          const inputFocus = () => {
+            refDOM.value.focus();
+          };
+          // defineExpose({ // 在 setup 函数中不能不其作用
+          //   inputFocus,
+          // });
+          return {
+            // setup 函数返回的内容，可以被 ref 访问 dom 的方式访问到；但如果是 <script setup> 就需要 defineExposes() 手动的暴露出去
+            inputFocus,
+          };
+        },
+        template: `
+          <input ref="inputRef" />
+        `,
+      };
+      createApp({
+        components: {
+          Component4,
+        },
+        setup() {
+          const refDOMs = new Map();
+          const focus8 = () => {
+            refDOMs.get(8).inputFocus();
+          };
+          return {
+            refDOMs,
+            focus8,
+          };
+        },
+        template: `
+          <div>app4</div>
+          <Component4 v-for="item in 10" :key="item" :ref="el=>{if(el){refDOMs.set(item,el)}else{refDOMs.delete(item)}}" />
+          <div><button @click="focus8">聚焦8</button></div>
+        `,
+      }).mount('#app4');
+    </script>
+  </body>
 </html>
