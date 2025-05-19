@@ -25,16 +25,16 @@
           Component2,
         },
         template: `
-        <div>
-          <Component2 />
-        </div>
-      `,
+          <div>app1</div>
+          <div>
+            <Component2 />
+          </div>
+        `,
       });
 
       const Component1 = {
         setup() {},
         template: `
-          <div>app1</div>
           <div>这是全局注册的组件 Component1</div>
         `,
       };
