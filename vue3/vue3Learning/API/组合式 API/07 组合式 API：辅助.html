@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="zh">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>组合式 API：辅助</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+  </head>
+  <body>
+    <div id="app1"></div>
+    <script type="text/x-template" id="component1">
+      <div>component1</div>
+      <Component1Child1 title="传入的 title" prop1="prop1" @click="clickHandler" />
+    </script>
+    <script type="text/x-template" id="component-1-child-1">
+      <div>component-1-child-1</div>
+    </script>
+    <hr />
+
+    <div id="app2"></div>
+    <script type="text/x-template" id="component2">
+      <div>component2</div>
+      <Component2Child1>
+        <div></div>
+      </Component2Child1>
+    </script>
+    <script type="text/x-template" id="component-2-child-1">
+      <div>component2child1</div>
+      <slot name="default" v-bind="{count: count}"></slot>
+    </script>
+    <hr />
+
+    <div id="app3"></div>
+    <script type="text/x-template" id="component3">
+      <div>component3</div>
+      <Component3Child1 v-model:model1="inputValue" />
+      <div>{{inputValue}}</div>
+    </script>
+    <script type="text/x-template" id="component-3-child-1">
+      <div>component3child1</div>
+      <input v-model="inputValue" />
+    </script>
+    <hr />
+
+    <div id="app4"></div>
+    <script type="text/x-template" id="component4">
+      <div>component4</div>
+      <input type="text" ref="inputRef">
+      <div><button @click="inputFocus">聚焦</button></div>
+    </script>
+    <hr />
+
+    <div id="app5"></div>
+    <script type="text/x-template" id="component5">
+      <div>component5</div>
+      <label :for="id"></label>
+      <input type="text" :id="id">
+    </script>
+
+    <script>
+      const {
+        createApp,
+        defineComponent,
+        watch,
+        ref,
+        isReadonly,
+        nextTick,
+        useAttrs,
+        useSlots,
+        useModel,
+        useTemplateRef,
+        useId,
+      } = Vue;
+
+      /**
+       * useAttrs
+       * 从 setup 上下文返回 attrs 对象，包含当前组件的透传 attributes
+       * attrs 包含的是未被声明为 props 的属性和未被声明为 emits 的事件
+       * attrs 是只读的，不能被修改
+       */
+      const Component1Child1 = defineComponent({
+        props: {
+          prop1: {
+            type: String,
+          },
+        },
+        setup() {
+          const attrs = useAttrs();
+          console.log('component-1-child-1 attrs', attrs);
+          console.log(
+            'component-1-child-1 isReadonly(attrs)',
+            isReadonly(attrs)
+          ); // false 虽然是返回的是 false，但是 attrs 确实是只读的，修改其值会修改失败并抛出警告
+          attrs.title = '修改'; // 会给出警告
+        },
+        template: '#component-1-child-1',
+      });
+      createApp({
+        components: {
+          Component1Child1,
+        },
+        setup() {
+          console.log('--- app1 ----------------------------------------');
+          const clickHandler = () => {
+            console.log('component1  clickHandler'); // Proxy 对象，里面有 onClick 和 title
+          };
+          return {
+            clickHandler,
+          };
+        },
+        template: '#component1',
+      }).mount('#app1');
+
+      /**
+       * useSlots
+       * 从 setup 上下文中返回 slots 对象，其中包含父组价你传递的插槽
+       * 这些插槽为可调用的函数，返回虚拟 DOM 节点
+       *
+       * 如果使用 ts 的话更推荐使用 defineSlots()
+       */
+      const Component2Child1 = {
+        setup() {
+          console.log(
+            '--- component-2-child-1 ----------------------------------------'
+          );
+          const count = ref(0);
+          const slots = useSlots();
+          console.log('component-2-child-1 slots', slots);
+          console.log('component-2-child-1 slots.default', slots.default); // () =>
+          console.log('component-2-child-1 slots.default()', slots.default()); // VNode[];
+
+          return {
+            count,
+          };
+        },
+        template: '#component-2-child-1',
+      };
+      createApp({
+        components: {
+          Component2Child1,
+        },
+        setup() {
+          console.log('--- app2 ----------------------------------------');
+        },
+        template: '#component2',
+      }).mount('#app2');
+
+      /**
+       * useModel
+       * 是驱动 defineModel 的底层辅助函数，如果使用 <script setup>，应该优先使用 defineModel
+       *
+       * useModel 可以用于非单文件组件，预期的第一个参数是 props，第二个参数是 model 的名称，第三个参数可以用于为生成的 model 的 ref 声明自定义的 getter 和 setter，与 defineModel 不同的是，props 和 emit 要自己声明
+       */
+      const Component3Child1 = defineComponent({
+        props: {
+          model1: {
+            type: String,
+            default: '',
+            required: true,
+          },
+        },
+        emits: {
+          'update:model1': (value) => {
+            return true;
+          },
+        },
+        setup(props, ctx) {
+          // const inputValue = useModel(props, 'model1', {
+          //   get(value) {
+          //     return value;
+          //   },
+          //   set(value) {
+          //     ctx.emit('update:model1', value);
+          //   },
+          // });
+          const inputValue = useModel(props, 'model1');
+          return {
+            inputValue,
+          };
+        },
+        template: '#component-3-child-1',
+      });
+      createApp({
+        components: {
+          Component3Child1,
+        },
+        setup() {
+          const inputValue = ref('');
+          return {
+            inputValue,
+          };
+        },
+        template: '#component3',
+      }).mount('#app3');
+
+      /**
+       * useTemplateRef
+       * 返回一个浅层 ref 对象，其值将于模板中的具有匹配的 ref attribute 的元素或组件同步
+       */
+      createApp({
+        setup() {
+          const inputRef = useTemplateRef('inputRef');
+          const inputFocus = () => {
+            inputRef.value.focus();
+          };
+          return {
+            inputFocus,
+          };
+        },
+        template: '#component4',
+      }).mount('#app4');
+
+      /**
+       * useId
+       * 保证生成的 id 在一个 vue 应用实例内是唯一的，注意只能保证在一个 vue 应用实例内，如果一个应用中有多个 vue 应用实例，不能保证，但是可以通过  app.config.idPrefix 配置 id 的前缀
+       * 每次调用都会生成一个新的 id
+       */
+      const app5 = createApp({
+        setup() {
+          const id = useId();
+          return {
+            id,
+          };
+        },
+        template: '#component5',
+      });
+      app5.config.idPrefix = 'app5';
+      app5.mount('#app5');
+    </script>
+  </body>
+</html>

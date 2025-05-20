@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="zh">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>响应式：核心</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+  </head>
+  <body>
+    <div id="app1"></div>
+    <script type="text/x-template" id="component1">
+      <div>{{count}}</div>
+      <button @click="addCount">增加</button>
+    </script>
+    <hr />
+
+    <div id="app2"></div>
+    <script type="text/x-template" id="component2">
+      <Component2Child1 :list="list" />
+    </script>
+    <script type="text/x-template" id="component-2-child-1">
+      <form>
+        <input v-model="inputModel" />
+        <br />
+        显示奇数还是偶数：
+        <label for="odd" value="odd" >奇数</label>
+        <input id="odd" type="radio" value="odd"  :checked="checked === 'odd'" @change="radioChange" />
+        <label for="even" value="even">偶数</label>
+        <input id="even" type="radio" value="even" :checked="checked === 'even'" @change="radioChange" />
+      </form>
+      <ul>
+        <li v-for="item in filterList" :key="item.id">{{item.value}}</li>
+      </ul>
+    </script>
+    <hr />
+
+    <div id="app3"></div>
+    <script type="text/x-template" id="component3">
+      component3
+    </script>
+    <hr />
+
+    <div id="app4"></div>
+    <script type="text/x-template" id="component4">
+      <div>component4</div>
+      <div>{{readonlyRef.data.name}}</div>
+    </script>
+    <hr />
+
+    <div id="app5"></div>
+    <script type="text/x-template" id="component5">
+      <div>component5</div>
+      <button @click="unmountApp5">卸载</button>
+      <button @click="stopWatchFun">停止监听</button>
+    </script>
+    <hr />
+
+    <hr />
+
+    <div id="app7"></div>
+    <script type="text/x-template" id="component7">
+      <div>component7</div>
+    </script>
+
+    <script>
+      const {
+        createApp,
+        defineComponent,
+        ref,
+        shallowRef,
+        computed,
+        reactive,
+        readonly,
+        watchEffect,
+        watchPostEffect,
+        watchSyncEffect,
+        watch,
+        onWatcherCleanup,
+      } = Vue;
+
+      /**
+       * ref
+       * 可以为 .value 赋予新的值。所有对 .value 的操作都会被追踪，并且写操作会触发与之相关的副作用
+       *
+       * 如果将一个对象赋值给 ref，那么这个对象将通过 reactive() 转为具有深层次的响应式的对象。如果对象中包含了嵌套的 ref，他们将被深层的解包
+       * 但是如果是原生的集合 Array Map 这种，其中的某一项为 ref 的时候，不会对这一项解包
+       *
+       * 如果不想要这种深层次的转换，可以使用 shallowRef() 来替代
+       */
+      createApp({
+        setup() {
+          const count = ref(0);
+          const addCount = () => {
+            count.value++;
+          };
+
+          const innerRef = ref(1);
+          const outerRef = ref({
+            foo: innerRef,
+            bar: ref(2),
+            arr: [ref(1), ref(2)],
+          });
+
+          console.log('outerRef.value.foo', outerRef.value.foo); // 1 注意这里返回的是一个数字，而不是一个 ref，被自动的解包了
+          const foo1 = outerRef.value.foo + 1; // 注意这里并没有 foo.value ref 会自动的对深层的 ref 进行解包
+          console.log('foo1', foo1); // 2
+          const bar1 = outerRef.value.bar + 1;
+          console.log('bar1', bar1); // 3
+
+          const outerShallowRef = shallowRef({
+            foo: innerRef,
+            bar: ref(2),
+          });
+          console.log('outerShallowRef.value.foo', outerShallowRef.value.foo); // ref 对象
+
+          console.log('outerRef.value.arr[0]', outerRef.value.arr[0]); // ref 对象 注意，这种原生集合中的某一项不会解包
+
+          return {
+            count,
+            addCount,
+          };
+        },
+        template: '#component1',
+      }).mount('#app1');
+
+      /**
+       * computed
+       * 接收一个 getter 函数，返回一个只读的响应式的 ref 对象
+       * 也可以接收一个带有 get 和 set 函数的对象来创建一个可写的 ref 对象
+       *
+       * computed 只有其中的响应式依赖项发生了改变的时候，才会重新执行，具有一定的缓存效果，也就是说，重新渲染的时候，不一定会重新执行 computed
+       */
+      const Component2Child1 = defineComponent({
+        props: {
+          list: {
+            type: Array,
+            default: () => [],
+          },
+        },
+        setup(props) {
+          const inputModel = ref('');
+
+          const checked = ref('');
+          const radioChange = (e) => {
+            checked.value = e.target.value;
+          };
+          const filterList = computed(
+            () => {
+              console.log('component2child1 执行了 computed filterList');
+              return props.list.filter((item) => {
+                if (checked.value === 'odd') {
+                  return item.value % 2 !== 0;
+                } else if (checked.value === 'even') {
+                  return item.value % 2 === 0;
+                } else {
+                  return true;
+                }
+              });
+            },
+            {
+              // 调试函数
+              onTrack(e) {},
+              onTrigger(e) {},
+            }
+          );
+          // const filterList = computed({
+          //   get: () => {},
+          //   set: (value) => {},
+          // });
+
+          return {
+            inputModel,
+            checked,
+            radioChange,
+            filterList,
+          };
+        },
+        template: '#component-2-child-1',
+      });
+      createApp({
+        components: {
+          Component2Child1,
+        },
+        setup() {
+          const list = Array.from({ length: 10 }).map((item, index) => ({
+            index: index,
+            value: index,
+          }));
+          return {
+            list,
+          };
+        },
+        template: '#component2',
+      }).mount('#app2');
+
+      /**
+       * reactive
+       * 不应该接收原始类型
+       * 响应式是深层的，也会自动的解包任何的 ref 属性，同时保持响应性
+       * 如果遇到某个响应式数组或者 Map 这样的原生集合类型中的 ref 元素时，不会自动的解包
+       *
+       * 如果指向保留顶部的响应式转化，可以使用 shallowReactive
+       */
+      createApp({
+        setup() {
+          const innerRef = ref(0);
+          const innerReactive = reactive({
+            inner: {},
+          });
+          console.log('--- component3 ---------------------');
+          const outerReactive = reactive({
+            innerArr: [ref(1)],
+            innerRef: innerRef,
+            innerReactive: innerReactive,
+          });
+          console.log('outerReactive.innerRef', outerReactive.innerRef); // 0
+          console.log('outerReactive.innerArr[0]', outerReactive.innerArr[0]); // ref 对象，不会自动解包
+
+          innerRef.value = {};
+          console.log(
+            'outerReactive.innerRef === innerRef.value',
+            outerReactive.innerRef === innerRef.value
+          ); // true 注意这里是 true，也就是说明虽然被解包了，但是还是同步修改的
+
+          innerReactive.inner = 12;
+          console.log(
+            'innerReactive.inner === outerReactive.innerReactive.inner',
+            innerReactive.inner === outerReactive.innerReactive.inner
+          ); // true
+        },
+        template: '#component3',
+      }).mount('#app3');
+
+      /**
+       * readonly
+       * 接收一个对象，可以使普通对象，也可以是响应式对象，染回一个原值的只读代理
+       * 其代理是深层的，对任何嵌套属性的访问都是只读的
+       *
+       * 原对象的修改会引发只读代理的修改
+       * 如果直接修改只读代理，会修改失败并抛出警告
+       *
+       * 如果只希望是浅层的可以是用 shallowReadonly
+       */
+      createApp({
+        setup() {
+          console.log('--- component4 ------------------------');
+          const originRef = ref({
+            data: {
+              name: 1,
+            },
+          });
+          const originReactive = reactive({
+            data: {},
+          });
+          const originObj = {
+            data: {},
+          };
+          const readonlyRef = readonly(originRef); // 传入 ref 返回的是 ref
+          const readonlyReactive = readonly(originReactive); // 传入的是 reactive 返回的是 reactive
+          const readonlyObj = readonly(originObj); // 传入的是普通对象，返回的是 reactive
+          console.log('readonlyRef', readonlyRef);
+          console.log('readonlyReactive', readonlyReactive);
+          console.log('readonlyObj', readonlyObj);
+
+          const timmer = setInterval(() => {
+            // readonlyRef.value.data.name++; // 修改失败并抛出警告
+            originRef.value.data.name++;
+            if (readonlyRef.value.data.name === 5) {
+              clearInterval(timmer);
+            }
+          }, 1000);
+          return {
+            readonlyRef,
+          };
+        },
+        template: '#component4',
+      }).mount('#app4');
+
+      /**
+       * watchEffect
+       * 立即运行一个函数，同时响应式的追踪其依赖，并在依赖更改时重新执行
+       * 需要立即执行是因为只有执行了之后，才知道该 watchEffect 依赖了哪些响应式数据
+       *
+       * 副作用函数的参数也是一个函数，用来清理回调，在该副作用下一次执行前被调用，组件卸载的时候也会调用
+       *
+       * watchEffect 的第二个参数是一个对象
+       * {
+       *   flush: 'pre'(dom 更新前执行) | 'post'（dom 更新后执行） | 'sync'（依赖发生改变的时候，立刻执行，放弃了优化）
+       *   onTrack
+       *   onTrigger
+       * }
+       *
+       * watchEffect 的返回值，是一个函数，用来停止继续监听
+       */
+      const app5 = createApp({
+        setup() {
+          console.log('--- component5 ------------------------');
+          const ref1 = ref(0);
+          watchEffect((onCleanup) => {
+            console.log('watchEffect ref1', ref1.value);
+            ref1.value;
+            onCleanup(() => {
+              // 注意，这里访问的 ref1.value 是更新后的值
+              console.log('watchEffect ref1.value onCleanup', ref1.value);
+            });
+          });
+          const unmountApp5 = () => {
+            app5.unmount();
+          };
+
+          const ref2 = ref(0);
+          watchEffect(() => {
+            console.log('watchEffect ref2');
+            setTimeout(() => {
+              // 由于是在异步中读取的该值，所以 ref2.value 并没有被收集到该 watchEffect 中
+              ref2.value;
+            });
+          });
+          setTimeout(() => {
+            ref1.value++;
+            ref2.value++;
+          }, 200);
+
+          const ref3 = ref(0);
+          const stopWatch3 = watchEffect(() => {
+            console.log('watchEffect ref3', ref3.value);
+          });
+          console.log(stopWatch3);
+          setInterval(() => {
+            ref3.value++;
+          }, 1000);
+          const stopWatchFun = () => {
+            stopWatch3();
+          };
+
+          return {
+            unmountApp5,
+            stopWatchFun,
+          };
+        },
+        template: '#component5',
+      });
+      app5.mount('#app5');
+
+      /**
+       * onWatcherCleaup
+       * 当前侦听器即将重新运行时执行，或者侦听器失效时调用
+       * 要在侦听器的回调同步执行期间调用，不能在异步函数的 await 之后调用
+       *
+       * onCleanup 是和侦听器实例绑定的，不受这个限制
+       */
+      createApp({
+        setup() {
+          const ref1 = ref(0);
+          watchEffect((onCleanup) => {
+            ref1.value;
+            console.log('component7 ref1', ref1.value);
+            setTimeout(() => {
+              // 和监听器的回调不同步，会抛出警告
+              onWatcherCleanup(() => {
+                console.log('component7 onWatcherCleanup ref1', ref1.value);
+              });
+              onCleanup(() => {
+                console.log('component7 onCleanup ref1', ref1.value);
+              });
+            });
+          });
+          setTimeout(() => {
+            const timmer = setInterval(() => {
+              ref1.value++;
+              if (ref1.value === 10) {
+                clearInterval(timmer);
+              }
+            }, 1000);
+          }, 7000);
+        },
+        template: '#component7',
+      }).mount('#app7');
+    </script>
+  </body>
+</html>

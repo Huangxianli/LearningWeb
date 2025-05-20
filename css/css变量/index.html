@@ -1,30 +1,36 @@
 <!DOCTYPE html>
 <html lang="zh">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>css 变量练习</title>
-  <style>
-    :root{
-      --base-background-color: red;
-      --base-font-size: 16px;
-    }
-    body {
-      background-color: var(--base-background-color);
-    }
-  </style>
-</head>
-<body>
-  <button id="backgroundChangeBtn">切换背景色</button>
-  <script>
-    const button = document.querySelector('#backgroundChangeBtn');
-    const rootElement= document.querySelector(':root');
-    const backgroundColorMap = ['red', 'blue', 'green', 'yellow'];
-    let currentBackgroundColorIndex = 0;
-    const changeBackgroundColor= () => {
-      rootElement.style.setProperty('--base-background-color', backgroundColorMap[ (++currentBackgroundColorIndex) % backgroundColorMap.length]);
-    };
-    button.addEventListener('click', changeBackgroundColor);
-  </script>
-</body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>css 变量练习</title>
+    <style>
+      :root {
+        --base-background-color: red;
+        --base-font-size: 16px;
+      }
+      body {
+        background-color: var(--base-background-color);
+      }
+    </style>
+  </head>
+  <body>
+    <button id="backgroundChangeBtn">切换背景色</button>
+    <script>
+      const button = document.querySelector('#backgroundChangeBtn');
+      const rootElement = document.querySelector(':root');
+      const backgroundColorMap = ['red', 'blue', 'green', 'yellow'];
+      let currentBackgroundColorIndex = 0;
+      const changeBackgroundColor = () => {
+        rootElement.style.setProperty(
+          // 注意这种写法是在内联在元素的 style 属性里面
+          '--base-background-color',
+          backgroundColorMap[
+            ++currentBackgroundColorIndex % backgroundColorMap.length
+          ]
+        );
+      };
+      button.addEventListener('click', changeBackgroundColor);
+    </script>
+  </body>
 </html>

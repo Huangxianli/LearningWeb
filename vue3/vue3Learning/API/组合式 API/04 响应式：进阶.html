@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="zh">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>响应式：进阶</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+  </head>
+  <body>
+    <div id="app1"></div>
+    <script type="text/x-template" id="component1">
+      <div>component1</div>
+      <div>{{countShallowRef.count}}</div>
+      <div><button @click="addCount">直接增加</button></div>
+      <div><button @click="addCountByValue">修改 .value</button></div>
+    </script>
+    <hr />
+
+    <div id="app2"></div>
+    <script type="text/x-template" id="component2">
+      <div>component2</div>
+      <div>{{countShallowRef.count}}</div>
+      <div><button @click="addCount">增加</button></div>
+    </script>
+    <hr />
+
+    <div id="app3"></div>
+    <script type="text/x-template" id="component3">
+      <div>component3</div>
+      <div>{{count}}</div>
+      <div><button @click="addCount">增加</button></div>
+    </script>
+    <hr />
+
+    <div id="app4"></div>
+    <script type="text/x-template" id="component4">
+      <div>component4</div>
+      <div>{{countShallowReactive.count}}</div>
+      <div><button @click="addCount">增加</button></div>
+      <div>{{countShallowReactive.obj.count}}</div>
+      <div><button @click="addCount1">增加</button></div>
+    </script>
+    <hr />
+
+    <div id="app5"></div>
+    <script type="text/x-template" id="component5">
+      <div>component5</div>
+      <div>{{refShallowReadonly.count}}</div>
+    </script>
+    <hr />
+
+    <div id="app6"></div>
+    <script type="text/x-template" id="component6">
+      <div>component6</div>
+    </script>
+    <hr />
+
+    <div id="app7"></div>
+    <script type="text/x-template" id="component7">
+      <div>component7</div>
+      <div>{{ref1.count}}</div>
+      <div><button @click="addCount">增加</button></div>
+      <div>{{refMarkRaw.count}}</div>
+      <div><button @click="addCount1">增加</button></div>
+    </script>
+    <hr />
+
+    <div id="app8"></div>
+    <script type="text/x-template" id="component8">
+      <div>component8</div>
+      <div>{{count}}</div>
+      <div><button @click="addCount">增加</button></div>
+    </script>
+    <hr />
+
+    <div id="app9"></div>
+    <script type="text/x-template" id="component9">
+      <div>component9</div>
+    </script>
+
+    <script>
+      const {
+        createApp,
+        ref,
+        reactive,
+        watch,
+        shallowRef,
+        triggerRef,
+        customRef,
+        shallowReactive,
+        shallowReadonly,
+        toRaw,
+        markRaw,
+        effectScope,
+        getCurrentScope,
+        onScopeDispose,
+      } = Vue;
+
+      /**
+       * shallowRef
+       * ref 的浅层作用形式，只有对 .value 的访问是响应式的
+       */
+      createApp({
+        setup() {
+          console.log('--- component1 -------------------------------');
+          const countShallowRef = shallowRef({
+            count: 0,
+          });
+          const addCount = () => {
+            countShallowRef.value.count++;
+            console.log(
+              'countShallowRef.value.count',
+              countShallowRef.value.count
+            ); // 1 2 3 4 随着点击增加，但是注意，count 不是响应式的
+          };
+          const addCountByValue = () => {
+            countShallowRef.value = {
+              count: countShallowRef.value.count + 1,
+            }; // 这样修改，页面才会触发改变
+          };
+          return {
+            countShallowRef,
+            addCount,
+            addCountByValue,
+          };
+        },
+        template: '#component1',
+      }).mount('#app1');
+
+      /**
+       * triggerRef
+       * 强制触发依赖于一个浅层 ref 的副作用，通常在对浅引用的内部值进行深度变更后使用
+       */
+      createApp({
+        setup() {
+          const countShallowRef = shallowRef({
+            count: 0,
+          });
+          const addCount = () => {
+            countShallowRef.value.count++;
+            triggerRef(countShallowRef); // 触发其修改后的副作用，这里是重新渲染，也可以重新执行 watch 监听等等
+          };
+          return {
+            countShallowRef,
+            addCount,
+          };
+        },
+        template: '#component2',
+      }).mount('#app2');
+
+      /**
+       * customRef
+       * 创建一个自定义的 ref，显示声明对其依赖追踪和更新触发的控制方式
+       * (track, trigger) => ({ get(){}, set(){}})
+       */
+      createApp({
+        setup() {
+          let value = 0;
+          const count = customRef((track, trigger) => ({
+            get() {
+              track();
+              return value;
+            },
+            set(newValue) {
+              value = newValue;
+              if (value % 2 === 0) {
+                // 只有在 count.value 的值为偶数的时候，才会触发副作用
+                trigger();
+              }
+            },
+          }));
+          const addCount = () => {
+            count.value++;
+          };
+          return {
+            count,
+            addCount,
+          };
+        },
+        template: '#component3',
+      }).mount('#app3');
+
+      /**
+       * shallowReactive
+       * reactive 的浅层作用形式
+       * 只有跟级别的属性是响应式的
+       * 值为 ref 的属性，不会被自动的解包
+       */
+      createApp({
+        setup() {
+          const countShallowReactive = shallowReactive({
+            count: 0,
+            obj: {
+              count: 0,
+            },
+          });
+          const addCount = () => {
+            countShallowReactive.count++;
+          };
+          const addCount1 = () => {
+            countShallowReactive.obj.count++; // 由于是浅层的，这样修改不会触发副作用
+          };
+          return {
+            countShallowReactive,
+            addCount,
+            addCount1,
+          };
+        },
+        template: '#component4',
+      }).mount('#app4');
+
+      /**
+       * shallowReadonly
+       * readonly 的浅层作用形式
+       * 只有跟层级的属性会被设置成只读
+       * 值为 ref 的属性不会自动的解包
+       */
+      createApp({
+        setup() {
+          console.log('--- component5 -------------------------------');
+          const reactive1 = reactive({
+            count: 1,
+          });
+          const reactiveShallowReadonly = shallowReadonly(reactive1);
+          reactiveShallowReadonly.count++; // 会抛出警告，并且修改失败
+          console.log(
+            'reactiveShallowReadonly.count',
+            reactiveShallowReadonly.count
+          ); // 1
+
+          const ref1 = ref({
+            count: 1,
+          });
+          const refShallowReadonly = shallowReadonly(ref1);
+          refShallowReadonly.value.count++;
+          console.log(
+            'refShallowReadonly.value.count',
+            refShallowReadonly.value.count
+          ); // 2 修改成功，这里只是不能对 .value 进行重新赋值
+
+          return {
+            refShallowReadonly,
+          };
+        },
+        template: '#component5',
+      }).mount('#app5');
+
+      /**
+       * toRaw
+       * 根据一个 Vue 创建的代理返回其原始对象
+       * 可以返回由 reactive readonly shallowReactive shallowReadonly 创建的代理对应的原始对象
+       */
+      createApp({
+        setup() {
+          console.log('--- component6 ------------------');
+          const ref1 = ref(1);
+          const refToRaw = toRaw(ref1.value);
+          console.log('refToRaw === ref1.value', refToRaw === ref1.value); // true
+        },
+        template: '#component6',
+      }).mount('#app6');
+
+      /**
+       * markRaw
+       * 将一个对象标记为不可被转为代理，返回该对象本身（注意，是返回传入的对象本身）
+       */
+      createApp({
+        setup() {
+          console.log('--- component7 ---------------------------');
+          const obj = {
+            count: 0,
+          };
+          const objMarkRaw = markRaw(obj);
+          console.log('objMarkRaw === obj', objMarkRaw === obj); // true
+          const ref1 = ref(objMarkRaw);
+          const addCount = () => {
+            ref1.value.count++;
+            console.log('ref1.value.count', ref1.value.count); // 1 2 3 4 ... 打印的是随着变化而变化的，但是不会触发页面的更新
+          };
+
+          const ref2 = ref({
+            count: 0,
+          });
+          const refMarkRaw = markRaw(ref2.value);
+          console.log('refMarkRaw', refMarkRaw); // ref 对象
+          console.log('ref2.value === refMarkRaw', ref2.value === refMarkRaw); // true
+          const addCount1 = () => {
+            refMarkRaw.count++; // 会触发页面的更新 说明如果传入 markRaw 的对象本身是响应式的，那么得到的内容还是响应式的
+          };
+
+          return {
+            ref1,
+            addCount,
+            refMarkRaw,
+            addCount1,
+          };
+        },
+        template: '#component7',
+      }).mount('#app7');
+
+      /**
+       * effectScope
+       * 创建一个 effect 作用域，可以捕获其中所创建的响应式副作用（即计算属性和侦听器）
+       */
+      createApp({
+        setup() {
+          console.log('--- component8 ---------------------------');
+          const count = ref(0);
+          const scope = effectScope();
+          scope.run(() => {
+            watch(
+              count,
+              () => {
+                console.log('watch count');
+              },
+              {
+                immediate: true,
+              }
+            );
+          });
+          const addCount = () => {
+            count.value++;
+            if (count.value === 5) {
+              scope.stop();
+            }
+          };
+
+          return {
+            count,
+            addCount,
+          };
+        },
+        template: '#component8',
+      }).mount('#app8');
+
+      /**
+       * getCurrentScope
+       * 返回当前活跃的 effect 作用域
+       */
+      createApp({
+        setup() {
+          const count = ref(0);
+          console.log('--- component9 ---------------------------');
+          const scope = getCurrentScope();
+          console.log(scope);
+        },
+        template: '#component9',
+      }).mount('#app9');
+
+      /**
+       * onScopeDispose
+       * 在当前活跃的 effect 作用域上注册一个处理回调函数，当相关的 effect 作用域停止的时候会调用这个回调函数
+       */
+    </script>
+  </body>
+</html>

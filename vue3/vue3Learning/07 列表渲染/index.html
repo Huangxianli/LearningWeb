@@ -1,67 +1,64 @@
 <!DOCTYPE html>
 <html lang="zh">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>07列表渲染</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+  </head>
 
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>07列表渲染</title>
-  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
-</head>
+  <body>
+    <div id="app1"></div>
+    <hr />
+    <div id="app2"></div>
+    <script>
+      const { createApp, ref, reactive } = Vue;
 
-<body>
-  <div id="app1"></div>
-  <hr />
-  <div id="app2"></div>
-  <script>
-    const { createApp, ref, reactive } = Vue;
-
-    /** 
-     * v-for 可以放在 template 上使用
-     */
-    createApp({
-      setup () {
-        const list = reactive([
-          { id: 1, value: 1 },
-          { id: 2, value: 2 },
-          { id: 3, value: 3 },
-        ]);
-        return {
-          list,
-        };
-      },
-      template: `
+      /**
+       * v-for 可以放在 template 上使用
+       *
+       * 注意 vue3 中 v-if 的优先级比 v-for 要高，vue2 中正好相反，v-for 的优先级比 v-if 要高
+       */
+      createApp({
+        setup() {
+          const list = reactive([
+            { id: 1, value: 1 },
+            { id: 2, value: 2 },
+            { id: 3, value: 3 },
+          ]);
+          return {
+            list,
+          };
+        },
+        template: `
         <ul>
           <template v-for="item in list" :key="item.id">
             <li>{{item.value}}</li>
           </template>
         </ul>
       `,
-    }).mount('#app1');
+      }).mount('#app1');
 
-    /**
-     * v-for 也可以直接遍历数组和对象，对象遍历的顺序和 Object.value() 返回的顺序是一样的 
-     */
-    createApp({
-      setup () {
-        const obj = reactive({
-          1: 1,
-          2: 2,
-          name: 3,
-          value: 4
-        });
-        return {
-          obj,
-        };
-      },
-      template: `
-        <div v-for="i in 10">{{i}}</div>
-        <div v-for="(value, key, index) in obj" >{{value}}-{{key}}-{{index}}</div>
-      `,
-    }).mount('#app2');
-
-
-
-  </script>
-</body>
-
+      /**
+       * v-for 也可以直接遍历数字和对象，对象遍历的顺序和 Object.value() 返回的顺序是一样的
+       */
+      createApp({
+        setup() {
+          const obj = reactive({
+            1: 1,
+            2: 2,
+            name: 3,
+            value: 4,
+          });
+          return {
+            obj,
+          };
+        },
+        template: `
+          <div v-for="i in 10">{{i}}</div>
+          <div v-for="(value, key, index) in obj" >{{value}}-{{key}}-{{index}}</div>
+        `,
+      }).mount('#app2');
+    </script>
+  </body>
 </html>

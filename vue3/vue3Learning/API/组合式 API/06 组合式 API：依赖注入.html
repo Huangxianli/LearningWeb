@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="zh">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>组合式 API：依赖注入</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+  </head>
+  <body>
+    <div id="app1"></div>
+    <script type="text/x-template" id="component1">
+      <div>component1</div>
+      <div>{{count}}</div>
+      <div><button @click="addCount">增加</button></div>
+      <Component1Child1 />
+    </script>
+    <script type="text/x-template" id="component-1-child-1">
+      <div>component-1-child-1</div>
+      <Component1Child1Child1 />
+    </script>
+    <script type="text/x-template" id="component-1-child-1-child-1">
+      <div>componet-1-child-1-child-1</div>
+      {{count}}
+    </script>
+
+    <script>
+      const {
+        createApp,
+        defineComponent,
+        ref,
+        provide,
+        inject,
+        hasInjectionContext,
+      } = Vue;
+
+      /**
+       * provide() 接收两个参数，第一个是要注入的 key，可以是字符串也可以是 symbol（ts InjectionKey）；第二个是要注入的值
+       * inject() 注入一个由祖先或者个应用（通过 app.provide()）提供的值，第一个参数是 key，第二个参数是默认值，第二个参数也可以是一个工厂函数，如果是工厂函数，第三个参数就要设置成 true
+       *
+       * 和生命周期钩子的 API 类似，provide/inject 必须在组件的 setup 阶段同步调用
+       * 同名的 key，近的会覆盖掉远的
+       * inject 的 key 如果是没有 provide，那么会返回 undefined
+       *
+       * hasInjectionContext() 返回是否可以在此处调用 inject
+       */
+      const canInject = hasInjectionContext();
+      console.log('script canInject', canInject); // false
+      const Component1Child1Child1 = defineComponent({
+        setup() {
+          console.log(
+            '--- component-1-child-1-child-1 --------------------------------'
+          );
+          const count = inject('count');
+          const count1 = inject(
+            'count1',
+            () => ({
+              count: 0,
+            }),
+            true
+          );
+          console.log('count1', count1); // {count: 0}
+
+          return {
+            count,
+          };
+        },
+        template: '#component-1-child-1-child-1',
+      });
+      const Component1Child1 = defineComponent({
+        components: {
+          Component1Child1Child1,
+        },
+        setup() {},
+        template: '#component-1-child-1',
+      });
+      createApp({
+        components: {
+          Component1Child1,
+        },
+        setup() {
+          console.log('--- component1 -------------------------------');
+          const canInject = hasInjectionContext();
+          console.log('canInject', canInject); // true
+          const count = ref(0);
+          provide('count', count);
+          const addCount = () => {
+            count.value++;
+          };
+          return {
+            count,
+            addCount,
+          };
+        },
+        template: '#component1',
+      }).mount('#app1');
+    </script>
+  </body>
+</html>

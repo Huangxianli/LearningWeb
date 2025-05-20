@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="zh">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>主题改变</title>
+    <style>
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+        width: 100%;
+      }
+      #app,
+      #app.themeWhite {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        width: 100%;
+        --aside-color: #000;
+        --aside-background-color: #fff;
+      }
+      #app.themeBlack {
+        --aside-color: #fff;
+        --aside-background-color: #000;
+      }
+      #app.themeRed {
+        --aside-color: #fff;
+        --aside-background-color: #f00;
+      }
+      #app.themeGreen {
+        --aside-color: #fff;
+        --aside-background-color: green;
+      }
+      #app.themeBlue {
+        --aside-color: #fff;
+        --aside-background-color: blue;
+      }
+
+      header {
+        height: 50px;
+        width: 100%;
+        line-height: 50px;
+        background-color: var(--aside-background-color);
+        color: var(--aside-color);
+      }
+      main {
+        display: flex;
+        flex-direction: row;
+        height: 100%;
+        width: 100%;
+      }
+      aside {
+        width: 100px;
+        height: 100%;
+        background-color: var(--aside-background-color);
+        color: var(--aside-color);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="app" class="themeBlack">
+      <header>
+        <label for="theme_select">切换主题：</label>
+        <select id="theme_select">
+          <option value="themeBlack">黑色</option>
+          <option value="themeRed">红色</option>
+          <option value="themeGreen">绿色</option>
+          <option value="themeBlue">蓝色</option>
+        </select>
+      </header>
+      <main>
+        <aside>aside</aside>
+        <section class="main-content">main content</section>
+      </main>
+    </div>
+
+    <script>
+      const themeColor = '';
+      const themeSelectDom = document.querySelector('#theme_select');
+      const body = document.body;
+      const appDom = document.querySelector('#app');
+      themeSelectDom.addEventListener('change', (e) => {
+        appDom.className = e.target.value;
+      });
+    </script>
+  </body>
+</html>
