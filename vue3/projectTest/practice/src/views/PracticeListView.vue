@@ -22,16 +22,30 @@ const goToDeatailPage = (routeName: string) => {
     </el-table-column>
     <el-table-column label="操作" width="100px">
       <template #default="{ row }">
-        <el-button
-          text
-          type="primary"
-          size="small"
-          @click="() => goToDeatailPage(row.name)"
-          >详情</el-button
-        >
+        <div class="opration_cell">
+          <el-button
+            text
+            type="primary"
+            size="small"
+            @click="() => goToDeatailPage(row.name)"
+          >
+            详情
+          </el-button>
+        </div>
       </template>
     </el-table-column>
   </el-table>
 </template>
 
-<style scoped></style>
+<style scoped>
+.opration_cell {
+  display: flex;
+  flex-direction: row;
+  gap: 12px;
+}
+button.is-text {
+  padding-right: 0;
+  padding-left: 0;
+  margin: 0;
+}
+</style>
