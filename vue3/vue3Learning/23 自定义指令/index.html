@@ -1,80 +1,109 @@
 <!DOCTYPE html>
 <html lang="zh">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>自定义指令</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <style>
+      .highlight {
+        background-color: yellow;
+      }
+    </style>
+  </head>
 
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>自定义指令</title>
-  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+  <body>
+    <div id="app1"></div>
+    <hr />
+    <div id="app2"></div>
 
-</head>
+    <script>
+      const { createApp, ref } = Vue;
 
-<body>
-  <div id="app1"></div>
-  <hr />
-  <div id="app2"></div>
+      /**
+       * 自定义指令主要是为了重用涉及普通元素的底层 DOM 访问的逻辑
+       * 只有当所需功能只能通过直接的 DOM 操作来实现的时候，才应该使用自定义指令
+       * 在 <script setup> 中，任何 v 开头的驼峰命名的变量都可以当成自定义指令使用
+       * 其他情况要在 directives 中注册
+       */
 
-  <script>
-    const { createApp, ref } = Vue;
+      const app = createApp({
+        setup() {
+          const outClick = () => {
+            console.log('点击了外部');
+          };
+          return {
+            outClick,
+          };
+        },
+        template: `
+         <div>app1</div>
+         <div v-highlight v-outClick="outClick">使用了 v-highlight</div>
+        `,
+      });
+      app.directive('highlight', {
+        mounted: (el) => {
+          el.classList.add('highlight');
+        },
+      });
+      app.directive('outClick', {
+        mounted(el, binding) {
+          el._clickHandelr = (e) => {
+            if (!el.contains(e.target)) {
+              binding.value();
+            }
+          };
+          document.addEventListener('click', el._clickHandelr);
+        },
+        beforeUnmount(el) {
+          document.removeEventListener('click', el._clickHandelr);
+        },
+      });
+      app.mount('#app1');
 
-    /**
-     * 自定义指令主要是为了重用涉及普通元素的底层 DOM 访问的逻辑
-     * 只有当所需功能只能通过直接的 DOM 操作来实现的时候，才应该使用自定义指令
-     * 在 <script setup> 中，任何 v 开头的驼峰命名的变量都可以当成自定义指令使用
-     * 其他情况要在 directives 中注册
-     */
-
-    const app = createApp({
-
-    });
-    app.directive('highligt', {});
-    app.mount('#app1');
-
-    /**
-     * 自定义指令执行的时机
-     * 指令钩子
-     */
-    createApp({
-      setup () { },
-      directives: {
-        highlight: {
-          // 在绑定元素的 attribute 前
-          // 或事件监听器应用前调用
-          created (el, binding, vnode) {
-            // 下面会介绍各个参数的细节
+      /**
+       * 自定义指令执行的时机
+       * 指令钩子
+       */
+      createApp({
+        setup() {},
+        directives: {
+          highlight: {
+            // 在绑定元素的 attribute 前
+            // 或事件监听器应用前调用
+            created(el, binding, vnode) {
+              // 下面会介绍各个参数的细节
+            },
+            // 在元素被插入到 DOM 前调用
+            beforeMount(el, binding, vnode) {},
+            // 在绑定元素的父组件
+            // 及他自己的所有子节点都挂载完成后调用
+            mounted(el, binding, vnode) {},
+            // 绑定元素的父组件更新前调用
+            beforeUpdate(el, binding, vnode, prevVnode) {},
+            // 在绑定元素的父组件
+            // 及他自己的所有子节点都更新后调用
+            updated(el, binding, vnode, prevVnode) {},
+            // 绑定元素的父组件卸载前调用
+            beforeUnmount(el, binding, vnode) {},
+            // 绑定元素的父组件卸载后调用
+            unmounted(el, binding, vnode) {},
+            /**
+             * binding: {
+             *   value: 传递给指令的值 v-input="value"
+             *   oldValue
+             *   arg：传递给指令的参数 v-input:arg
+             *   modifiers: 修饰符对象 v-input.foo.bar => { foo: true, bar: true }
+             *   instance: 使用该指令的组件的实例
+             *   dir: 指令的定义对象
+             * }
+             */
           },
-          // 在元素被插入到 DOM 前调用
-          beforeMount (el, binding, vnode) { },
-          // 在绑定元素的父组件
-          // 及他自己的所有子节点都挂载完成后调用
-          mounted (el, binding, vnode) { },
-          // 绑定元素的父组件更新前调用
-          beforeUpdate (el, binding, vnode, prevVnode) { },
-          // 在绑定元素的父组件
-          // 及他自己的所有子节点都更新后调用
-          updated (el, binding, vnode, prevVnode) { },
-          // 绑定元素的父组件卸载前调用
-          beforeUnmount (el, binding, vnode) { },
-          // 绑定元素的父组件卸载后调用
-          unmounted (el, binding, vnode) { }
-          /**
-           * binding: {
-           *   value: 传递给指令的值 v-input="value"
-           *   oldValue
-           *   arg：传递给指令的参数 v-input:arg
-           *   modifiers: 修饰符对象 v-input.foo.bar => { foo: true, bar: true }
-           *   instance: 使用该指令的组件的实例
-           *   dir: 指令的定义对象
-           * }
-           */
-        }
-      },
-      template: ``,
-    }).mount('#app2');
-
-
-
-  </script>
-</body>
-
+        },
+        template: `
+          <div>app2</div>
+        `,
+      }).mount('#app2');
+    </script>
+  </body>
 </html>
