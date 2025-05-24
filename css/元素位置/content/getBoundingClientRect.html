@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="zh">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>getBoundingClientRect</title>
+    <style>
+      .box_1 {
+        width: 200px;
+        height: 200px;
+        padding: 10px;
+        border: 2px solid red;
+        margin: 10px;
+        background-color: green;
+        position: relative;
+        top: 100px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="box_1"></div>
+    <script>
+      const box1 = document.querySelector('.box_1');
+      const rect = box1.getBoundingClientRect(); // { top: 110, width, 224 }
+      // top border 外到视口顶部的宽度
+      // width border 外到 border 外的距离
+      debugger;
+    </script>
+  </body>
+</html>

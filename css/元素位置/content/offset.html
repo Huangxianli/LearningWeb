@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="zh">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>offset</title>
+    <style>
+      .outer_box {
+        position: relative;
+        box-sizing: border-box;
+        margin: 20px;
+        height: 200px;
+        width: 200px;
+        border: 2px solid green;
+        background-color: red;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+      }
+      .inner_box {
+        height: 20px;
+        width: 20px;
+        padding: 10px;
+        margin: 10px;
+        background-color: #333;
+        border: 2px solid green;
+        /* box-sizing: border-box; */
+      }
+
+      .outer_box_1 {
+        box-sizing: border-box;
+        /* box-sizing: content-box; */
+        height: 200px;
+        width: 200px;
+        padding: 20px;
+        border: 2px solid red;
+        background-color: aqua;
+        overflow: auto;
+      }
+      .inner_box_1 {
+        height: 300px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="outer_box">
+      <div class="inner_box"></div>
+    </div>
+    <div class="outer_box_1">
+      <div class="inner_box_1"></div>
+    </div>
+    <script>
+      const innerBox = document.querySelector('.inner_box');
+      innerBox.offsetTop; // 76
+      innerBox.offsetLeft; // 76
+
+      const outerBox1 = document.querySelector('.outer_box_1');
+      outerBox1.offsetWidth;
+      debugger;
+    </script>
+  </body>
+</html>
