@@ -51,16 +51,18 @@
       };
       // const Component1 = {
       //   setup() {
-      //     const model = defineModel({ // 注意 defineModel 在 html 中和在 SFC <script setup> 中表现有所不同
+      //     const model = defineModel({
+      //       // 注意 defineModel 在 html 中和在 SFC <script setup> 中表现有所不同
       //       type: String,
       //       default: '',
       //     });
+      //     debugger;
       //     const inputHandler = (e) => {
       //       model.value = e.target.value;
       //       console.log(e.target.value);
       //     };
       //     return {
-      //       model1,
+      //       model,
       //       inputHandler,
       //     };
       //   },
@@ -74,10 +76,11 @@
           Component1,
         },
         setup() {
+          console.log('--- app1 -----------------------------------');
           const inputValue = ref('');
           const inputValue1 = ref('');
           watchEffect(() => {
-            console.log('parent value:', inputValue.value);
+            console.log('app1 watchEffect inputValue.value:', inputValue.value);
           });
 
           return {
@@ -86,6 +89,7 @@
           };
         },
         template: `
+          <div>app1</div>
           <Component1 v-model="inputValue" />{{inputValue}}
           <br />
           <Component1 :modelValue="inputValue1" @update:modelValue="inputValue1 = $event" />{{inputValue1}}
@@ -121,6 +125,7 @@
           };
         },
         template: `
+          <div>app2</div>
           <Component2 v-model:model1="modelData" />
         `,
       }).mount('#app2');
@@ -163,6 +168,7 @@
           };
         },
         template: `
+          <div>app3</div>
           <Component3 v-model:model1="modelData1" v-model:model2="modelData2" />
         `,
       }).mount('#app3');
@@ -239,6 +245,7 @@
           };
         },
         template: `
+          <div>app4</div>
           <Component4 v-model.upper="model" v-model:model1.upper="model1" />
         `,
       }).mount('#app4');
