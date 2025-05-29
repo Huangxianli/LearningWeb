@@ -4,13 +4,13 @@
 
 interface Point1 {
   name: string;
-  age: number
-};
+  age: number;
+}
 
 function getUser(user: Point1): string {
   return `my name is: ${user.name}, my age is: ${user.age}`;
-};
-const userInfo = getUser({ name: "Huang Xianli", age: 25 });
+}
+const userInfo = getUser({ name: 'Huang Xianli', age: 25 });
 console.log(userInfo);
 
 /*
@@ -19,15 +19,15 @@ console.log(userInfo);
 
 interface Aminal1 {
   name: string;
-};
+}
 interface Bear1 extends Aminal1 {
   age: number;
-};
-const bear2: Bear1 = {
-  name: "Huang xianlil",
-  age: 1
+  // name: number | string; // extends 两者如果有相同的内容，不能是不同的类型
 }
-
+const bear2: Bear1 = {
+  name: 'Huang xianlil',
+  age: 1,
+};
 
 /* 
 允许定义同名的接口，同名的会合并，如果相同的属性冲突了，后面定义的那个会报错
@@ -36,26 +36,25 @@ type 不允许定义同名的类型别名，而且会报错
 
 interface MyWindow1 {
   title: string;
-};
+}
 
 interface MyWindow1 {
   count: number;
 }
 
 const win1: MyWindow1 = {
-  title: "window1",
-  count: 1
+  title: 'window1',
+  count: 1,
 };
 
-
 interface Interface_persion {
-  name: string,
-  age: number
+  name: string;
+  age: number;
 }
 const persion: Interface_persion = {
-  name: "Huang Xianli",
-  age: 25
-}
+  name: 'Huang Xianli',
+  age: 25,
+};
 /* 
 interface Interface_persion { // 两个同名的接口，会合并，同属性冲突，后面定义的会报错
   sex: string,
@@ -70,26 +69,26 @@ const persion_extend: Interface_persion = {
  */
 
 /*
-interface 的继承  
+interface 的继承
  */
 
 interface Persion_extend {
-  name: string,
+  name: string;
 }
 interface Persion_extend_1 {
-  age: number,
+  age: number;
 }
 
-
-interface Swimmer extends Persion_extend, Persion_extend_1 { // 这种写法好奇怪
-  job: string
+interface Swimmer extends Persion_extend, Persion_extend_1 {
+  // 这种写法好奇怪
+  job: string;
 }
 
 const swimmer: Swimmer = {
-  name: "Huang Xianli",
+  name: 'Huang Xianli',
   age: 23,
-  job: 'swimmer'
-}
+  job: 'swimmer',
+};
 
 /* const swimmer_1: Swimmer{
   job:"swimmer"

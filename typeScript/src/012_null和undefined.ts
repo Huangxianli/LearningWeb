@@ -12,9 +12,9 @@ let y: null = null;
 let z = undefined;
 z = null;
 z = 123;
-z = "123";
+z = '123';
 
 let aa = null;
 aa = undefined;
 aa = 123;
-aa = "123";
+aa = '123';

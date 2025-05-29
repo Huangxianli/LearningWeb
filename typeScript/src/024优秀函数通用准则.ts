@@ -6,12 +6,12 @@
 
 // 1、使用类型参数本身，而不是对其进行约束
 function firstElement2<T>(arr: T[]) {
-  // 这种写法更好，会自动的推断出函数返回的类型是 T 
+  // 这种写法更好，会自动的推断出函数返回的类型是 T
   return arr[0];
 }
 
 function firstElement3<T extends any[]>(arr: T) {
-  // 这里会推断出返回的类型是 any 
+  // 这里会推断出返回的类型是 any
   return arr[0];
 }
 

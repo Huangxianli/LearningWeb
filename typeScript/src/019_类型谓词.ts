@@ -3,21 +3,21 @@
  */
 
 function isString(s: any) {
-  return typeof s === "string";
+  return typeof s === 'string';
 }
 
 function toUpperCase(x: unknown) {
   if (isString(x)) {
-    // x.toUpperCase() // 这里编译会有问题的，因为在这里，x在这个函数中，还是只能知道是unknown类型，不能确定是string类型
+    // x.toUpperCase() // 这里编译会有问题的，因为在这里，x 在这个函数中，还是只能知道是 unknown 类型，不能确定是 string 类型
   }
 }
 
 function isString_1(s: any): s is string {
-  return typeof s === "string"
+  return typeof s === 'string';
 }
 
 function toUpperCase_1(x: unknown) {
   if (isString_1(x)) {
-    x.toUpperCase(); // 这里编译不会有问题，通过前面isString_1的类型谓词，已经能够判断出x的类型是string了
+    x.toUpperCase(); // 这里编译不会有问题，通过前面 isString_1 的类型谓词，已经能够判断出x的类型是 string 了
   }
 }

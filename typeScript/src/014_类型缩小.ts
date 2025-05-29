@@ -3,13 +3,15 @@
 */
 
 function printAll(str: string | string[] | null) {
-  if (typeof str === "string") { // 这里就是一次类型缩小
+  if (typeof str === 'string') {
+    // 这里就是一次类型缩小
     console.log(str);
   } else if (typeof str === 'object' && str !== null) {
     for (const s of str) {
       console.log(s);
     }
   } else {
-    // 
+    // 这里会自动的判定 str 为 null
+    str;
   }
 }

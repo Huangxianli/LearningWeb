@@ -27,4 +27,4 @@ target: "es5", 将ts文件编译成es5的语法的js文件
 /*
 rootDir: "./src" 要转化的ts文件的文件夹
 outDir: "./dist" 存放转化之后js文件的文件夹
- */ 
+ */

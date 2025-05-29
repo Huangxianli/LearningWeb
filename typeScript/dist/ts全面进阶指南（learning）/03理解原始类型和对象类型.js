@@ -6,7 +6,6 @@ function test() {
     test4();
     test5();
 }
-;
 /**
  * 原始类型
  */
@@ -16,9 +15,8 @@ function test1() {
     test1_2();
     test1_3();
 }
-;
 /**
- * es6及以上新增的原始类型
+ * es6 及以上新增的原始类型
  * 原始类型 String Number Boolean Null Undefined BigInt Symbol
  */
 function test1_1() {
@@ -26,7 +24,6 @@ function test1_1() {
     const bigint1 = BigInt(12);
     const symbol1 = Symbol.for('12312');
 }
-;
 /**
  * undefined 和 null
  * 在 js 中：
@@ -43,7 +40,6 @@ function test1_2() {
     // const null1: null = undefined;
     // const obj: Object = null;
 }
-;
 /**
  * void
  * 在 js 中：执行后面的表达式，并总是返回 undefined
@@ -59,14 +55,13 @@ function test1_3() {
     console.log('---test1_3---------------------------------------------');
     // 鼠标移到函数名称函看类型推导
     function test1_3_1() {
+        // 表明没有显式的 return 具体的内容的时候，会被推导成 void 类型，只有 return 了一个显示的内容，才会推导成返回值对应的类型
         // return; // 会推导成 void
         // return undefined; // 会推导成 undefined
     }
-    ;
     function test1_3_2() {
         return undefined; // undefined 可以赋值给 void
     }
-    ;
     // let test1_3_2_1: undefined = test1_3_2(); // 会报错，void 类型，不能赋值给 undefined 类型
     function test1_3_3() {
         return; // 按理来说，直接 return，但是 return 后面没有内容，应该是被推导成 void 的，void 应该是不能赋值给 udefined 的 这里为什么可以？？？
@@ -79,7 +74,6 @@ function test1_3() {
     let test1_3_7;
     // test1_3_6 = test1_3_7; // 这里会报错，通常情况下 void 类型是不能赋值给 undefined 类型的
 }
-;
 /**
  * 数组的类型标注
  */
@@ -88,7 +82,6 @@ function test2() {
     test2_1();
     test2_2();
 }
-;
 /**
  * 声明方法
  */
@@ -97,7 +90,6 @@ function test2_1() {
     const arr1 = [];
     const arr3 = [];
 }
-;
 /**
  * 元祖
  * 元组限制了数组的类型和长度范围
@@ -110,7 +102,6 @@ function test2_2() {
     // 具名元组
     const arr2 = ['12'];
 }
-;
 /**
  * 对象类型标注
  */
@@ -120,13 +111,11 @@ function test3() {
     test3_2();
     test3_3();
 }
-;
 /**
  * interface
  */
 function test3_1() {
     console.log('---test3_1---------------------------------------------');
-    ;
     const obj1 = {
         name: '',
         // age: 12, // age 不在接口 Obj1 里面，不能添加在这个对象里面
@@ -135,7 +124,6 @@ function test3_1() {
     // obj1.single = true; // 因为定义类型的时候，添加了修饰符 readonly，即使是赋原值，一样会报错
     const a = obj1.male; // 由于定义的时候 male 定义为 boolean 而且该属性不一定存在，所以会 a 的类型是 boolean | undefined
 }
-;
 /**
  * 数组/元组上使用 readonly 只能将整个标记成 readonly，在定义时候的赋值之后，里面的每一项都不能在改变，而且也无法再改变长度，无法重新赋值新的引用地址
  * 失去了 push 等方法，不能修改原数组的任何一项的值
@@ -150,7 +138,6 @@ function test3_2() {
     // arr2 = [];
     // arr1[0] = 12;
 }
-;
 /**
  * interface 和 type
  * interface 描述对象和类
@@ -160,7 +147,6 @@ function test3_3() {
     console.log('---test3_3---------------------------------------------');
     let test3_3_1 = function () { };
 }
-;
 /**
  * Object object {}
  * 区分这三者
@@ -176,7 +162,6 @@ function test4() {
     test4_2();
     test4_3();
 }
-;
 /**
  * Object
  * 在 js 中所有的类型沿着原型链最终都是指向 Object
@@ -197,7 +182,6 @@ function test4_1() {
     // const object5: Object = undefined;
     let object6 = ''; // 装箱类型也是 Object 的子类型
 }
-;
 /**
  * object
  * 确保是引用类型（object 类型也要排除 undefined、null、void 0）
@@ -210,7 +194,6 @@ function test4_2() {
     const object4 = {};
     // const object5: object = '';
 }
-;
 /**
  * {}
  * 内部无属性的空对象
@@ -225,7 +208,7 @@ function test4_3() {
     console.log('---test4_3---------------------------------------------');
     const object1 = 'li';
     const object2 = {
-        12: 12
+        12: 12,
     };
     object2.toString(); // 访问 Object 原型上的属性是允许的
     // object2[12]; // 这种访问也报错
@@ -235,7 +218,6 @@ function test4_3() {
     // object1.name = 12;
     // object3(); // 这种操作也不允许
 }
-;
 /**
  * unique symbol
  * 是 symbol 的子类型，没有个 unique symbol 类型都是独一无二的类型
@@ -246,5 +228,4 @@ function test5() {
     // const uniqueSymbol3: unique symbol = uniqueSymbol2; // 因为每一个 unique symbol 类型都是独一无二的类型，所以不能相互赋值
     const uniqueSymbol4 = uniqueSymbol2; // 可以通过这种方式来进行赋值
 }
-;
 export default test;

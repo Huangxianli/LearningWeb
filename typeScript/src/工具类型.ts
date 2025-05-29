@@ -1,4 +1,4 @@
-// 传入对象，赋值该对象的类型
+// 传入 tyoeof 对象，复制该对象的类型
 type ObjectType<T> = {
   [K in keyof T]: T[K] extends object ? ObjectType<T[K]> : T[K];
   // [K in keyof T]: T[K]; 使用这个写法，循环引用类型有问题
@@ -12,6 +12,6 @@ a13 = {
   d: a13,
   b: {
     c: 1,
-    d: {}
-  }
+    d: {},
+  },
 };
