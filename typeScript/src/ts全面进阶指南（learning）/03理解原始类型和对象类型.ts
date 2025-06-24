@@ -45,9 +45,11 @@ function test1_1(): void {
 function test1_2(): void {
   console.log('---test1_2---------------------------------------------');
 
+  // 下面这些都会报错，因为 undefine 和 null 不是其他任何类型的子类型
   // const string1: string = undefined;
   // const null1: null = undefined;
   // const obj: Object = null;
+  // const undefined1: undefined = null;
 }
 
 /**
@@ -78,7 +80,7 @@ function test1_3(): void {
 
   function test1_3_3(): undefined {
     return; // 按理来说，直接 return，但是 return 后面没有内容，应该是被推导成 void 的，void 应该是不能赋值给 udefined 的 这里为什么可以？？？
-    // 这里是一个边界情况，在 ts 中 return 后面没有接内容的话，应该是会推导成 void 类型的，但是在 js 中，return 后面没有接内容默认的是 return undefined 的，作为一种边界情况，实际上不推荐这么写，没有就 return undefined 定义为 undefined 类型，要不就 return 定义为 void 类型。
+    // 这里是一个边界情况，在 ts 中 return 后面没有接内容的话，应该是会推导成 void 类型的，但是在 js 中，return 后面没有接内容默认的是 return undefined 的，作为一种边界情况，实际上不推荐这么写，要不就 return undefined 定义为 undefined 类型，要不就 return 定义为 void 类型。
   }
 
   let test1_3_4: undefined = undefined;
@@ -86,7 +88,7 @@ function test1_3(): void {
   let test1_3_6: undefined;
   test1_3_6 = void 0; // 很奇怪，这里也没有报错 // 这里识别的是 js 中的 void，执行后面的语句，并返回 undefined 类型
   let test1_3_7: void;
-  // test1_3_6 = test1_3_7; // 这里会报错，通常情况下 void 类型是不能赋值给 undefined 类型的
+  // test1_3_6 = test1_3_7; // 这里会报错，通常情况下 void 类型是不能赋值给 undefined 类型的， void 在 ts 中表示的是：返回值没有任何意义，返回值不应该被使用，所以不应该将 void 类型赋值给 undefined 类型
 }
 
 /**
@@ -111,17 +113,17 @@ function test2_1(): void {
 
 /**
  * 元祖
- * 元组限制了数组的类型和长度范围
+ * 元组限制了数组的类型和长度范围，在访问设置的时候，都会进行限制
  * 还可以使用具名元组来给元组中的每一项做定义
  */
 function test2_2(): void {
   console.log('---test2_2---------------------------------------------');
 
   const arr1: [string, number?] = ['1'];
-  // arr1[2];
+  // arr1[2];  // 访问也会受限制
 
   // 具名元组
-  const arr2: [name: string, age?: number] = ['12'];
+  const arr2: [name: string, age?: number] = ['name1', 12];
 }
 
 /**
@@ -133,6 +135,7 @@ function test3() {
   test3_1();
   test3_2();
   test3_3();
+  test3_4();
 }
 
 /**
@@ -147,6 +150,7 @@ function test3_1(): void {
     readonly single: boolean; // 只读属性要在变量定义的时候就赋值，并且之后就不能赋值了
   }
   const obj1: Obj1 = {
+    // 和接口相比不能多也不能少
     name: '',
     // age: 12, // age 不在接口 Obj1 里面，不能添加在这个对象里面
     single: true,
@@ -174,14 +178,44 @@ function test3_2() {
 
 /**
  * interface 和 type
- * interface 描述对象和类
- * type 用来将一个函数签名、一组组合类型、一个工具类型等等抽离成一个完整的类型
+ * interface 描述对象和类（接口）
+ * type 用来将一个函数签名、一组组合类型、一个工具类型等等抽离成一个完整的类型（别名）
  */
 function test3_3(): void {
   console.log('---test3_3---------------------------------------------');
 
   type Func1 = () => void;
   let test3_3_1: Func1 = function () {};
+}
+
+/**
+ * interface 同名的接口会合并成一个，但是如果是同名的属性，基础类型属性要是一样的，函数属性会当成函数的重载，
+ * type 不能有同名的
+ */
+function test3_4(): void {
+  console.log('---test3_4---------------------------------------------');
+
+  interface SameNameInterface {
+    name: string;
+    age: number | string;
+    getName(): string;
+    address: {
+      address1: string;
+      address2: string;
+    };
+  }
+  interface SameNameInterface {
+    // age: number; // 会报错，要一致
+    getName(name?: string): string;
+    address: {
+      address1: string;
+      address2: string;
+      // address3: string;
+    };
+  }
+
+  type SameType = () => {};
+  // type SameType = () => {}; // 只要重复就会报错
 }
 
 /**
@@ -206,6 +240,7 @@ function test4(): void {
  * 在 js 中所有的类型沿着原型链最终都是指向 Object
  * ts 中的表现就为 Object 包含了所有的类型（除去 undefined、null 和 void 0）
  * undefined、 null 和 void 0 只在 strictNullcheck 为 false 的时候才可以赋值给 Object 类型的元素
+ * Object 指向 Object 构造函数，一般有 Object.prototype
  *
  * 在任何情况下，都不使用这种装箱类型 Object Number ...
  *
@@ -224,11 +259,22 @@ function test4_1(): void {
   // const object5: Object = undefined;
 
   let object6: Object = '' as String; // 装箱类型也是 Object 的子类型
+
+  const object7: Object = '';
+  type Object7Type = typeof object7; // Object
+  const object7Type = typeof object7; // 虽然在编辑器中显示的是一大串，但是实际应该只是 'string'，从编译结果就可以看出来
+  if (object7Type === 'string') {
+  } else {
+    // let a: never = object7Type; // 而且这里的类型收缩也是有问题的
+  }
+
+  const object8: Object = Object.create(null);
 }
 
 /**
  * object
  * 确保是引用类型（object 类型也要排除 undefined、null、void 0）
+ * 该对象不一定有原型，不能确定有没有相同的 key
  */
 function test4_2(): void {
   console.log('---test4_2---------------------------------------------');
@@ -270,7 +316,7 @@ function test4_3(): void {
 
 /**
  * unique symbol
- * 是 symbol 的子类型，没有个 unique symbol 类型都是独一无二的类型
+ * 是 symbol 的子类型，每一个 unique symbol 类型都是独一无二的类型
  */
 function test5(): void {
   // let uniqueSymbol1: unique symbol = Symbol('test1'); // unique symbol 类型只能是 const 声明，不能用 let 声明

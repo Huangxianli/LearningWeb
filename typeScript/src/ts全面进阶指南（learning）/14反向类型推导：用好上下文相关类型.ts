@@ -1,4 +1,3 @@
-function test(): void { };
-
+function test(): void {}
 
 export default test;

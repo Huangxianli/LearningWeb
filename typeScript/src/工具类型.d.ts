@@ -1,4 +1,4 @@
-// 传入 tyoeof 对象，复制该对象的类型
+// 传入 tyoeof 对象，复制该对象的类型，同时可以协助显示完整的类型细节
 type ObjectType<T> = {
   [K in keyof T]: T[K] extends object ? ObjectType<T[K]> : T[K];
   // [K in keyof T]: T[K]; 使用这个写法，循环引用类型有问题
@@ -15,3 +15,5 @@ a13 = {
     d: {},
   },
 };
+
+type DeepRequired<T extends object> = {};

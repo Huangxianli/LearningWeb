@@ -6,12 +6,10 @@ function test() {
     test4();
     test5();
 }
-;
 function test1() {
     console.log('---test1---------------------------------------------');
     let a = '';
 }
-;
 /**
  * 从原始类型开始
  * 字面量类型 < 对应的原始类型
@@ -19,7 +17,6 @@ function test1() {
 function test2() {
     console.log('---test2---------------------------------------------');
 }
-;
 /**
  * 向上探索
  */
@@ -29,7 +26,6 @@ function test3() {
     test3_2();
     test3_3();
 }
-;
 /**
  * 联合类型
  * 只要满足其中一个类型，就可以认为实现了这个联合类型
@@ -38,7 +34,6 @@ function test3() {
 function test3_1() {
     console.log('---test3_1---------------------------------------------');
 }
-;
 /**
  * 装箱类型
  * 原始类型 < 原始装箱类型 < Object 类型
@@ -46,7 +41,7 @@ function test3_1() {
 function test3_2() {
     console.log('---test3_2---------------------------------------------');
     const a = '1223';
-    // string -> String -> object 
+    // string -> String -> object
     let test3_2_1 = '';
     let test3_2_2;
     test3_2_2 = test3_2_1;
@@ -55,7 +50,6 @@ function test3_2() {
     // 如果是具有传递性的话，那么 test3_2_3 = test3_2_1; 不会报错（这个示例应该被当成特殊的示例）
     // test3_2_3 = test3_2_1; // 会报错
 }
-;
 /**
  * Top Type
  * any 和 unknown 无视一切的因果定律
@@ -66,17 +60,16 @@ function test3_3() {
     console.log('---test3_3---------------------------------------------');
     // any extends unknown 和 unknown extends any 都是完全成立的，不存在一部分满足一部分不满足
 }
-;
 /**
  * 向下探索，直到万物虚无
  * never null undefined void
  *
  * never < 字面量类型
+ * 其实可以说 never 比 null undefined void 更低一级
  */
 function test4() {
     console.log('---test4---------------------------------------------');
 }
-;
 /**
  * 其他场景比较场景
  * 基类和派生类
@@ -85,5 +78,4 @@ function test4() {
  */
 function test5() {
 }
-;
 export default test;

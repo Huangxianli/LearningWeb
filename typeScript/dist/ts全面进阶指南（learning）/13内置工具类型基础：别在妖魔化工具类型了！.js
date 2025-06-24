@@ -12,9 +12,7 @@ function test() {
     test3();
     test4();
 }
-;
 function test1() {
-    ;
     /*
       type B = {
         a1?: string | undefined;
@@ -29,8 +27,7 @@ function test1() {
         a2: undefined, // 可以是 undefined，也可以是没有这个属性
         a4: undefined,
     };
-    ;
-    const test1 = { name: undefined }; // ? 本身就可以是 没有这个属性或者这个属性的值为 undefined 
+    const test1 = { name: undefined }; // ? 本身就可以是 没有这个属性或者这个属性的值为 undefined
     /*
      type C = {
       a1: string;
@@ -56,8 +53,21 @@ function test1() {
         a5: undefined;
       }
     */
+    // MyType1 是自己定义的全局的类型
+    const myTest1 = {
+        name: '',
+        age: 1,
+        myType: '',
+    };
+    const createMyTest1 = function (a) {
+        return a;
+    };
+    createMyTest1({
+        name: '',
+        age: 1,
+        myType: '',
+    });
 }
-;
 /**
  * 结构工具类型
  * 对类型的裁剪、拼接、转换等
@@ -67,10 +77,10 @@ function test2() {
     test2_1();
     test2_2();
 }
-;
 /**
  * 结构声明工具
  * 快速的声明一个结构
+ * Record<K,V>
  */
 function test2_1() {
     const record3 = {}; // 即使是没有传属性也不会报错
@@ -79,28 +89,32 @@ function test2_1() {
         b: 2,
     };
     const record5 = {
-        12: 1,
+        12: 1, // 这里的 12 在作为一个对象访问的时候，会转化成 '12'，所以不会报错
     };
 }
-;
 /**
  * 结构处理工具
+ * Pick<T, K> Omit<T, K>
  */
 function test2_2() {
+    /*
+      type OmitName = {
+        readonly age: number;
+        job: String;
+      }
+    */
 }
-;
 /**
  * 集合工具类型
  * 主要的使用条件类型、条件类型分布式特点
+ * Extract<T, U> Exclued<T, U>
  */
 function test3() {
 }
-;
 /**
  * 模式匹配工具类型
  * 主要使用条件类型和 infer 关键字
  */
 function test4() {
 }
-;
 export default test;

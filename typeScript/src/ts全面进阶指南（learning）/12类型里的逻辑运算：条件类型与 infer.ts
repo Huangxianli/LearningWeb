@@ -1,16 +1,19 @@
 function test() {
-  console.log('--- 类型里的逻辑运算：条件类型与 infer ---------------------------------------------');
+  console.log(
+    '--- 类型里的逻辑运算：条件类型与 infer ---------------------------------------------'
+  );
 
   test1();
   test2();
   test3();
-
-};
+}
 /**
  * 条件类型基础
  * 对于能够进行赋值的变量，不要求他们变量的类型是完全相等的，只需要具有兼容性
- * 
+ *
  * 记住：泛型参数的实际类型会在 实际调用 时才被填充（类型别名中显式传入，或者函数中隐式提取）
+ *
+ * 收集所有候选 -> 判断是否是同一个原始类型 -> 计算最佳通用类型 -> 检查约束
  */
 function test1(): void {
   console.log('---test1---------------------------------------------');
@@ -28,14 +31,30 @@ function test1(): void {
   // const c: 5 | 8 = a;
 
   // 由于 T 会被推导为一个联合类型，返回的值如果直接使用 T ，推导出来的也是一个联合类型的值，和实际中函数返回的内容是不同的
+  // 那这里为什么实际返回值不是 T 类型，也不会报错呢？因为根据这个函数的定义，返回值为 T，在函数中返回值的类型主要可以赋值给 T 就不会报错
 
-  type Result1<T> = T extends number ? number : T extends string ? string : never;
+  type Result1<T> = T extends number
+    ? number
+    : T extends string
+    ? string
+    : never;
   const fun2 = function <T extends number | string>(x: T, y: T): Result1<T> {
     return x + (y as any);
   };
 
   const b = fun2(1, 2); // b number
-};
+
+  const fun3 = function <T>(x: T, y: T): T {
+    return (x as any) + y;
+  };
+  fun3(1, 2);
+  // fun3(1, '1'); // 会报错
+
+  const fun4 = function <T extends { length: number }>(x: T, y: T): number {
+    return x.length + y.length;
+  };
+  fun4({ x: 1, length: 2 }, [1, '']);
+}
 
 /**
  * infer 关键字在条件类型中提取类型的一部分信息
@@ -45,70 +64,88 @@ function test2() {
   console.log('---test2---------------------------------------------');
 
   type Swap<T extends any[]> = T extends [infer A, infer B] ? [B, A] : T; // 交换元组中数据的位置
-  type Swap1<T extends any[]> = T extends [infer A, ...infer Left, infer B] ? [B, A] : T; // 获取到第一个和最后一个，组成一个新的元组，并且调换数据
+  type Swap1<T extends any[]> = T extends [infer A, ...infer Left, infer B]
+    ? [B, A]
+    : T; // 获取到第一个和最后一个，组成一个新的元组，并且调换数据
   // infer 可以和 reset 操作符一样同时提取一组不定长的类型
-  type Swap2<T extends number[]> = T extends [infer A, ...infer Center, infer B] ? [...Center] : [];
+  type Swap2<T extends number[]> = T extends [infer A, ...infer Center, infer B]
+    ? [...Center]
+    : [];
   let swap2_1: Swap2<[1, 2, 3]> = [2]; // 根据传入的内容，只能是 [2]，如果不是的话，会报错
   let arr2_1: number[] = [123, 12, 2, 231];
   // let swap2_2: Swap2<arr2_1>; 注意，这种写法是错误的，不能将变量赋值给 泛型参数，只能传类型给泛型参数
 
-  type ArrayItemType<T> = T extends Array<infer ElementType> ? ElementType : never;
+  type ArrayItemType<T> = T extends Array<infer ElementType>
+    ? ElementType
+    : never;
 
   type A1 = ArrayItemType<string[]>; // A1 string
   type A2 = ArrayItemType<[string, number, undefined]>; // A2 string | number | undefined
 
   // infer 结构也可以是接口
   // 根据对象和传入的属性，获取该属性对应的类型
-  type PropType<T, K extends keyof T> = T extends { [Key in K]: infer R } ? R : never;
+  type PropType<T, K extends keyof T> = T extends { [Key in K]: infer R }
+    ? R
+    : never;
   // type PropTypeResult1 = PropType<{ name: string; age: number }, 'a'>; // 不满足第二个泛型的约束，会报错
-  type PropTypeResult2 = PropType<{ name: string; age: number }, 'name' | 'age'>; // string | number
+  type PropTypeResult2 = PropType<
+    { name: string; age: number },
+    'name' | 'age'
+  >; // string | number
 
   // 反转键名与键值
-  type ReverseKeyValue<T extends Record<string, unknown>> = T extends Record<infer K, infer V> ? Record<V & string, K> : never;
+  type ReverseKeyValue<T extends Record<string, unknown>> = T extends Record<
+    infer K,
+    infer V
+  >
+    ? Record<V & string, K>
+    : never;
   // 这里要加上 & string
-};
+}
 
 /**
  * 分布式条件类型
  * 参数类型是联合类型，且类型参数是通过泛型的方式传入的，条件类型中的泛型 不能 被包裹，这样就产生了分布式条件类型
- * 同时要注意一下 never 作为参数传递的情况，如果没有参数没有被包裹，extends 会返回 never（这是特殊情况中的特殊情况）
- * 
+ * 同时要注意一下 never 作为参数传递的情况，如果参数没有被包裹，extends 会返回 never（这是特殊情况中的特殊情况）
+ *
  * 对于属于裸类型参数（作为泛型参数，但是在 extends 语句中没有被包裹的）的检查类型，条件类型会在实例化时期自动分发到联合类型上（以 | 为界限，拆分后一个一个去执行）
- * 
+ *
  * 如果不是作为类型参数的话，不会分发，也就是符合我们认为的常规的 联合类型的 extends 判断
  * 如果作为参数，但是包裹了，也不会分发
  */
 function test3() {
   console.log('---test3---------------------------------------------');
 
-  type Condition<T> = T extends (1 | 2 | 3) ? T : never;
-  type Res1 = Condition<(1 | 2 | 3 | 4 | 5)>; // 1 | 2 | 3
-  // 这里为何是 false 
+  type Condition<T> = T extends 1 | 2 | 3 ? T : never;
+  type Res1 = Condition<1 | 2 | 3 | 4 | 5>; // 1 | 2 | 3
+  // 这里为何是 false
   // 1. 通过泛型参数传入 2. 泛型没有被包裹
 
-  type Res2 = (1 | 2 | 3 | 4 | 5) extends (1 | 2 | 3) ? (1 | 2 | 3 | 4 | 5) : never; // never
+  type Res2 = 1 | 2 | 3 | 4 | 5 extends 1 | 2 | 3 ? 1 | 2 | 3 | 4 | 5 : never; // never
   // 这里是可以理解 extends 在判断这种联合类型是 范围大的 extends 范围小的为 false
 
   type Condition1<T> = [T] extends 1[] ? T : never;
-  type Res3 = Condition1<(1 | 2 | 3 | 4 | 5)>; // never
+  type Res3 = Condition1<1 | 2 | 3 | 4 | 5>; // never
   // 这里又符合 extends 在判断联合类型的时候 范围大的 extends 范围小的 为 false
   // 原因是  在 extends 语句中 T 被包裹住了
 
-  type Naked<T> = T extends boolean ? "Y" : "N";
-  type Wrapped<T> = [T] extends [boolean] ? "Y" : "N";
-  type Res4 = Naked<number | boolean>;  // "N" | "Y"
-  type Res5 = Wrapped<number | boolean> // "N"
+  type Naked<T> = T extends boolean ? 'Y' : 'N';
+  type Wrapped<T> = [T] extends [boolean] ? 'Y' : 'N';
+  type Res4 = Naked<number | boolean>; // "N" | "Y"
+  type Res5 = Wrapped<number | boolean>; // "N"
 
-  type NeverExtends = never extends never ? 1 : 2; // 1
+  type NeverExtends = never extends never ? 1 : 2; // 1 注意这里不是作为参数传递的，所以是 1
   type NeverExtends1<T> = T extends never ? 1 : 2;
   type NeverExtends2<T> = T extends 1 ? 1 : 2;
   type NeverExtends3<T> = [T] extends [never] ? 1 : 2;
-  type Res6 = NeverExtends1<never>; // never 如果 never 作为参数传递的时候且该参数没有被包裹，会跳过extends判断（判断返回值为 never）
+  type NeverExtends4<T> = [T] extends [null] ? 1 : 2;
+  type Res6 = NeverExtends1<never>; // never 如果 never 作为参数传递的时候且该参数没有被包裹，会跳过 extends 判断（判断返回值为 never）
   type Res7 = NeverExtends2<never>; // never
-  type Res8 = NeverExtends3<never>; // 1 如果 never 作为参数传递，但是参数被包裹了，
+  type Res8 = NeverExtends3<never>; // 1 never 作为参数传递，但是参数被包裹了\
+  type Res9 = NeverExtends4<never>; // 1
 
   type Intersection<A, B> = A extends B ? A : 5;
   type IntersectionRes = Intersection<1 | 2 | 3, 2 | 3 | 4>; // 2 | 3 | 5
-};
+}
 
 export default test;

@@ -1,5 +1,7 @@
 function test() {
-  console.log('---类型编程基石：TypeScript 中无处不在的泛型---------------------------------------------');
+  console.log(
+    '---类型编程基石：TypeScript 中无处不在的泛型---------------------------------------------'
+  );
 
   test1();
   test2();
@@ -7,7 +9,7 @@ function test() {
   test4();
   test5();
   test6();
-};
+}
 /**
  * 类型别名如果使用了泛型坑位，那么就相当于一个接收参数的函数
  * 泛型大部分的时候用来进行工具类型的封装
@@ -21,11 +23,16 @@ function test1() {
     return [T, null, undefined, false, 0];
   } */
 
+  type Clone<T> = {
+    [K in keyof T]: T[K];
+  };
+
   // 条件类型
   type IsEqual<T> = T extends true ? 1 : 2;
   // const a: IsEqual<false> = 1; // 会报错，不能把 1 分配给 2
   const b: IsEqual<false> = 2;
-};
+  const c: IsEqual<true> = 1;
+}
 
 /**
  * extends 关键字详解
@@ -37,15 +44,15 @@ function test1() {
 function test1_1() {
   interface HasLength {
     length: number;
-  };
+  }
   function getLength<T extends HasLength>(a: T): number {
     return a.length;
-  };
+  }
 
   // 多重约束
   interface HasName {
     name: string;
-  };
+  }
   function multi<T extends HasLength & HasName>(arg: T): string {
     return arg.length + arg.name;
   }
@@ -58,12 +65,12 @@ function test1_1() {
   // 接口继承 extends
   interface Animal {
     name: string;
-  };
+  }
   interface Bird extends Animal {
     // name: string | undefined; // 如果同名不可以有冲突
+    name: '';
     fly(): void;
-  };
-
+  }
 
   // 兼容性检查
   interface Parent {
@@ -75,10 +82,29 @@ function test1_1() {
     age: number;
   }
 
+  interface Child1 {
+    name: string | number | symbol;
+    age: number;
+  }
+  interface Child2 {
+    name: string | number | [];
+  }
 
-  type CheckExtends = Child extends Parent ? true : false;  // false 同名属性应该更加的精确或者类型不变才满足 extends 
-};
+  type CheckExtends = Child extends Parent ? true : false; // false 同名属性应该更加的精确或者类型不变才满足 extends
+  type CheckExtends1 = Child extends Child1 ? true : false; // true 注意这里是 true
+  type CheckExtends2 = Child extends Child2 ? true : false; // true key 可以更多，但是同一个 key 对应的类型要更加的收紧
 
+  const child: Child = {
+    name: '',
+    age: 1,
+  };
+  const child1: Child1 = {
+    name: Symbol(),
+    age: 1,
+  };
+
+  type CheckChild2 = typeof child extends typeof child1 ? true : false; // true 这里的 typeof 关注的是编译阶段，所以更加关注变量定义时的类型
+}
 
 /**
  * 泛型约束与默认值
@@ -90,15 +116,14 @@ function test2() {
   type ResultStatus<T extends number> = T extends 200 ? 'success' : 'fail'; // 要求传入的 T 必须是 number 类型
 
   // type Res1 = ResultStatus<'200'>; // 会报错
-
-};
+}
 
 /**
  * 多泛型关联
  */
 function test3() {
   type MyType<T, S extends T> = number;
-};
+}
 
 /**
  * 对象类型中的泛型
@@ -108,29 +133,28 @@ function test4() {
     code: number;
     error?: string;
     data: T;
-  };
+  }
 
   const iRes1: IRes<string> = {
     code: 1,
     data: '',
     // a: '', // 不能多也不能少
   };
-
-};
+}
 
 /**
  * 函数的泛型
  */
 function test5() {
-
-  function handle<T>(input: T): T { // 在调用函数传入参数的时候，T 会自动被填充为这个参数的类型，类型的信息会尽可能的推导的更精细，可以推导到字面量的时候会尽量的推导到字面量类型，而非基础类型
+  function handle<T>(input: T): T {
+    // 在调用函数传入参数的时候，T 会自动被填充为这个参数的类型，类型的信息会尽可能的推导的更精细，可以推导到字面量的时候会尽量的推导到字面量类型，而非基础类型
     return input;
-  };
+  }
 
   // 箭头函数中加入泛型的表示
   const handle1 = <T>(a: T): T => a;
   const handle2: <T>(a: T) => T = (a) => a;
-};
+}
 
 /**
  * Class 中的泛型
@@ -139,20 +163,15 @@ function test5() {
  */
 function test6() {
   class Queueo<T> {
-    list: T[];
-    constructor(list: T[]) {
-      this.list = list;
-    };
+    constructor(public list: T[]) {}
 
     add(item: T) {
       this.list.push(item);
-    };
+    }
     add1<T1 extends T>(item: T1) {
       this.list.push(item);
-    };
-
-  };
-};
-
+    }
+  }
+}
 
 export default test;

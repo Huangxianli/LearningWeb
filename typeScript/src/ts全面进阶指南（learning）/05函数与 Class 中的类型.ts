@@ -50,7 +50,7 @@ function test1_2(): void {
   console.log('---test1_2---------------------------------------------');
 
   function test1_2_1(): void {
-    // 没有return
+    // 没有 return
   }
   function test1_2_2(): void {
     return; // 有 return 但是没有具体的值，其实这个函数的返回值用 undefined 会更好

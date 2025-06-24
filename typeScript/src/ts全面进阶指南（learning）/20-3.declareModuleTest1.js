@@ -1,2 +1,2 @@
-function test() { }
+function test() {}
 export default test;

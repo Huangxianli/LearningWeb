@@ -11,34 +11,79 @@ function test(): void {
   test2();
   test3();
   test4();
-};
+}
 
 /**
  * 属性修饰工具类型
  * 主要使用属性修饰、映射类型与索引类型相关
+ * Partial<T> Required<T> Readonly<T>
  */
 declare const never1: never;
 function test1(): void {
-  type Partial<T> = { // 复制 T 并且属性都是可选的
+  type Partial<T> = {
+    // 复制 T，并且把所有属性设置成可选的
     [P in keyof T]?: T[P];
     // 可以理解为 [P in keyof T]+?: T[P];
   };
-  type Prequired<T> = { // 复制 T 并且所有属性都是必选的
+  type Prequired<T> = {
+    // 复制 T，并且去除掉可选标志，将所有属性都设置成必选的
     [P in keyof T]-?: T[P];
   };
-  type Readonly<T> = { // 复制 T 并且所有属性都是只读的
+  type Readonly<T> = {
+    // 复制 T，并且所有属性都设置成只读的
     readonly [P in keyof T]: T[P];
   };
-
-  interface A {
-    a1: string,
-    a2?: number,
-    a3: undefined | string,
-    a4?: undefined | string,
-    a5: undefined,
+  type DeeepReadonly<T> = {
+    readonly [K in keyof T]: T[K] extends object ? DeeepReadonly<T[K]> : T[K];
+    // 注意这里，要额外的考虑 函数，Date、RegExp、Map、Set 等内置的非纯粹的 key-value 结构，他们 extends object 为 true
   };
+  type A4 = (...a: any[]) => any;
+  type A5 = DeeepReadonly<A4>; // {}
+  /* 
+    readonly [K in keyof 函数] ： 函数[K] extends object ? DeepReadonly<函数[K]> : 函数[K]
+    readonly [K in never] ： 函数[K] extends object ? DeepReadonly<函数[K]> : 函数[K]
+    K in never 一次都不会执行，因为 never 本身就是一个空集，这样 : 右边的内容也不会进行求值，最终 DeepReadonly<函数> 就是 {}
+  */
 
-  type B = Partial<A>
+  // 这种写法兼容了基础类型和函数等类型
+  type DeepReadonlyV2<T> = T extends
+    | RegExp
+    | Date
+    | Set<any>
+    | Map<any, any>
+    | WeakMap<any, any>
+    | WeakSet<any>
+    | ((...arg: any[]) => any)
+    ? T
+    : T extends object
+    ? {
+        readonly [K in keyof T]: DeepReadonlyV2<T[K]>;
+      }
+    : T;
+
+  type A6 = {
+    a1: () => any;
+  };
+  type A7 = DeepReadonlyV2<A6>;
+  type A8 = {
+    a: Set<number>;
+  };
+  type A9 = DeepReadonlyV2<A8>;
+
+  type A10<T> = {
+    readonly [K in keyof T]: T[K];
+  };
+  type A11 = Set<number>;
+  type A12 = A10<A11>;
+  interface A {
+    a1: string;
+    a2?: number;
+    a3: undefined | string;
+    a4?: undefined | string;
+    a5: undefined;
+  }
+
+  type B = Partial<A>;
   /*
     type B = {
       a1?: string | undefined;
@@ -53,13 +98,12 @@ function test1(): void {
     a1: undefined, // 可以是 undefined，也可以是没有这个属性
     a2: undefined, // 可以是 undefined，也可以是没有这个属性
     a4: undefined,
-  }
+  };
 
   interface Test1 {
-    name?: number
-  };
-  const test1: Test1 = { name: undefined }; // ? 本身就可以是 没有这个属性或者这个属性的值为 undefined 
-
+    name?: number;
+  }
+  const test1: Test1 = { name: undefined }; // ? 本身就可以是 没有这个属性或者这个属性的值为 undefined
 
   type C = Required<B>; // 会将可选的变成必选的，同时将联合类型中 undefined 去除掉，如果本身就是 undefined 类型，则会转化成 never 类型
   /*
@@ -77,7 +121,7 @@ function test1(): void {
     a3: '',
     a4: '',
     a5: never1,
-  }
+  };
 
   type D = Readonly<A>; // 将所有的属性转化成只读
   /*
@@ -90,11 +134,10 @@ function test1(): void {
     }
   */
 
-
   // 如何去除 readonly
   type Mutable<T> = {
     -readonly [P in keyof T]: T[P];
-  }
+  };
   type E = Mutable<D>;
   /*
     type E = {
@@ -106,7 +149,22 @@ function test1(): void {
     }
   */
 
-};
+  // MyType1 是自己定义的全局的类型
+  const myTest1: MyType1<string> = {
+    name: '',
+    age: 1,
+    myType: '',
+  };
+
+  const createMyTest1 = function <T>(a: MyType1<T>): MyType1<T> {
+    return a;
+  };
+  createMyTest1({
+    name: '',
+    age: 1,
+    myType: '',
+  });
+}
 
 /**
  * 结构工具类型
@@ -116,14 +174,16 @@ function test1(): void {
 function test2(): void {
   test2_1();
   test2_2();
-};
+}
 
 /**
  * 结构声明工具
  * 快速的声明一个结构
+ * Record<K,V>
  */
 function test2_1() {
-  type Record<K extends keyof any, T> = { // 构建一个对象类型 key 是 string | number | symbol 类型，value 可以是任何类型
+  type Record<K extends keyof any, T> = {
+    // 构建一个对象类型 key 是 string | number | symbol 类型，value 可以是任何类型
     [P in K]: T;
   };
 
@@ -142,61 +202,72 @@ function test2_1() {
   };
   type Record5 = Record<string | 12, any>; // 相当于 type Record5 = { 12: any, [key: string]: any }
   const record5: Record5 = {
-    12: 1,
-  }
-
-
-};
+    12: 1, // 这里的 12 在作为一个对象访问的时候，会转化成 '12'，所以不会报错
+  };
+}
 
 /**
  * 结构处理工具
+ * Pick<T, K> Omit<T, K>
  */
 function test2_2() {
-  type Pick<T, K extends keyof T> = { // 从对象中生成一个新的对象，新的对象是原来对象的子集
+  type Pick<T, K extends keyof T> = {
+    // 从对象中生成一个新的对象，新的对象是原来对象的子集
     [P in K]: T[P];
   };
 
   interface Foo {
-    name: string;
-    age: number;
+    name?: string;
+    readonly age: number;
     job: String;
   }
 
-  type PickedFoo = Pick<Foo, "name" | "age">
+  type PickedFoo = Pick<Foo, 'name' | 'age'>;
+  // 会保留原接口的对 key 的限制可选择性等
   /*
     type PickedFoo = {
-      name: string;
-      age: number;
+      name?: string;
+      readonly age: number;
     }
   */
 
-  type Omit<T, K extends keyof any> = Pick<T, Exclude<keyof T, K>>; // 根据对象和键生成一个不包含该键的新对象；在使用 Omit 的时候，传入的 key 没有要求必须在对象内 
-
-};
+  type Omit<T, K extends keyof any> = Pick<T, Exclude<keyof T, K>>; // 根据接口和键生成一个不包含该键的新接口（除去接口中对应的 key）；在使用 Omit 的时候，传入的 key 没有要求必须在对象内
+  type OmitName = Omit<Foo, 'name'>;
+  /* 
+    type OmitName = {
+      readonly age: number;
+      job: String;
+    }
+  */
+}
 
 /**
  * 集合工具类型
  * 主要的使用条件类型、条件类型分布式特点
+ * Extract<T, U> Exclued<T, U>
  */
 function test3(): void {
   type Extract<T, U> = T extends U ? T : never; // 交集
 
   type Extract1 = Extract<1, 1 | 2>; // 1
 
-
   type Exclude<T, U> = T extends U ? never : T; // 差集
 
   type Exclude1 = Exclude<1 | 2 | 3, 2>; // 1 | 3
 
-  // 如何实现交集
+  // 如何实现并集
   type Concurrence<A, B> = A | B;
+
+  // 交集 Extract
+  // 由于泛型没有被包裹，会采用分布式比较
+  type Intersection<A, B> = A extends B ? A : never;
 
   // 如何实现补集（补集是差集的一种特殊情况，B 要完全在 A 里面）
   type Complement<A, B extends A> = Exclude<A, B>;
 
   // 固定的内置 排除 null 和 undefined 的工具类型
   type NonNullable<T> = T extends null | undefined ? never : T;
-};
+}
 
 /**
  * 模式匹配工具类型
@@ -205,9 +276,13 @@ function test3(): void {
 function test4() {
   type FunctionType = (...args: any) => any;
 
-  type Parameters<T extends FunctionType> = T extends (...args: infer P) => any ? P : never; // 获取函数的入参的类型
+  type Parameters<T extends FunctionType> = T extends (...args: infer P) => any
+    ? P
+    : never; // 获取函数的入参的类型
 
-  type ReturnType<T extends FunctionType> = T extends (...args: any) => infer R ? R : any; // 获取函数的人会值的类型
+  type ReturnType<T extends FunctionType> = T extends (...args: any) => infer R
+    ? R
+    : any; // 获取函数的返回值的类型
 
   type FirstParameter<T extends FunctionType> = T extends (
     arg: infer P,
@@ -215,7 +290,6 @@ function test4() {
   ) => any
     ? P
     : never; // 获取函数第一个参数的类型
-};
-
+}
 
 export default test;

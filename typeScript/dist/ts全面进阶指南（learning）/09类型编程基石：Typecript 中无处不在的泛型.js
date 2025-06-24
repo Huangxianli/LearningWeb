@@ -7,7 +7,6 @@ function test() {
     test5();
     test6();
 }
-;
 /**
  * 类型别名如果使用了泛型坑位，那么就相当于一个接收参数的函数
  * 泛型大部分的时候用来进行工具类型的封装
@@ -16,8 +15,8 @@ function test1() {
     test1_1();
     // const a: IsEqual<false> = 1; // 会报错，不能把 1 分配给 2
     const b = 2;
+    const c = 1;
 }
-;
 /**
  * extends 关键字详解
  * 1. 类型约束
@@ -26,58 +25,55 @@ function test1() {
  * 4. 兼容性检查
  */
 function test1_1() {
-    ;
     function getLength(a) {
         return a.length;
     }
-    ;
-    ;
     function multi(arg) {
         return arg.length + arg.name;
     }
     multi({ name: '', length: 0 });
-    ;
-    ;
+    const child = {
+        name: '',
+        age: 1,
+    };
+    const child1 = {
+        name: Symbol(),
+        age: 1,
+    };
 }
-;
 /**
  * 泛型约束与默认值
  */
 function test2() {
     // type Res1 = ResultStatus<'200'>; // 会报错
 }
-;
 /**
  * 多泛型关联
  */
 function test3() {
 }
-;
 /**
  * 对象类型中的泛型
  */
 function test4() {
-    ;
     const iRes1 = {
         code: 1,
         data: '',
         // a: '', // 不能多也不能少
     };
 }
-;
 /**
  * 函数的泛型
  */
 function test5() {
     function handle(input) {
+        // 在调用函数传入参数的时候，T 会自动被填充为这个参数的类型，类型的信息会尽可能的推导的更精细，可以推导到字面量的时候会尽量的推导到字面量类型，而非基础类型
         return input;
     }
-    ;
     // 箭头函数中加入泛型的表示
     const handle1 = (a) => a;
     const handle2 = (a) => a;
 }
-;
 /**
  * Class 中的泛型
  * 函数中的泛型的消费方是 参数和返回值类型
@@ -88,17 +84,12 @@ function test6() {
         constructor(list) {
             this.list = list;
         }
-        ;
         add(item) {
             this.list.push(item);
         }
-        ;
         add1(item) {
             this.list.push(item);
         }
-        ;
     }
-    ;
 }
-;
 export default test;

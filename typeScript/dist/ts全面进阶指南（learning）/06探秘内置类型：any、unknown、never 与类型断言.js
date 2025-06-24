@@ -4,7 +4,6 @@ function test() {
     test2();
     test3();
 }
-;
 /**
  * 内置类型：any、unknown 与 never
  * any 可以接收任何类型，可以赋值给除了 never 之外的其他所有类型
@@ -17,7 +16,6 @@ function test1() {
     test1_2();
     test1_3();
 }
-;
 function test1_1() {
     console.log('---test1_1---------------------------------------------');
     let val1; // 会被推导为 any
@@ -34,7 +32,6 @@ function test1_1() {
     val7 = 12;
     let val8 = val7; // any 类型即使是被赋值成其他的类型还是可以赋值给另一个类型的，因为看的是定义时候的类型
 }
-;
 function test1_2() {
     console.log('---test1_2---------------------------------------------');
     let val1;
@@ -42,8 +39,9 @@ function test1_2() {
     val1 = ''; // unknown 可以接受任何类型
     let val3 = val1;
     val1 = test1_2_val4;
+    val1 = undefined;
+    val1 = null;
 }
-;
 function test1_3() {
     console.log('---test1_3---------------------------------------------');
     let val2 = val1;
@@ -56,8 +54,10 @@ function test1_3() {
     else {
         let val5 = val4; // 这样如果 val5 的类型增加，如果 没有增加 else if 这里就会报错，原因是 never 类型只能接收 never 类型
     }
+    let val6 = val1;
+    let val7 = val1;
+    let val8 = val1;
 }
-;
 /**
  * 类型断言
  * as newType 、 <newType>
@@ -78,9 +78,8 @@ function test2() {
  * ! 表示 ! 前面一定是非 null 非 undefined
  */
 function test3() {
-    ;
     const obj = {
-        fun() { }
+        fun() { },
     };
     // obj.fun(); // 会报错，根据定义，不一定会有 fun 属性
     obj.fun(); // 注意和 js 中的 ? 不同，虽然在编译的时候不会报错，但是可能在运行的时候报错
