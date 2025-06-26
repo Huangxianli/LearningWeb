@@ -14,13 +14,18 @@ const addTask = () => {
     todoListStore.addTodoItem(toDoName.value.trim());
     toDoName.value = '';
   }
-}
+};
 </script>
 
 <template>
   <div class="todo-input-container">
-    <input v-model="toDoName" class="todo-input" type="text" placeholder="请输入代办事项，点击添加按钮或键入回车键添加"
-      @keyup.enter="handleUpEnter" />
+    <input
+      v-model="toDoName"
+      class="todo-input"
+      type="text"
+      placeholder="请输入代办事项，点击添加按钮或键入回车键添加"
+      @keyup.enter="handleUpEnter"
+    />
     <button class="add-button" :disabled="!toDoName" @click="handleClick">添加</button>
   </div>
 </template>

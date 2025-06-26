@@ -12,7 +12,9 @@ const handleChange = (e: Event) => {
 };
 const checked = ref(false);
 watchEffect(() => {
-  checked.value = Boolean(todoListStore.todoList.length) && isDoneList.value.length === todoListStore.todoList.length;
+  checked.value =
+    Boolean(todoListStore.todoList.length) &&
+    isDoneList.value.length === todoListStore.todoList.length;
 });
 
 // 清除已选逻辑
@@ -24,9 +26,17 @@ const handleClick = () => {
 <template>
   <div class="todo-total">
     <span>已完成 {{ isDoneList.length }} / {{ todoListStore.todoList.length }}</span>
-    <div>全选<input type="checkbox" v-model="checked" :disabled="!todoListStore.todoList.length" @change="handleChange">
+    <div>
+      全选<input
+        type="checkbox"
+        v-model="checked"
+        :disabled="!todoListStore.todoList.length"
+        @change="handleChange"
+      />
     </div>
-    <button :disabled="!isDoneList.length" class="clean-button" @click="handleClick">清除已选</button>
+    <button :disabled="!isDoneList.length" class="clean-button" @click="handleClick">
+      删除已选
+    </button>
   </div>
 </template>
 

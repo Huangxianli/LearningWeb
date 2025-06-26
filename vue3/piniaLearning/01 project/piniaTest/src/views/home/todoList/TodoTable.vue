@@ -1,17 +1,20 @@
 <script setup lang="ts">
 import { useTodoListStore } from '@/stores/todoList';
-import TodoItem from './TodoItem.vue';
+import TodoItem from '@/views/home/todoList/TodoItem.vue';
 
 const toListStore = useTodoListStore();
 </script>
 
 <template>
   <div class="todo-table">
-    <div v-if="!toListStore.todoList.length" class="empty-todo">
-      暂无代办事项，请添加
-    </div>
+    <div v-if="!toListStore.todoList.length" class="empty-todo">暂无代办事项，请添加</div>
     <template v-else>
-      <TodoItem v-for="item in toListStore.todoList" :key="item.id" :row="item"></TodoItem>
+      <TodoItem
+        v-for="(item, index) in toListStore.todoList"
+        :key="item.id"
+        :row="item"
+        :index="toListStore.todoList.length - index"
+      ></TodoItem>
     </template>
   </div>
 </template>

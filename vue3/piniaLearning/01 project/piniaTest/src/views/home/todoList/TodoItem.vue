@@ -1,31 +1,35 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue';
+import { ref, watch, defineProps } from 'vue';
 import type { TodoItem } from '@/stores/todoList';
 import { useTodoListStore } from '@/stores/todoList';
 const todoListStore = useTodoListStore();
 
-import { defineProps } from 'vue';
-const { row } = defineProps<{ row: TodoItem }>();
+const { row, index } = defineProps<{ row: TodoItem; index: number }>();
 const handleClick = () => {
   todoListStore.deleteTodoItem(row.id);
 };
 
 const handleChange = (e: Event) => {
   todoListStore.selectItem(row.id, (e.target as HTMLInputElement).checked);
-}
+};
 const checked = ref(false);
-watch(() => row.isDone, (newValue) => {
-  checked.value = newValue;
-});
-
+watch(
+  () => row.isDone,
+  (newValue) => {
+    checked.value = newValue;
+  },
+);
 </script>
 
 <template>
   <div class="todo-item">
+    <div class="todo-item-index">{{ index }}</div>
     <div class="todo-item-checkbox-container">
       <input v-model="checked" class="todo-item-checkbox" type="checkbox" @change="handleChange" />
     </div>
-    <div :class="{ 'is-done-name': row.isDone }" class="todo-item-name" :title="row.name">{{ row.name }}</div>
+    <div :class="{ 'is-done-name': row.isDone }" class="todo-item-name" :title="row.name">
+      {{ row.name }}
+    </div>
     <button class="todo-item-delete" @click="handleClick">删除</button>
   </div>
 </template>
@@ -38,10 +42,16 @@ watch(() => row.isDone, (newValue) => {
   height: 20px;
   padding: 2px 0;
 }
+.todo-item-index {
+  height: 20px;
+  width: 20px;
+  line-height: 20px;
+}
 
 .todo-item-checkbox-container {
   height: 20px;
   width: 20px;
+  line-height: 20px;
 }
 
 .todo-item-name {

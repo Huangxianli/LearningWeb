@@ -1,29 +1,29 @@
-import { defineStore } from 'pinia'
-import { ref } from 'vue'
-import type { Ref } from 'vue'
+import { defineStore } from 'pinia';
+import { ref } from 'vue';
+import type { Ref } from 'vue';
 
 export interface TodoItem {
-  id: number
-  name: string
-  isDone: boolean
+  id: number;
+  name: string;
+  isDone: boolean;
 }
 
 // 组合式的写法
 // 要自己定义 $reset 方法来实现重置为初始值
 export const useTodoListStore = defineStore('todoList', () => {
-  let maxId = 0
-  const todoList: Ref<TodoItem[]> = ref([])
+  let maxId = 0;
+  const todoList: Ref<TodoItem[]> = ref([]);
 
   function addTodoItem(name: string) {
     todoList.value.unshift({
       id: maxId++,
       name,
       isDone: false,
-    })
+    });
   }
 
   function deleteTodoItem(id: number) {
-    todoList.value = todoList.value.filter((todoItem) => todoItem.id !== id)
+    todoList.value = todoList.value.filter((todoItem) => todoItem.id !== id);
   }
 
   function selectItem(id: number, isDone: boolean) {
@@ -32,21 +32,21 @@ export const useTodoListStore = defineStore('todoList', () => {
         return {
           ...todoItem,
           isDone,
-        }
+        };
       }
-      return todoItem
-    })
+      return todoItem;
+    });
   }
   function selectAll(isDone: boolean) {
     todoList.value = todoList.value.map((todoItem) => {
       return {
         ...todoItem,
         isDone,
-      }
-    })
+      };
+    });
   }
   function clearSelect() {
-    todoList.value = todoList.value.filter((todoItem) => !todoItem.isDone)
+    todoList.value = todoList.value.filter((todoItem) => !todoItem.isDone);
   }
 
   return {
@@ -56,8 +56,8 @@ export const useTodoListStore = defineStore('todoList', () => {
     selectItem,
     selectAll,
     clearSelect,
-  }
-})
+  };
+});
 
 // 选项式的写法
 // const todoListStore = useTodoListStore();

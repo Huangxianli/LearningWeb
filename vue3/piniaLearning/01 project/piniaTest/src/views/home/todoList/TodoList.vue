@@ -1,21 +1,18 @@
 <script setup lang="ts">
-import TodoInput from './TodoInput.vue';
-import TodoTable from './TodoTable.vue';
-import TodoTotal from './TodoTotal.vue';
+import TodoInput from '@/views/home/todoList/TodoInput.vue';
+import TodoTable from '@/views/home/todoList/TodoTable.vue';
+import TodoTotal from '@/views/home/todoList/TodoTotal.vue';
 </script>
 
 <template>
   <div class="todo-list-container">
     <div class="todo-list">
-      <div class="todo-list-title">
-        todo list
-      </div>
+      <div class="todo-list-title">todo list</div>
       <TodoInput />
       <TodoTable />
       <TodoTotal />
     </div>
   </div>
-
 </template>
 
 <style scoped>

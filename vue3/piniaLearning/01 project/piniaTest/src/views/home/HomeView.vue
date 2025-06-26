@@ -1,12 +1,15 @@
 <script setup lang="ts">
-import TodoList from './todoList/TodoList.vue';
-
+import TodoList from '@/views/home/todoList/TodoList.vue';
 </script>
 
 <template>
-  <div>
+  <div class="home-view">
     <TodoList />
   </div>
 </template>
 
-<style scoped></style>
+<style scoped lang="less">
+.home-view {
+  padding-top: 20px;
+}
+</style>
