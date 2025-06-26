@@ -10,9 +10,9 @@ export default {};
 //     : [F]
 //   : [];
 
-type PromiseAll = <T extends readonly PromiseLike<any>[], U =[]>(
-  arg: T
-) => Promise<[T extends readonly [infer F, ...infer Rest] ? ]>;
+// type PromiseAll = <T extends readonly PromiseLike<any>[], U =[]>(
+//   arg: T
+// ) => Promise<[T extends readonly [infer F, ...infer Rest] ? ]>;
 
 // const promise1 = Promise.resolve(3);
 // const promise2 = 42;
@@ -21,3 +21,16 @@ type PromiseAll = <T extends readonly PromiseLike<any>[], U =[]>(
 // });
 // const a = [promise1, promise2, promise3] as const;
 // type A = Array1<typeof a>;
+
+declare function PromiseAll<T extends any[]>(
+  values: readonly [...T]
+): Promise<{ [K in keyof T]: T[K] extends Promise<infer R> ? R : T[K] }>;
+
+const promise1 = Promise.resolve(3);
+const promise2 = 42;
+const promise3 = new Promise<string>((resolve, reject) => {
+  setTimeout(resolve, 100, 'foo');
+});
+
+// `Promise<[number, 42, string]>`
+const p = PromiseAll([promise1, promise2, promise3] as const);
