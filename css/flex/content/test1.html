@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="zh">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>test1</title>
+    <style>
+      .outer {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+      }
+
+      .left {
+        border: 1px solid gray;
+        display: grid;
+        grid-template-columns: repeat(auto-fill, 200px);
+        grid-auto-flow: row;
+        gap: 20px;
+        max-width: calc(100% - 100px - 40px);
+      }
+
+      .right {
+        width: 100px;
+        height: 200px;
+        background-color: red;
+        border: 1px solid gray;
+        margin-left: 20px;
+      }
+
+      .left-inner {
+        height: 100px;
+        width: 200px;
+        background-color: yellow;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="outer">
+      <div class="left">
+        <div class="left-inner"></div>
+        <div class="left-inner"></div>
+        <div class="left-inner"></div>
+        <div class="left-inner"></div>
+        <div class="left-inner"></div>
+        <div class="left-inner"></div>
+        <div class="left-inner"></div>
+        <div class="left-inner"></div>
+        <div class="left-inner"></div>
+        <div class="left-inner"></div>
+      </div>
+
+      <div class="right"></div>
+    </div>
+  </body>
+</html>

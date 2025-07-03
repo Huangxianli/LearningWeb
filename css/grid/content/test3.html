@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="zh">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      .form_box {
+        display: grid;
+        gap: 4px 20px;
+        justify-items: end;
+      }
+      .form_box input {
+        width: 100%;
+      }
+      @media screen and (min-width: 720px) {
+        .form_box {
+          grid-template-columns: repeat(2, 120px 1fr);
+        }
+      }
+      @media screen and (max-width: 720px) {
+        .form_box {
+          grid-template-columns: 120px 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div>
+      <form class="form_box">
+        <label for="">label1</label>
+        <input type="text" />
+        <label for="">label2</label>
+        <input type="text" />
+        <label for="">label3</label>
+        <input type="text" />
+        <label for="">label4</label>
+        <input type="text" />
+        <label for="">label5</label>
+        <input type="text" />
+        <label for="">label6</label>
+        <input type="text" />
+        <label for="">label7</label>
+        <input type="text" />
+        <label for="">label8</label>
+        <input type="text" />
+        <label for="">label9</label>
+        <input type="text" />
+        <label for="">label10</label>
+        <input type="text" />
+        <label for="">label11</label>
+        <input type="text" />
+        <label for="">label12</label>
+        <input type="text" />
+        <label for="">label13</label>
+        <input type="text" />
+      </form>
+    </div>
+  </body>
+</html>

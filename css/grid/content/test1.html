@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      body {
+        margin: 0;
+      }
+      .outer_box {
+        display: grid;
+        grid-template: 'header header header' 100px 'menu main aside' 1fr 'footer footer footer' 20px / 1fr 3fr 1fr;
+        height: 100vh;
+        /* 父元素不设置高度可能会导致如果子元素设置占据的高度为 fr 单位的时候，没有高度 */
+      }
+      .header {
+        grid-area: header;
+        background-color: red;
+      }
+      .menu {
+        grid-area: menu;
+        background-color: green;
+      }
+      .main {
+        grid-area: main;
+        background-color: yellow;
+      }
+      .aside {
+        grid-area: aside;
+        background-color: green;
+      }
+      .footer {
+        grid-area: footer;
+        background-color: blue;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="outer_box">
+      <header class="header"></header>
+      <div class="menu"></div>
+      <main class="main"></main>
+      <div class="aside"></div>
+      <footer class="footer"></footer>
+    </div>
+  </body>
+</html>

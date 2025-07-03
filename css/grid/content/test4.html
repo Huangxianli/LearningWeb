@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="zh">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      .outer_box {
+        display: grid;
+        grid-template: repeat(8, 100px) / repeat(8, 100px);
+        justify-content: center;
+        align-content: center;
+        height: 100%;
+      }
+      .cell:nth-child(16n + 1),
+      .cell:nth-child(16n + 3),
+      .cell:nth-child(16n + 5),
+      .cell:nth-child(16n + 7),
+      .cell:nth-child(16n + 10),
+      .cell:nth-child(16n + 12),
+      .cell:nth-child(16n + 14),
+      .cell:nth-child(16n + 16) {
+        background-color: #f0d9b5;
+      }
+      .cell:nth-child(16n + 2),
+      .cell:nth-child(16n + 4),
+      .cell:nth-child(16n + 6),
+      .cell:nth-child(16n + 8),
+      .cell:nth-child(16n + 9),
+      .cell:nth-child(16n + 11),
+      .cell:nth-child(16n + 13),
+      .cell:nth-child(16n + 15) {
+        background-color: #b58863;
+      }
+      .cell:hover {
+        transform: scale(1.08);
+        z-index: 2;
+        box-shadow: 0 0 15px rgba(255, 215, 0, 0.8);
+      }
+      .cell {
+        position: relative;
+      }
+      .cell .description_span {
+        position: absolute;
+        color: gray;
+      }
+      .top_number {
+        transform: rotate(180deg);
+        top: 0;
+        left: 0;
+      }
+      .right_letter {
+        transform: rotate(180deg);
+        top: 0;
+        right: 0;
+      }
+      .bottom_number {
+        bottom: 0;
+        right: 0;
+      }
+      .left_letter {
+        bottom: 0;
+        left: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="outer_box">
+      <div class="cell"></div>
+      <div class="cell"></div>
+      <div class="cell"></div>
+      <div class="cell"></div>
+      <div class="cell"></div>
+      <div class="cell"></div>
+      <div class="cell"></div>
+      <div class="cell"></div>
+      <div class="cell"></div>
+      <div class="cell"></div>
+      <div class="cell"></div>
+      <div class="cell"></div>
+      <div class="cell"></div>
+      <div class="cell"></div>
+      <div class="cell"></div>
+      <div class="cell"></div>
+      <div class="cell"></div>
+      <div class="cell"></div>
+      <div class="cell"></div>
+      <div class="cell"></div>
+      <div class="cell"></div>
+      <div class="cell"></div>
+      <div class="cell"></div>
+      <div class="cell"></div>
+      <div class="cell"></div>
+      <div class="cell"></div>
+      <div class="cell"></div>
+      <div class="cell"></div>
+      <div class="cell"></div>
+      <div class="cell"></div>
+      <div class="cell"></div>
+      <div class="cell"></div>
+      <div class="cell"></div>
+      <div class="cell"></div>
+      <div class="cell"></div>
+      <div class="cell"></div>
+      <div class="cell"></div>
+      <div class="cell"></div>
+      <div class="cell"></div>
+      <div class="cell"></div>
+      <div class="cell"></div>
+      <div class="cell"></div>
+      <div class="cell"></div>
+      <div class="cell"></div>
+      <div class="cell"></div>
+      <div class="cell"></div>
+      <div class="cell"></div>
+      <div class="cell"></div>
+      <div class="cell"></div>
+      <div class="cell"></div>
+      <div class="cell"></div>
+      <div class="cell"></div>
+      <div class="cell"></div>
+      <div class="cell"></div>
+      <div class="cell"></div>
+      <div class="cell"></div>
+      <div class="cell"></div>
+      <div class="cell"></div>
+      <div class="cell"></div>
+      <div class="cell"></div>
+      <div class="cell"></div>
+      <div class="cell"></div>
+      <div class="cell"></div>
+      <div class="cell"></div>
+    </div>
+  </body>
+  <script>
+    const cells = document.querySelectorAll('.cell');
+    cells.forEach((cell, index) => {
+      if ((index + 1) / 8 <= 1) {
+        const span = document.createElement('span');
+        span.innerText = index + 1;
+        span.classList.add('description_span');
+        span.classList.add('top_number');
+        cell.appendChild(span);
+      }
+      if ((index + 1) / 8 > 7) {
+        const span = document.createElement('span');
+        span.innerText = 8 - (8 * 8 - index) + 1;
+        span.classList.add('description_span');
+        span.classList.add('bottom_number');
+        cell.appendChild(span);
+      }
+      if ((index + 1) % 8 === 1) {
+        const span = document.createElement('span');
+        span.classList.add('description_span');
+        span.innerText = String.fromCharCode(
+          'a'.charCodeAt(0) + 8 - parseInt((index + 1) / 8) - 1
+        );
+        span.classList.add('left_letter');
+        cell.appendChild(span);
+      }
+      if ((index + 1) % 8 === 0) {
+        const span = document.createElement('span');
+        span.classList.add('description_span');
+        span.innerText = String.fromCharCode(
+          'a'.charCodeAt(0) + 8 - parseInt((index + 1) / 8)
+        );
+        span.classList.add('right_letter');
+        cell.appendChild(span);
+      }
+    });
+  </script>
+</html>

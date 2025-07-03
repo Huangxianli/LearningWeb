@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>最终正确布局</title>
+    <style>
+      /* 这是一个干净的样式块，没有任何隐藏错误 */
+
+      .outer_box {
+        border: 1px solid red;
+        display: inline-flex;
+        flex-wrap: wrap;
+        gap: 20px;
+      }
+
+      .inner_box {
+        height: 100px;
+        width: 200px;
+        background-color: yellow;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>这段文字证明HTML加载成功</h1>
+
+    <div class="outer_box">
+      <div class="inner_box" style="background-color: green"></div>
+      <div class="inner_box"></div>
+      <div class="inner_box"></div>
+      <div class="inner_box"></div>
+      <div class="inner_box"></div>
+      <div class="inner_box"></div>
+      <div class="inner_box"></div>
+      <div class="inner_box"></div>
+      <div class="inner_box"></div>
+      <div class="inner_box"></div>
+    </div>
+  </body>
+</html>
