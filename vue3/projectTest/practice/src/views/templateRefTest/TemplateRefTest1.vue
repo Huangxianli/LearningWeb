@@ -10,6 +10,7 @@ const clickHandler = () => {
 
 <template>
   <el-card>
+    <h3>ref() 的写法</h3>
     <el-input ref="inputRef" placeholder="请输入" />
     <el-button type="primary" @click="clickHandler">聚焦</el-button>
   </el-card>

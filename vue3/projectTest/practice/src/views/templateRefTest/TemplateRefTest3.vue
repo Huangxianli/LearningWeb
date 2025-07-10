@@ -11,6 +11,7 @@ const clickHandler = () => {
 
 <template>
   <el-card>
+    <h3>在组价上使用</h3>
     <FormInput ref="form" />
     <el-button @click="clickHandler">校验</el-button>
   </el-card>

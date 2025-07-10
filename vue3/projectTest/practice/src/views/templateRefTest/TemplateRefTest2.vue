@@ -13,6 +13,7 @@ const inputHandler = () => {
 
 <template>
   <el-card>
+    <h3>useTemplateRef() 的写法</h3>
     <el-input type="text" ref="input" />
     <el-button @click="inputHandler">聚焦</el-button>
   </el-card>

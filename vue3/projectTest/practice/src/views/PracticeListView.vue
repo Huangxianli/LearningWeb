@@ -15,8 +15,12 @@ const goToDeatailPage = (routeName: string) => {
 <template>
   <div class="practice-list">
     <el-table :data="tableData" border size="small">
-      <el-table-column type="index"></el-table-column>
-      <el-table-column label="模块">
+      <el-table-column
+        type="index"
+        label="序号"
+        align="center"
+      ></el-table-column>
+      <el-table-column label="练习模块">
         <template #default="{ row }">
           {{ row.meta.testInfo.name }}
         </template>
