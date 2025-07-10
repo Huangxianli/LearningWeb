@@ -18,20 +18,33 @@ const goBackList = () => {
 </script>
 
 <template>
-  <div class="practice_detail_header">
-    <div class="practice_detail_header_info">
-      模块：{{
-        (route.meta as RouteMeta & TestDetailRouteMeta).testInfo?.name ?? ''
-      }}
+  <div class="practice_detail">
+    <div class="practice_detail_header">
+      <div class="practice_detail_header_info">
+        模块：{{
+          (route.meta as RouteMeta & TestDetailRouteMeta).testInfo?.name ?? ''
+        }}
+      </div>
+      <el-button type="primary" @click="goBackList">回到列表页</el-button>
     </div>
-    <el-button type="primary" @click="goBackList">回到列表页</el-button>
-  </div>
-  <div class="practice_detail_content">
-    <router-view></router-view>
+    <div class="practice_detail_content">
+      <router-view></router-view>
+    </div>
   </div>
 </template>
 
 <style scoped>
+.practice_detail {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+.practice_detail_content {
+  height: calc(100 - 53px);
+  padding-right: 10px;
+  padding-left: 10px;
+  overflow: auto;
+}
 .practice_detail_content :deep(.el-card.is-always-shadow) {
   margin-bottom: 8px;
 }
@@ -44,6 +57,8 @@ const goBackList = () => {
   align-items: center;
   border-bottom: 1px solid #ccc;
   margin-bottom: 12px;
+  padding-right: 10px;
+  padding-left: 10px;
 }
 .practice_detail_header_info {
   font-size: 18px;

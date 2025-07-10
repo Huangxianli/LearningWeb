@@ -1,7 +1,10 @@
 <script setup lang="ts">
-import { ref, watchEffect } from 'vue';
+import { ref, useTemplateRef, watchEffect } from 'vue';
 import type { Ref } from 'vue';
 import type { User } from './types';
+
+// import { outClickExcludes as vOutClickExcludes } from '../../directives/outClickExcludes';
+
 const usersTemp: User[] = [];
 for (let i = 0; i < 100; i++) {
   usersTemp.push({
@@ -45,38 +48,49 @@ const showDropDone: Ref<boolean> = ref(false);
 const focusHandler = () => {
   showDropDone.value = true;
 };
+
+const clickTableOutHander = () => {
+  showDropDone.value = false;
+};
+const inputRef = useTemplateRef('inputRef');
 </script>
 
 <template>
-  <el-card>
-    <input
-      type="text"
-      :value="inputValue"
-      @input="inputHandler"
-      @focus="focusHandler"
-    />
-    <div v-if="showDropDone" class="input_dropdone_box">
+  <input
+    ref="inputRef"
+    type="text"
+    :value="inputValue"
+    @input="inputHandler"
+    @focus="focusHandler"
+  />
+  <div
+    v-if="showDropDone"
+    class="input_dropdone_box"
+    v-outClickExcludes="{
+      handler: clickTableOutHander,
+      excludes: [inputRef!],
+    }"
+  >
+    <table>
+      <thead>
+        <tr>
+          <th>姓名</th>
+          <th>工号</th>
+        </tr>
+      </thead>
+    </table>
+    <div v-if="users.length" class="table-body-box">
       <table>
-        <thead>
-          <tr>
-            <th>姓名</th>
-            <th>工号</th>
+        <tbody @click="clickHandler">
+          <tr v-for="user in users" :id="user.id">
+            <td :data-id="user.id">{{ user.userName }}</td>
+            <td :data-id="user.id">{{ user.userAccount }}</td>
           </tr>
-        </thead>
+        </tbody>
       </table>
-      <div v-if="users.length" class="table-body-box">
-        <table>
-          <tbody @click="clickHandler">
-            <tr v-for="user in users" :id="user.id">
-              <td :data-id="user.id">{{ user.userName }}</td>
-              <td :data-id="user.id">{{ user.userAccount }}</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-      <div v-else class="no-data">暂无数据</div>
     </div>
-  </el-card>
+    <div v-else class="no-data">暂无数据</div>
+  </div>
 </template>
 
 <style scoped>

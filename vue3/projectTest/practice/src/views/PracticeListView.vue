@@ -13,31 +13,36 @@ const goToDeatailPage = (routeName: string) => {
 </script>
 
 <template>
-  <el-table :data="tableData" border size="small">
-    <el-table-column type="index"></el-table-column>
-    <el-table-column label="模块">
-      <template #default="{ row }">
-        {{ row.meta.testInfo.name }}
-      </template>
-    </el-table-column>
-    <el-table-column label="操作" width="100px">
-      <template #default="{ row }">
-        <div class="opration_cell">
-          <el-button
-            text
-            type="primary"
-            size="small"
-            @click="() => goToDeatailPage(row.name)"
-          >
-            详情
-          </el-button>
-        </div>
-      </template>
-    </el-table-column>
-  </el-table>
+  <div class="practice-list">
+    <el-table :data="tableData" border size="small">
+      <el-table-column type="index"></el-table-column>
+      <el-table-column label="模块">
+        <template #default="{ row }">
+          {{ row.meta.testInfo.name }}
+        </template>
+      </el-table-column>
+      <el-table-column label="操作" width="100px">
+        <template #default="{ row }">
+          <div class="opration_cell">
+            <el-button
+              text
+              type="primary"
+              size="small"
+              @click="() => goToDeatailPage(row.name)"
+            >
+              详情
+            </el-button>
+          </div>
+        </template>
+      </el-table-column>
+    </el-table>
+  </div>
 </template>
 
 <style scoped>
+.practice-list {
+  padding: 10px;
+}
 .opration_cell {
   display: flex;
   flex-direction: row;

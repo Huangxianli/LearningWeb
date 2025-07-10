@@ -59,6 +59,16 @@ const routes: RouteRecordRaw[] = [
         },
         component: () => import('../views/JSXTest/JSXTestView.vue'),
       },
+      {
+        path: 'renderTest',
+        name: 'renderTest',
+        meta: {
+          testInfo: {
+            name: 'render',
+          },
+        },
+        component: () => import('../views/renderTest/RenderTestView.vue'),
+      },
     ],
   },
 ];

@@ -1,4 +1,5 @@
 import JSXTest2_1 from './JSXTest2_1';
+import JSXTest2_2 from './JSXTest2_2.vue';
 import type { ListItem } from './types';
 
 export default {
@@ -6,6 +7,7 @@ export default {
     return () => (
       <div>
         {/* 插槽在 jsx 中的使用 */}
+        <h3>插槽在 jsx 中使用</h3>
         <JSXTest2_1
           v-slots={{
             default: ({ list = [] }: { list: ListItem[] }) => (
@@ -15,6 +17,7 @@ export default {
                 ))}
               </ul>
             ),
+            footer: () => <>footer</>,
           }}
         ></JSXTest2_1>
         <br />
@@ -24,6 +27,11 @@ export default {
             footer: () => 'footer 插槽内容',
           }}
         </JSXTest2_1>
+        <JSXTest2_2>
+          {{
+            default: () => <div>测试111</div>,
+          }}
+        </JSXTest2_2>
       </div>
     );
   },
