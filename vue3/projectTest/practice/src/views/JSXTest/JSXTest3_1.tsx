@@ -1,6 +1,6 @@
 import { defineComponent } from 'vue';
 import type { PropType } from 'vue';
-import type { ModelValueModifiers } from './types';
+import type { ModelModifiers } from './types';
 
 // 注意在 jsx 中不能直接使用 v-model 要自己进行拆分
 export default defineComponent({
@@ -10,8 +10,8 @@ export default defineComponent({
       default: '',
       required: true,
     },
-    modelValueModifiers: {
-      type: Object as PropType<ModelValueModifiers>,
+    modelModifiers: {
+      type: Object as PropType<ModelModifiers>,
       default: () => ({}),
     },
   },
@@ -30,7 +30,7 @@ export default defineComponent({
     const inputHandler = (e: Event) => {
       if (isComposing) return;
       let value = (e.target as HTMLInputElement).value;
-      if (props.modelValueModifiers.upper) {
+      if (props.modelModifiers.upper) {
         value = value.toLocaleUpperCase();
       }
       emit('update:modelValue', value);
@@ -38,7 +38,7 @@ export default defineComponent({
     const compositionendHandler = (e: Event) => {
       isComposing = false;
       let value = (e.target as HTMLInputElement).value;
-      if (props.modelValueModifiers.upper) {
+      if (props.modelModifiers.upper) {
         value = value.toLocaleUpperCase();
       }
       emit('update:modelValue', value);

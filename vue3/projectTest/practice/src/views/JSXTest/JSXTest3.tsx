@@ -19,7 +19,7 @@ export default defineComponent({
         <h3>v-model</h3>
         <JSXTest3_1
           modelValue={model.value}
-          modelValueModifiers={{ upper: true }}
+          modelModifiers={{ upper: true }}
           onUpdate:modelValue={updateModelValue}
         ></JSXTest3_1>
         <JSXTest3_1 v-model_upper={model.value}></JSXTest3_1>
