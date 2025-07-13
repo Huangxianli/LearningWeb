@@ -3,6 +3,7 @@ import SlotTest1_1 from './SlotTest1_1.vue';
 </script>
 
 <template>
+  <h3>$slots</h3>
   <SlotTest1_1>
     <template #header> header </template>
     <div class="slot_test_1_default">

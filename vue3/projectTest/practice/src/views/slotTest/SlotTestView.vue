@@ -4,6 +4,7 @@ import SlotTest2 from './SlotTest2.vue';
 import SlotTest3 from './SlotTest3.vue';
 import SlotTest4 from './SlotTest4.vue';
 import SlotTest5 from './SlotTest5.vue';
+import SlotTest6 from './SlotTest6';
 </script>
 
 <template>
@@ -21,6 +22,9 @@ import SlotTest5 from './SlotTest5.vue';
   </el-card>
   <el-card>
     <SlotTest5></SlotTest5>
+  </el-card>
+  <el-card>
+    <SlotTest6></SlotTest6>
   </el-card>
 </template>
 

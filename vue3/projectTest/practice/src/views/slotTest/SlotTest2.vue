@@ -11,6 +11,7 @@ const addListItem = (list: ListItem[]) => {
 </script>
 
 <template>
+  <h3>defineSlots()</h3>
   <SlotTest2_1>
     <template #list="{ list }">
       <ul>

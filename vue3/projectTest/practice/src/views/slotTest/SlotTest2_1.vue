@@ -1,6 +1,10 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, type VNodeChild } from 'vue';
 import type { ListItem } from './types';
+
+defineSlots<{
+  list: (props: { list: ListItem[] }) => VNodeChild;
+}>();
 
 const list = ref<ListItem[]>([
   { id: 1, name: 'name1' },

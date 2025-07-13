@@ -1,7 +1,11 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, type VNodeChild } from 'vue';
 
-const list = ref([]);
+defineSlots<{
+  default: (props: { list: number[] }) => VNodeChild;
+}>();
+
+const list = ref<number[]>([2, 3, 4, 5, 6]);
 </script>
 
 <template>

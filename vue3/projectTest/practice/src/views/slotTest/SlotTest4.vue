@@ -7,6 +7,7 @@ import SlotTest4_1 from './SlotTest4_1.vue';
     <template #default="{ list }">
       <div v-for="item in list" :key="item.id">{{ item.name }}</div>
     </template>
+    <template #header></template>
   </SlotTest4_1>
 </template>
 
