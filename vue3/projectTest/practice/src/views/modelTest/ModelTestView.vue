@@ -43,7 +43,7 @@ const model7: Ref<string> = ref('');
 const ModelTest7H = () =>
   h(ModelTest7, {
     modelValue: model7.value,
-    modelValueModifiers: {
+    modelModifiers: {
       upper: true,
     },
     'onUpdate:modelValue': (value: string) => {

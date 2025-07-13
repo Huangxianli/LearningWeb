@@ -6,7 +6,7 @@ export default defineComponent({
       default: '',
       required: false,
     },
-    modelValueModifiers: {
+    modelModifiers: {
       type: Object as PropType<{
         upper?: true;
         lower?: true;
@@ -18,10 +18,10 @@ export default defineComponent({
     const text = ref<string>('');
     const setTextValue = (value: string) => {
       let newValue = value;
-      if (props.modelValueModifiers?.upper) {
+      if (props.modelModifiers?.upper) {
         newValue = value.toLocaleUpperCase();
       }
-      if (props.modelValueModifiers?.lower) {
+      if (props.modelModifiers?.lower) {
         newValue = value.toLocaleLowerCase();
       }
       text.value = newValue;
