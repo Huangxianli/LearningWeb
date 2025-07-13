@@ -1,9 +1,16 @@
-import { defineComponent, h, ref } from 'vue';
+import { defineComponent, h, ref, useTemplateRef } from 'vue';
 export default defineComponent({
   setup() {
     const arr = ref(Array.from({ length: 10 }).map((_, index) => index));
-    const inputRefs = new Map();
-    return () =>
+    const inputRefs: Map<number, HTMLInputElement> = new Map();
+    // 像这种 循环中的 refDOM 在 h 函数中不支持平常的 ref 的写法
+
+    const inputRef1 = ref<HTMLInputElement | null>(null);
+    // 注意这里的参数是 null
+
+    const inputRef2 = useTemplateRef<HTMLInputElement>('inputRef2');
+
+    return () => [
       h('div', [
         ...arr.value.map((item) =>
           h(
@@ -14,8 +21,9 @@ export default defineComponent({
               item,
               h('input', {
                 ref: (el) => {
+                  console.log('key el', item, ' ', el);
                   if (el) {
-                    inputRefs.set(item, el);
+                    inputRefs.set(item, el as HTMLInputElement);
                   } else {
                     inputRefs.delete(item);
                   }
@@ -38,11 +46,37 @@ export default defineComponent({
           'button',
           {
             onClick: () => {
-              arr.value.shift();
+              arr.value.splice(1, 1);
             },
           },
-          '删除1'
+          '删除第二个'
         ),
-      ]);
+      ]),
+      h('input', {
+        ref: inputRef1, // 使用 ref() 这里是 ref 变量
+      }),
+      h(
+        'button',
+        {
+          onClick: () => {
+            inputRef1.value!.focus();
+          },
+        },
+        '聚焦当前 input'
+      ),
+      h('br'),
+      h('input', {
+        ref: 'inputRef2', // 使用 useTemplateRef，这里是字符串，
+      }),
+      h(
+        'button',
+        {
+          onClick: () => {
+            inputRef2.value!.focus();
+          },
+        },
+        '聚焦当前 input'
+      ),
+    ];
   },
 });

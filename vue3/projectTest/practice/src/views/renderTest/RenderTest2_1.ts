@@ -3,7 +3,7 @@ import type { Ref } from 'vue';
 
 export default defineComponent({
   emits: {
-    showChange: (_: boolean) => true,
+    showChange: (value: boolean): value is boolean => true,
   },
   setup(_, { emit }) {
     const showItem: Ref<boolean> = ref(true);

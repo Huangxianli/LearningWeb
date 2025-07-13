@@ -6,6 +6,7 @@ export default defineComponent({
     const model = ref<string>('');
     return () =>
       h('div', null, [
+        h('h3', '函数式组件'),
         h(RenderTest6_1, {
           modelValue: model.value,
           'onUpdate:modelValue': (value: string) => {

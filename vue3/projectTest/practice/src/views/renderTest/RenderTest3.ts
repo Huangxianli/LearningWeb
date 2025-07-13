@@ -1,13 +1,19 @@
 import { defineComponent, h, nextTick, ref } from 'vue';
 import RenderTest3_1 from './RenderTest3_1';
-import type { ListItem } from './types';
+
+type RenderTest3_1Type = InstanceType<typeof RenderTest3_1>;
+type DefaultSlotType = RenderTest3_1Type['$slots']['default'];
+type ParmarsType<T> = T extends (props: infer P) => any ? P : never;
+type DeafaultSlotParamsType = ParmarsType<DefaultSlotType>;
+
 export default defineComponent({
   setup() {
     const ulRef = ref();
     return () =>
       h('div', null, [
+        h('h3', '插槽'),
         h(RenderTest3_1, null, {
-          default: ({ list }: { list: ListItem[] }) => [
+          default: ({ list }: DeafaultSlotParamsType) => [
             h(
               'ul',
               {

@@ -9,7 +9,7 @@ type FComponentEvent = {
   'update:modelValue': (value: string) => void;
 };
 
-// 注意函数式组件内部没有声明周期，没有内部的状态，如果不需要使用功能，函数式组件是更好的选择，新能更加的好
+// 注意函数式组件内部没有声明周期，没有内部的状态，如果不需要使用功能，函数式组件是更好的选择，性能更加的好
 const RenderTest6_1: FunctionalComponent<FComponentProps, FComponentEvent> = (
   props,
   { emit }

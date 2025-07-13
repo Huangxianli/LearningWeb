@@ -8,6 +8,7 @@ export default defineComponent({
 
     return () =>
       h('div', null, [
+        h('h3', 'v-model'),
         h(RenderTest4_1, {
           modelValue: modelValue.value,
           'onUpdate:modelValue': (value) => {
