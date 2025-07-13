@@ -69,6 +69,17 @@ const routes: RouteRecordRaw[] = [
         },
         component: () => import('../views/renderTest/RenderTestView.vue'),
       },
+      {
+        path: 'functionalTest',
+        name: 'functionalTest',
+        meta: {
+          testInfo: {
+            name: 'functional',
+          },
+        },
+        component: () =>
+          import('../views/functionalTest/FunctionalTestView.vue'),
+      },
     ],
   },
 ];
