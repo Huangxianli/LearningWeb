@@ -1,0 +1,22 @@
+{
+  "name": "vite-project-vue2-2",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue2": "^2.3.3",
+    "typescript": "~5.8.3",
+    "vite": "^6.3.5",
+    "vue": "^2.7.16"
+  },
+  "dependencies": {
+    "@vue/babel-helper-vue-jsx-merge-props": "^1.4.0",
+    "@vue/babel-preset-jsx": "^1.4.0",
+    "vue": "^2.7.16"
+  }
+}
