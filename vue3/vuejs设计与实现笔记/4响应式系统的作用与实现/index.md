@@ -949,10 +949,17 @@ watch(obj, () => {
 // 这样只监听了这个对象的一个属性，我们希望监听第一层
 
 ```ts
-function watch(obj, cb) {
-  effect(() => traverse(obj), {
+function watch(source, cb) {
+  // source 可能会是 () => xxx、obj.xxx 的形式，添加 getter 变量来统一处理成一种形式
+  let getter;
+  if (typeof source === 'function') {
+    getter = source;
+  } else {
+    getter = () => tracerse(source);
+  }
+  effect(() => getter(), {
     scheduler() {
-      cb;
+      cb();
     },
   });
 }
@@ -965,3 +972,5 @@ function traverse(value, seen = new Set()) {
   return value;
 }
 ```
+现在我们还要获取 oldValue 和 newValue
+我们知道，执行完 ch 之后，newValue 就应该被赋值为 oldValue 
