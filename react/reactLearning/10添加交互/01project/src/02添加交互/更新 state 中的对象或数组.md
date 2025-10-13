@@ -9,13 +9,13 @@ state 中可以保存任意类的 JS 值
 
 ```js
 const [position, setPosition] = useState({ x: 0, y: 0 });
-position.x = 12; // 产生一个 mutation
+position.x = 12; // 修改了对象，产生一个 mutation
 ```
 
 ## 将 state 视为只读的
 
 **应该把所有存放在 state 中的 JS 对象都视为只读的**
-局部的 mutation 是可以的接受的
+局部的 mutation 是可以的接受的（指的是修改非 state 数据）
 
 ```js
 const [position, setPosition] = useState({ x: 0, y: 0 });

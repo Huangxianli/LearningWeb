@@ -46,6 +46,9 @@ export default function ChildComponent1() {
         onClick={function () {
           alert('被子组件的 click 事件冒泡触发了');
         }}
+        onClickCapture={() => {
+          alert('事件捕获阶段被触发了');
+        }}
       >
         <ChildComponent2 onClick={handlerClick} />
       </div>

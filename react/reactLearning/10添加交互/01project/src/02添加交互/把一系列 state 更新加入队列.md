@@ -19,6 +19,7 @@ state setter(n => n + 1);
 setter(1) 相当于 setter(n => 1)
 setter(n => n + 1) 中的更新函数的**参数 n 是该 state 上一个更新函数的返回值**
 
+> 注意：这里说的更新函数是 n => n + 1，而不是 setter
 > 注意：直接访问 state，获取到的都是当前的快照的值，即使是在更新函数里面
 
 ### 如果你在替换 state 后更新 state 会发生什么

@@ -14,6 +14,7 @@
     <div id="root"></div>
 
     <script type="text/babel">
+      const { useState } = React;
       /**
        * 可以使用if 三目 && || 来进行条件渲染
        * 注意 && || 为 0 的时候
@@ -23,15 +24,30 @@
         const showJsx = showItem ? <div>show ChildComponent1</div> : null;
         return showJsx;
       }
+      // 更推荐这种直接将逻辑写在 return 的内容里面
       function ChildComponent2() {
         const showItem = true;
         return <>{showItem && <div>show ChildComponent2</div>}</>;
       }
+
+      // 和 vue3 的不同，state 的变化会重新执行整个函数组件，而不单单的是重新渲染
+      function ChildComponent3() {
+        const [showItem, setShowItem] = useState(true);
+        const item = showItem ? <div>show ChildComponent3</div> : null;
+        return (
+          <>
+            {item}
+            <button onClick={() => setShowItem(!item)}>切换 item 显示</button>
+          </>
+        );
+      }
+
       function RootComponent() {
         return (
           <>
             <ChildComponent1 />
             <ChildComponent2 />
+            <ChildComponent3 />
           </>
         );
       }

@@ -24,7 +24,7 @@
 如果一个 state 能从 props 或者其他 state 计算得来，那这个 state 就是冗余的
 
 > 不要在 state 中镜像 props，除非是要利用它只在创建时的渲染获得 props 的值的特性
-> 在子组件中,如果设置一个 state 来接收父组件的 props，那么只会在组件创建时的渲染中接收 props 的值，后面由于 props 改变触发的组件的重新渲染，这个 state 的值不会随着 props 的更新而更新
+> 在子组件中，如果设置一个 state 来接收父组件的 props，那么只会在组件创建时的渲染中接收 props 的值，后面由于 props 改变触发的组件的重新渲染，这个 state 的值不会随着 props 的更新而更新
 
 ## 避免重复的 state
 

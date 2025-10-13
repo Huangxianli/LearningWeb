@@ -28,8 +28,9 @@ function NormalVar() {
         {/* 注意：一般在事件回调处理完之后才会触发重新渲染 */}
         <button
           onClick={() => {
-            setStateCount(stateCount + 1);
+            setStateCount(stateCount + 1); // 这里修改了 state 的值，稍后会触发该组件的重新渲染，重新执行函数， normalCount 的值会被重置，或者说这次的 normalCount 是重新创建的变量
             alert('普通变量：' + normalCount + 'state变量：' + stateCount);
+            // 注意在这里我们读取到的 stateCount 的值是上一次渲染时的值，setSateCount 是异步的
           }}
         >
           修改state变量

@@ -19,10 +19,13 @@
        * 可以将 JSX 作为子组件传递
        *
        * 不要在组件内修改 props，必须由来源组件修改并传递一个新的 props（一个新的对象）
+       *
+       * props 的改变触发组件重新渲染本质上是对应父组件的 state 变化引起的，如果传入的 props 不是 state，那么该 props 的变化不会触发组件的重新渲染
        */
       function ChildComponent1({
         person = { name: 'name', age: 'age' },
         children,
+        changeName = () => void 0,
       }) {
         return (
           <>
@@ -34,6 +37,7 @@
               <span>age</span>
               <span>{person.age}</span>
             </div>
+            <button onClick={changeName}>changeName</button>
             {children}
           </>
         );
@@ -47,14 +51,17 @@
       }
 
       function RootComponent() {
-        const person = {
+        let person = {
           name: 'name1',
           age: 1,
+        };
+        const changeName = () => {
+          person = { ...person, name: person.name + '1' };
         };
 
         return (
           <>
-            <ChildComponent1 person={person}>
+            <ChildComponent1 person={person} changeName={changeName}>
               <ChildComponent2 />
             </ChildComponent1>
           </>

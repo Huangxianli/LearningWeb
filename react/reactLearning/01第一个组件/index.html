@@ -37,6 +37,15 @@
       const container = document.getElementById('root');
       const root = ReactDOM.createRoot(container);
       root.render(<HelloWorld />);
+
+      function HelloWorld1() {
+        return <>Hello World 1</>;
+      }
+      setTimeout(() => {
+        root.render(<HelloWorld1 />);
+      }, 3000);
+
+      // ReactDOM.createRoot().render();
     </script>
   </body>
 </html>

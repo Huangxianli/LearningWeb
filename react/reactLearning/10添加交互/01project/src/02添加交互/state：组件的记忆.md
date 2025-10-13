@@ -12,7 +12,7 @@
 ### useState Hook
 
 1. State 变量用于存储*渲染间*的数据
-2. State Setter 函数更新变量并触发 React 组件*再次渲染*
+2. State Setter 函数*更新变量*并触发 React 组件*再次渲染*
 
 ## 添加一个 State 变量
 
@@ -33,7 +33,7 @@ useState 用于解决之前普通变量可能会遇到的问题
 如果很多时候，总是同时更新多个 state 变量，可以将多个 state 变量合并成一个（一个优化策略）
 
 **在同一组件的每次渲染中，Hooks 都依托于一个稳定的调用顺序**
-在 React 内部，为每个组件保存了一个数组，每一项都是一个 state 对：[state, stateSetter0]。
+在 React 内部，为每个组件实例保存了一个数组，每一项都是一个 state 对：[state, stateSetter]。
 它维护当前 state 对的索引值，在渲染之前将其值设置为“0”。
 每次调用 useState 的时候，React 就会提供一个 state 并增加索引值。
 所以，useState 要放在组件的顶部，不要在判断条件中使用 useState；
@@ -41,7 +41,7 @@ useState 用于解决之前普通变量可能会遇到的问题
 在第二次渲染的时候，遇到 useState 执行就会去组件中查找对应的下标（第一次执行为 0，执行一次就加 1），如果在第二次渲染的时候，条件为 false，将不会执行 useState，这个时候，下标没有改变，那么后面获取到的 state 的值和更新函数会错位
 
 ```js
-let componentHooks = [];
+const componentHooks = [];
 let currentHookIndex = 0;
 
 // useState 在 React 中是如何工作的（简化版）

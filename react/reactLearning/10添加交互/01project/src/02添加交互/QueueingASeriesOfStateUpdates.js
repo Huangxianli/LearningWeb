@@ -18,11 +18,11 @@ function QueueingASeriesOfStateUpdate() {
   // 只会加一： 一次渲染中，state 的值是不会变的，且 React 会等到事件处理函数的所有代码都运行完再处理 state
   function handlerClick() {
     // 可以认为 触发了三次，但是最终只会渲染一次
-    setCount(count + 1);
-    setCount(count + 1);
-    setCount(count + 1);
-    setDisabled(true);
-    setDisabled(false);
+    setCount(count + 1); // setCount(n => count + 1)
+    setCount(count + 1); // setCount(n => count + 1)
+    setCount(count + 1); // setCount(n => count + 1)
+    setDisabled(true); // setDisabled(n => true)
+    setDisabled(false); // setDisabled(n => false)
   }
   function handlerClick1() {
     setCount((n) => n + 1);

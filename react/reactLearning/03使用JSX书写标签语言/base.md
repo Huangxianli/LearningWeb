@@ -2,7 +2,7 @@
 
 ## JSX: 将标签引入 JavaScript
 
-一直以来：HTML 文件存放网页内容 CSS 文件存放样式 JS 文件存放逻辑
+一直以来：HTML 文件存放网页内容，CSS 文件存放样式，JS 文件存放逻辑
 交互性加强，逻辑更加决定了页面中的内容。JS 负责了一部分 HTML 的内容
 React 中，逻辑和标签处于同一个地方——组件
 
@@ -17,3 +17,19 @@ _React 组件使用 JSX 语法扩展来描述标签_，语法比 JS 更加严格
 2. 标签必须闭合
 3. 使用驼峰命名法给大部分*属性*命名
    JSX 缩写的属性会转化成对象的健值对
+
+## React.createElement(标签名/组件名， props， childrens)
+
+所有的 JSX 最终都会编译成 `React.createElement()` 方法的调用，这一过程由 `babel` 实现
+
+```tsx
+function MyComponent() {
+  return <div className="my-component">name</div>;
+}
+
+const MyComponent = React.createElement(
+  'div',
+  { className: 'my-component' },
+  'name'
+);
+```

@@ -6,7 +6,7 @@
 
 要使界面对输入做出反应，需要设置其 state
 
-直接修改 state 变量的值不会触发重新渲染，要使用 state setter 函数才能触发重新渲染，注意只有在前后两次通过 Object.is()比较的之后为 false 的时候，才会触发渲染
+直接修改 state 变量的值不会触发重新渲染，要使用 state setter 函数才能触发重新渲染，注意只有在前后两次通过 Object.is() 比较的之后为 false 的时候，才会触发渲染
 
 > Object.is(NaN, NaN); // true
 > Object.is(+0, -0); // false
