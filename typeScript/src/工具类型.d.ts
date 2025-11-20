@@ -16,4 +16,7 @@ a13 = {
   },
 };
 
-type DeepRequired<T extends object> = {};
+// 深度必需类型：递归地使对象所有属性变为必需
+type DeepRequired<T extends object> = {
+  [K in keyof T]-?: T[K] extends object ? DeepRequired<T[K]> : T[K];
+};
