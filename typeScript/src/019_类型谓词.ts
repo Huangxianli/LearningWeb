@@ -1,5 +1,6 @@
 /*
-类型谓词使用在函数上，如果一个函数返回的是真，就把参数的类型改为更有用的的东西
+  类型谓词使用在函数上，如果一个函数返回的是真，就把参数的类型改为更有用的的东西
+  类型谓词是否正确完全取决于函数的实现，也就是说 类型谓词不对结果负责
  */
 
 function isString(s: any) {
@@ -18,6 +19,14 @@ function isString_1(s: any): s is string {
 
 function toUpperCase_1(x: unknown) {
   if (isString_1(x)) {
-    x.toUpperCase(); // 这里编译不会有问题，通过前面 isString_1 的类型谓词，已经能够判断出x的类型是 string 了
+    x.toUpperCase(); // 这里编译不会有问题，通过前面 isString_1 的类型谓词，已经能够判断出 x 的类型是 string 了
   }
+}
+
+export interface A {
+  name: string;
+}
+
+export function isA(arg: any): arg is A {
+  return arg && typeof arg.name === 'string';
 }

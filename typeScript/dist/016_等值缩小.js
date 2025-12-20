@@ -1,6 +1,6 @@
 "use strict";
 /*
-利用 === !== == != 来进行分支判断
+利用 ===、!==、==、!= 来进行分支判断
  */
 function switchdata(age) {
     if (age === 0) {

@@ -1,27 +1,42 @@
 "use strict";
-/* {
-    a: string; // 这里可以是逗号，也可以是分号
-    b: number
-}  */
+/*
+  {
+      a: string; // 对于接口或者类型来说，这里可以是逗号，也可以是分号
+      b: number
+  }
+*/
 const obj1 = {
     a: 123,
     b: '',
 };
-/* const obj2: {
-  a: number
-} = {
-  a: ""
-}; */
-/* const obj3: {
-  a: number
-} = {
-  a: 123,
-  b: 123
-}; */
+/*
+  const obj2: {
+    a: number
+  } = {
+    a: ""
+  };
+*/
+/*
+  const obj3: {
+    a: number;
+  } = {
+    a: 123,
+    b: 123,
+  };
+  // 不能有多余的属性
+*/
+// const obj4: { a: number; b: string } = { a: 1 };
+// 不能少属性
+// 字面量方式的赋值，无论是定义时还是非定义时，都不能多或者少属性
 function fun3(arg1) {
     console.log('My name is: ', arg1.name, ', my age is: ', arg1.age);
 }
 fun3({ name: 'huanxgianli', age: 12 });
+function objFun(a) {
+    return a.b;
+}
+const objFunArg = { a: 123, b: '' };
+objFun(objFunArg);
 let type1 = {
     prop: {
         name: 'uang',

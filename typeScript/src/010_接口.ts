@@ -1,6 +1,4 @@
-/*
-接口一般都采用大驼峰的命名方法 
- */
+/* 接口一般都采用大驼峰的命名方法 */
 
 interface Point1 {
   name: string;
@@ -13,16 +11,14 @@ function getUser(user: Point1): string {
 const userInfo = getUser({ name: 'Huang Xianli', age: 25 });
 console.log(userInfo);
 
-/*
-接口的扩展（继承），通过 extends 关键字实现
- */
+// 接口的扩展（继承），通过 extends 关键字实现
 
 interface Aminal1 {
   name: string;
 }
 interface Bear1 extends Aminal1 {
   age: number;
-  // name: number | string; // extends 两者如果有相同的内容，不能是不同的类型
+  // name: number | string; // extends 两者如果有相同的属性，不能是不同的类型
 }
 const bear2: Bear1 = {
   name: 'Huang xianlil',
@@ -30,8 +26,8 @@ const bear2: Bear1 = {
 };
 
 /* 
-允许定义同名的接口，同名的会合并，如果相同的属性冲突了，后面定义的那个会报错
-type 不允许定义同名的类型别名，而且会报错
+  允许定义同名的接口，同名的会合并，如果相同的属性冲突了，后面定义的那个会报错
+  type 不允许定义同名的类型别名，而且会报错
 */
 
 interface MyWindow1 {

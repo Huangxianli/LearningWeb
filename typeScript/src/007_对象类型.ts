@@ -1,7 +1,9 @@
-/* {
-    a: string; // 这里可以是逗号，也可以是分号
-    b: number
-}  */
+/* 
+  {
+      a: string; // 对于接口或者类型来说，这里可以是逗号，也可以是分号
+      b: number
+  }
+*/
 
 const obj1: {
   a: number;
@@ -11,30 +13,39 @@ const obj1: {
   b: '',
 };
 
-/* const obj2: {
-  a: number
-} = {
-  a: ""
-}; */
+/* 
+  const obj2: {
+    a: number
+  } = {
+    a: ""
+  };
+*/
 
-/* const obj3: {
-  a: number 
-} = {
-  a: 123,
-  b: 123
-}; */
+/* 
+  const obj3: {
+    a: number;
+  } = {
+    a: 123,
+    b: 123,
+  };
+  // 不能有多余的属性
+*/
+
+// const obj4: { a: number; b: string } = { a: 1 };
+// 不能少属性
+
+// 字面量方式的赋值，无论是定义时还是非定义时，都不能多或者少属性
 
 function fun3(arg1: { name: string; age: number }): void {
   console.log('My name is: ', arg1.name, ', my age is: ', arg1.age);
 }
-
 fun3({ name: 'huanxgianli', age: 12 });
 
-/* function objFun(a: { a: number, b: string }): string {
+function objFun(a: { a: number; b: string }): string {
   return a.b;
 }
 const objFunArg = { a: 123, b: '' };
-objFun(objFunArg); */
+objFun(objFunArg);
 
 /*
 属性修改器
@@ -48,7 +59,7 @@ interface PaintOptions {
 }
 
 // 只读属性
-// 注意：如果两个类型的属性是相同的，但是一个是只读的，一个是非只读的，对应的使用这两个接口的对象，将非只读的对象直接赋值给只读的那个对象，是可以赋值成功的，需改非只读的对象的属性的时候，只读的那个也会同步的修改，所以 readonly 也不是绝对安全的
+// 注意：如果两个类型的属性是相同的，但是一个是只读的，一个是非只读的，对应的使用这两个接口的对象，将非只读的对象直接赋值给只读的那个对象，是可以赋值成功的，之后改非只读的对象的属性的时候，只读的那个也会同步的修改，所以 readonly 也不是绝对安全的
 interface SomeType {
   readonly prop: string;
 }
@@ -106,8 +117,9 @@ interface aaa {
 
 interface AddressWithUnit extends BasicAddress, aaa {
   unit: string;
-  // name: number; 和 BasicAddress 中的 name 的类型不同就会报错
-  // name: string | number;
+  // name: number; // 和 BasicAddress 中的 name 的类型相冲突会报错
+  // name: string | number; // 比 BasicAddress 中的 name 的类型更广会报错
+  name: ''; // 比 BasicAddress 中的 name 类型的范围更加的收紧，是可以的
 }
 
 /* 

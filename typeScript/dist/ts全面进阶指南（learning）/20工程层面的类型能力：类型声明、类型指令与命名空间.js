@@ -36,19 +36,34 @@ function test1_2() {
 }
 function test2() {
     console.log('--- 类型声明 --------------------------------------------------------------------');
-    // declare let a2: string; // 修饰符的出现的位置不正确
+    // declare let a2: string; // 修饰符的出现的位置不正确，不能出现在函数作用域内
+    /**
+     * declare 可以出现的位置：
+     * 1. 全局作用域
+     * 2. class 内部
+     * 3. 命名空间内部
+     * 4. export declare
+     */
 }
 /**
  * 让类型定义全面覆盖你的项目
  *
- * 通过额外的类型声明文件，在核心代码文件以外去提供对类型的进一步补全
+ * 通过额外的类型声明文件 .d.ts 文件，在核心代码文件以外去提供对类型的进一步补全
  * declare modele 通常为没有提供类型定义的库进行类型的补全，以及为非代码文件提供基本类型定义
+ *
+ * 可以这样配置，就会自动的开启
+ * tsconfig.json：
+ * "compilerOptions": {
+    "declaration": false,           // 关闭声明文件生成
+    "declarationMap": false,        // 关闭声明源映射
+  },
+ *
  */
 import declareModuleTest from './20-2.declareModuleTest.js';
 import { PI } from './20-2.declareModuleTest.js';
 function test3() {
     console.log('--- 让类型定义全面覆盖你的项目 --------------------------------------------------------------------');
-    declareModuleTest(); // 在global.d.ts 中声明了 declare module '*declareModuleTest'，定义了 default 导出是一个函数，不然 ts 根本不知道 declareModuleTest 是什么类型的
+    declareModuleTest(); // 在global.d.ts 中声明了 declare module '*20-2.declareModuleTest.js'，定义了 default 导出是一个函数，不然 ts 根本不知道 declareModuleTest 是什么类型的，不单单是 js 文件，还可以对其他的非代码文件进行类型声明，也是使用这种方式
     const piValue = PI;
     test3_1();
     test3_2();
@@ -57,7 +72,7 @@ function test3() {
  * DefinitleyTyped
  * 以 @types/ 开头的这一类 npm 包都属于 DefinitelyTeyped，它是由 TypeScript 维护的，专门为社区存在的无类型定义的 JS 添加类型支持 如 @types/react
  *
- * 只要安转了 @types/react，ts 就会将其自动的加在到环境中，作为 react 模块内部 API 的类型声明，这些声明不一定都是通过 declare module，命名空间 namespace 也可以实现一样的能力
+ * 只要安装了 @types/react，ts 就会将其自动的加在到环境中，作为 react 模块内部 API 的类型声明，这些声明不一定都是通过 declare module，命名空间 namespace 也可以实现一样的能力
  */
 function test3_1() { }
 /**
@@ -74,6 +89,8 @@ function test3_2() {
  * 注意要放在文件的顶部才能生效
  */
 function test4() {
-    /// <reference path="./other.d.ts" /> //
+    /// <reference path="./other.d.ts" /> // 表明依赖某一个文件
+    /// <reference types="xxx" /> // 表明依赖 @types/xxx
+    /// <reference lib="xxx" /> // 表明依赖了 TypeScript 自带的类型声明 lib.xxx.d.ts
 }
 export default test;

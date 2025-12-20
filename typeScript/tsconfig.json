@@ -99,6 +99,8 @@
     // "allowUnreachableCode": true,                     /* Disable error reporting for unreachable code. */
     /* Completeness */
     // "skipDefaultLibCheck": true,                      /* Skip type checking .d.ts files that are included with TypeScript. */
-    "skipLibCheck": true /* Skip type checking all .d.ts files. */
-  }
+    "skipLibCheck": true, /* Skip type checking all .d.ts files. */
+  },
+  "exclude":["src/ts全面进阶指南（learning）/21在React中愉快的使用TypeScript"]
+
 }

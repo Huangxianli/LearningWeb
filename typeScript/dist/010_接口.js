@@ -1,7 +1,5 @@
 "use strict";
-/*
-接口一般都采用大驼峰的命名方法
- */
+/* 接口一般都采用大驼峰的命名方法 */
 function getUser(user) {
     return `my name is: ${user.name}, my age is: ${user.age}`;
 }
