@@ -1,6 +1,5 @@
 "use strict";
-/*
- */
+/* 对象类型 */
 function greet3(persion) {
     return 'hello';
 }
@@ -18,7 +17,7 @@ let persion4 = persion3; // 这里赋值不会报错
 persion3.name = '123'; // 这里修改不会报错
 // let address1: AddressWithUnit2 = {
 //   // name: "", // 这里会报错
-//   // name: 12, // 这里也会报错 不能将number 分配给 never
+//   // name: 12, // 这里也会报错 不能将 number 分配给 never
 //   unit: ""
 // };
 let address2 = {

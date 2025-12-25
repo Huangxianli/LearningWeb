@@ -1,5 +1,4 @@
-/*
- */
+/* 对象类型 */
 function greet3(persion: { name: string; age: number }) {
   return 'hello';
 }
@@ -21,7 +20,8 @@ function greet5(persion: Persion2) {
 }
 
 /* 
-readonly
+  readonly
+  非 readonly 可以赋值给 readonly
  */
 interface Temp {
   name: string;
@@ -40,8 +40,8 @@ persion3.name = '123'; // 这里修改不会报错
 // persion4.name = ""; // 这里会报错，ReadOnlyTemp 接口限制了不能修改 name 属性
 
 /* 
-扩展类型
-extends
+  扩展类型
+  extends
  */
 
 interface BasicAddress1 {
@@ -67,7 +67,7 @@ type AddressWithUnit3 = {
 
 // let address1: AddressWithUnit2 = {
 //   // name: "", // 这里会报错
-//   // name: 12, // 这里也会报错 不能将number 分配给 never
+//   // name: 12, // 这里也会报错 不能将 number 分配给 never
 //   unit: ""
 // };
 let address2: AddressWithUnit3 = {
@@ -76,9 +76,9 @@ let address2: AddressWithUnit3 = {
 };
 
 /* 
-接口和联合类型的同名的冲突处理
-接口：合并，存在同名属性，但是类型不同时，报错
-联合类型：报错
+  接口和类型的同名的冲突处理
+  接口：合并，存在同名属性，但是类型不同时，报错
+  类型：同名的类型会直接报错
  */
 interface Sister {
   name: string;
@@ -87,7 +87,7 @@ interface Sister {
   age: number;
 }
 interface Sister {
-  // name: number; // 这里与前面的name的类型不同，会报错
+  // name: number; // 这里与前面的 name 的类型不同，会报错
 }
 let sister1: Sister = {
   // 两个属性都要加，不然会报错
@@ -101,7 +101,7 @@ type Sister1 = {
 // type Sister1 = {}; // 直接就报错
 
 /* 
-泛型对象类型
+  泛型对象类型
  */
 interface Box<T> {
   content: T;

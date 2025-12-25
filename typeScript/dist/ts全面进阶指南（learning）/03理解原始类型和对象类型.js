@@ -22,6 +22,7 @@ function test1() {
 function test1_1() {
     console.log('---test1_1---------------------------------------------');
     const bigint1 = BigInt(12);
+    const bigint2 = 12n;
     const symbol1 = Symbol.for('12312');
 }
 /**
