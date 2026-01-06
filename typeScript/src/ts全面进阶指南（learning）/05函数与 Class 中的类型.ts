@@ -130,7 +130,7 @@ function test2_1(): void {
   console.log('---test2_1---------------------------------------------');
 
   class A {
-    name1: string = '';
+    private name1: string = '';
     constructor(name: string) {}
 
     get name2(): string {

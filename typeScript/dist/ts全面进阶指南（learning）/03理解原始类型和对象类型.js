@@ -46,7 +46,7 @@ function test1_2() {
 /**
  * void
  * 在 js 中：执行后面的表达式，并总是返回 undefined
- * 在 ts 中：用于描述一个没有 return 、return 了但是没有显式的值 的函数的返回值
+ * 在 ts 中：用于描述一个没有 return 、return 了但是没有显式的值 的函数的返回值；表示他可能是 undefined，但是不保证，所以 undefined 可以赋值给 void，但是反过来不行；void 在 ts 中的语义是，明确的表示不要该返回值
  *
  * 注意一点，即使显式的 return undefined，会被推导成 undefined，但是在声明的时候可以用 void；说明 undefined 是可以赋值给 void 类型的；也就表明，即使标注的是 void 类型，其值有可能是实实在在的 undefined
  *
@@ -137,6 +137,7 @@ function test3_2() {
     console.log('---test3_2---------------------------------------------');
     const arr1 = [1]; // 元组
     const arr2 = [1]; // 数组
+    const arr3 = [12, 2];
     // arr2.push(1);
     // arr2.pop();
     // arr2[1] = 12;
@@ -164,7 +165,7 @@ function test3_4() {
  * Object object {}
  * 区分这三者
  * Object 和 {} 都表示除 undefined、null 和 void 0 之外的任何类型，但是 {} 类型不可以进行属性操作，即使是赋值了
- * object 表示除了 undefined、undefined 和 void 0 之外的任何非原始类型
+ * object 表示非原始类型（对象、数组、函数、Set、Map 等）
  *
  * Object 在 js 里面是一切
  *
@@ -196,7 +197,7 @@ function test4_1() {
     // const object5: Object = undefined;
     let object6 = ''; // 装箱类型也是 Object 的子类型
     const object7 = '';
-    const object7Type = typeof object7; // 虽然在编辑器中显示的是一大串，但是实际应该只是 'string'，从编译结果就可以看出来
+    const object7Type = typeof object7; // 虽然在编辑器中显示的是一大串，但是实际应该只是 'string'，从编译结果就可以看出来，因为这里的 typeof 会在运行的时候判定为 js 的 typeof，在编辑器看来，这里的 typeof 是 ts 的
     if (object7Type === 'string') {
     }
     else {
@@ -206,7 +207,7 @@ function test4_1() {
 }
 /**
  * object
- * 确保是引用类型（object 类型也要排除 undefined、null、void 0）
+ * 确保是引用类型（Funciton、Map、Set 等也是）
  * 该对象不一定有原型，不能确定有没有相同的 key
  */
 function test4_2() {
@@ -216,10 +217,11 @@ function test4_2() {
     const object3 = function () { };
     const object4 = {};
     // const object5: object = '';
+    const object5 = new Map();
 }
 /**
  * {}
- * 内部无属性的空对象
+ * 内部无属性的空对象（表示无属性类型）
  * 除去 undefined、null、void 0 的任何类型
  * 无法访问属性（除了 Object 原型上的属性）
  * 无法调用方法
