@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh">
   <head>
     <meta charset="UTF-8" />
@@ -8,10 +8,14 @@
   </head>
 
   <body>
-    <div id="app"></div>
+    <div id="app1"></div>
+    <hr />
+    <div id="app2"></div>
+    <hr />
+    <div id="app3"></div>
 
     <script>
-      const { createApp } = Vue;
+      const { createApp, h } = Vue;
       const app1 = createApp({
         template: '<div>{{message}}</div>',
         setup() {
@@ -19,10 +23,12 @@
           return {
             message,
           };
-          // 可以 return 一个函数，但是需要支持 jsx
+          // 可以 return 一个函数，但是需要配置 Babel 来支持 jsx（如果使用的是 h 函数就不需要）
         },
       });
-      const message = 'hello world !!!'; // 这种写法，如果要在组件的 template 里面可以访问到，必须要用一个东西来承接 message 变量，如 data computed ... 或者 setup 中返回
+      app1.mount('#app1');
+
+      const message = 'hello world !!!'; // 这种写法，如果要在组件的 template 里面可以访问到，必须要用一个东西来承接 message 变量，如 data computed ... 或者 setup 中返回，还可以使用 app2.config.globalProperties.xxx= "xxxx" 来承接这个变量
       // 为什么 setup 如此特殊，setup 究竟做了什么
       const app2 = createApp({
         template: '<div>{{message}}</div>',
@@ -32,8 +38,14 @@
           };
         },
       });
-      // app1.mount('#app');
-      app2.mount('#app');
+      app2.mount('#app2');
+
+      const app3 = createApp({
+        setup() {
+          // return 的是一个函数，这个函数就是组件的 render 函数，render 函数的返回值就是组件的 VNode（一般会借助 h 函数来实现）
+          return () => h('div', 'Hello, World');
+        },
+      }).mount('#app3');
     </script>
   </body>
 </html>

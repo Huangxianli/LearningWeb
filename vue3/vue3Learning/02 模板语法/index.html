@@ -9,9 +9,20 @@
 
   <body>
     <div id="app"></div>
+    <hr />
     <div id="app1"></div>
+    <hr />
     <div id="app2"></div>
+    <hr />
+    <div id="app3"></div>
     <script>
+      /**
+       * 模板语法：
+       * 将组件实例的数据和 DOM 绑定
+       * 模板 -> 编译成高度优化的 JS 代码（编译时会有优化）
+       * 应用状态变更 -> 智能推断出最少需要渲染的部分，最少的 DOM 操作
+       */
+
       const { createApp } = Vue;
       createApp({
         setup() {
@@ -34,6 +45,7 @@
         // 如果是用户输入的内容，不要用 v-html。或者是先进行转义之后再使用 v-html
       }).mount('#app1');
 
+      // Attribute 绑定
       createApp({
         setup() {
           return {
@@ -43,6 +55,19 @@
         template: `<div :id>attribute绑定</div>`,
         // 这种同名简写语法只能在 Vue3.4 之后才能使用
       }).mount('#app2');
+
+      createApp({
+        setup() {
+          return {
+            bindObj: {
+              attribute1: null,
+              attribute2: 'attribute2',
+            },
+          };
+        },
+        template:
+          '<div v-bind="bindObj">测试 attribute 的值为 null/undefined 以及其他的情况</div>',
+      }).mount('#app3');
     </script>
   </body>
 </html>

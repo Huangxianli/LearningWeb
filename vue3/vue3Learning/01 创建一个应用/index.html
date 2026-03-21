@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh">
   <head>
     <meta charset="UTF-8" />
@@ -23,8 +23,19 @@
     <div id="app6"></div>
     <hr />
     <div id="app7"></div>
+    <hr />
+    <div id="app8"></div>
+    <hr />
+    <div id="app9">
+      <div>{{count}}</div>
+      <button @click="addCount">增加</button>
+    </div>
+    <hr />
+    <div id="app10"></div>
+    <hr />
+    <div id="app11"></div>
     <script>
-      const { createApp, h } = Vue;
+      const { createApp, h, ref } = Vue;
 
       /**
        * 每个 Vue 应用都是通过 createApp 函数创建一个新的 应用实例
@@ -32,31 +43,33 @@
       createApp({
         setup() {},
         template: `
-        <div>这是一个 Vue 应用</div>
-      `,
+          <div>这是一个 Vue 应用</div>
+        `,
       }).mount('#app1');
 
       const rootComponent = {
         setup() {},
         template: `
-        <div>将根组件抽离处理</div>
-      `,
+          <div>将根组件抽离处理</div>
+        `,
       };
       createApp(rootComponent).mount('#app2');
 
       /**
-       * 引用实例必须在调用了 .mount() 方法之后才会渲染出来；传入的参数可以一个 DOM，可以是一个 CSS 选择器字符串
+       * 应用实例必须在调用了 .mount() 方法之后才会渲染出来；传入的参数可以一个 DOM，可以是一个 CSS 选择器字符串
        */
       const DOM = document.querySelector('#app3');
       createApp({
         setup() {},
         template: `
-        <div>.mount() 方法中传递的是一个 DOM</div>
-      `,
+          <div>.mount() 方法中传递的是一个 DOM</div>
+        `,
       }).mount(DOM);
 
       /**
-       * 如果没有 templat 内容，那么会利用容器的 innerHTML 作为模板
+       * 如果没有 template 内容，那么会利用容器的 innerHTML 作为模板
+       * 构建版本限制：当前引入的是 vue.global.js（包含编译器的完整版），所以它能在浏览器中实时将 innerHTML 编译为渲染函数
+       * 但在实际的工程化项目（如 Vite/Webpack）中，默认引入的是 Runtime-only（仅运行时）版本。在仅运行时版本中，这段代码会直接报错，因为它不包含模板编译器，无法处理 DOM 中的模板
        */
       createApp({
         setup() {},
@@ -65,14 +78,15 @@
       /**
        * 应用配置
        * 应用实例有一个 config 对象，允许配置一些应用级别的选项
+       * 确保在挂载实例之前完成所有的应用配置
        */
       const app = createApp({
         setup() {
           throw new Error('抛出错误');
         },
         template: `
-        <div>应用配置</div>
-      `,
+          <div>应用配置</div>
+        `,
       });
       app.config.errorHandler = (err, vm, info) => {
         console.error('错误处理', err, vm, info);
@@ -89,7 +103,7 @@
       });
 
       /**
-       * setup 中 return 的模板比 template 的优先级
+       * setup 中 return 的模板比 template 的优先级更高
        */
       createApp({
         setup() {
@@ -99,6 +113,40 @@
           <div>这里是 template 的内容</div>
         `,
       }).mount('#app7');
+
+      // 优先级按照数字排列，注意如果 1 2 3 都没有的时候，会利用 mount 对应的 dom 里面内容
+      createApp({
+        setup() {
+          return () => '1';
+        },
+        render: () => '2',
+        template: '3',
+      }).mount('#app8');
+
+      createApp({
+        setup() {
+          const count = ref(0);
+          const addCount = () => {
+            count.value++;
+          };
+          return {
+            count,
+            addCount,
+          };
+        },
+      }).mount('#app9');
+
+      // 一个实例只能挂载一次，即使这个实例被卸载了，也不能再挂载
+      const app10 = createApp({
+        setup() {
+          return () => h('div', 'app10');
+        },
+      });
+      app10.mount('#app10');
+      setTimeout(() => {
+        app10.unmount();
+        app10.mount('#app11');
+      }, 1000);
     </script>
   </body>
 </html>
