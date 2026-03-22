@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh">
   <head>
     <meta charset="UTF-8" />
@@ -17,9 +17,12 @@
     <div id="app4"></div>
     <script>
       const { createApp, computed, ref, reactive, nextTick } = Vue;
+      /**
+       * 模板中应该保持简洁，复杂的逻辑应该放在计算属性或者方法中
+       */
 
       /**
-       * computed 得到的是一个 ref 对象，访问的时候，要加上 .value 来访问
+       * computed 得到的是一个类 ref 对象，访问的时候，要加上 .value 来访问
        */
       createApp({
         template: `
@@ -40,7 +43,8 @@
 
       /**
        * computed 依赖的是响应式数据，如果不是响应式数据的变化，不会触发 computed 的变化
-       * 如果 computed 没有直接或者间接的在 template 上使用，那么即使改变了其依赖项，也不会重新的触发 computed 的 getter 函数
+       * computed 是懒执行的，如果没有访问，其回调函数是不会执行的
+       * 如果 computed 没有直接或者间接的在 template 上使用（没有被任何激活的 Reactive Effect 订阅或读取，例如在 事件回调中，watch 中），那么即使改变了其依赖项，也不会重新的触发 computed 的 getter 函数
        */
       createApp({
         template: `
@@ -60,9 +64,10 @@
           const arrLength = computed(() => arr.length, {
             // 第二个参数是用来调试的一个对象
             onTrack(e) {
+              // 注意，即使是 onTrigger 执行了也不一定会执行 onTrack，只有在依赖读取该 computed 的时候才会触发 onTrack
               console.log('onTrack app2');
             },
-            onTigger(e) {
+            onTrigger(e) {
               console.log('onTrigger app2');
             },
           });
@@ -78,7 +83,7 @@
 
           const arr2 = reactive([]);
           const arr2Length = computed(() => {
-            console.log('触发了 arr2Length');
+            console.log('触发了 arr2Length'); // 由于 arr2Length 没有被任何的 Reactive Effect 订阅或读取，所以并不会输出
             return arr2.length;
           });
           const clickHandler2 = () => {
@@ -109,7 +114,7 @@
           console.log('--- app3 ------------------');
           const clicks1 = ref(0);
           const computed1 = computed((oldValue) => {
-            console.log('进入了 computed1 的 getter 函数');
+            console.log('进入了 computed1 的 getter 函数', oldValue);
             if (clicks1.value < 3) {
               return clicks1.value;
             }
@@ -134,9 +139,9 @@
        * computed 的 getter 函数应该是一个无副作用的函数
        * 即使是使用了 setter，computed 还是有缓存的
        *
-       * 不建议直接修改 computed 的值，应该通过修改 computed 依赖的响应式数据触发 computed 的变化
+       * 不建议直接修改 computed 的值（只有在写了 setter 函数的时候，才支持修改），应该通过修改 computed 依赖的响应式数据触发 computed 的变化
+       * 即使是写了 setter 函数，对 computed 的修改，也应该是直接替换掉整个内容，而不是 .xxx = xxx 的方式修改 computed 的内部属性（因为这样绕过了 setter）
        */
-
       createApp({
         template: `
           <div>app4</div>
@@ -149,6 +154,7 @@
           console.log('--- app4 -------------------------------------');
           const clicks1 = ref(0);
           const computed1 = computed(
+            // 注意这里是对象的方式，如果是 函数的方式，这个函数就是 getter 函数
             {
               get(oldValue) {
                 // get 函数中接收的上一次的值
@@ -156,6 +162,7 @@
                 return clicks1.value;
               },
               set(newValue) {
+                console.log('app4 computed setter', newValue);
                 clicks1.value = newValue;
               },
             },
@@ -166,7 +173,7 @@
               onTrigger(e) {
                 console.log('app4 computed trigger', e);
               },
-            }
+            },
           );
           const clickHandler1 = () => {
             computed1.value += 1;

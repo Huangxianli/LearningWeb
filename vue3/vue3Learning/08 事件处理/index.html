@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh">
   <head>
     <meta charset="UTF-8" />
@@ -25,14 +25,19 @@
           const clickHandler = (e) => {
             console.log('app1 clickHandler e', e); // PointerEvent {isTrusted: true, _vts: 1738852450295, pointerId: 1, width: 1, height: 1, …}
           };
+          const clickHandler1 = (value, e) => {
+            console.log('app1 clickHandler1 e', e); // PointerEvent {isTrusted: true, _vts: 1758602292643, pointerId: 1, width: 1, height: 1, …}
+          };
           return {
             clickHandler,
+            clickHandler1,
           };
         },
         template: `
           <div>app1</div>
           <div>
             <button @click="clickHandler">点击</button>
+            <button @click="clickHandler1('click1', $event)">点击1</button>
           </div>
         `,
       }).mount('#app1');
@@ -60,7 +65,7 @@
       }).mount('#app2');
 
       /**
-       * 事件绑定的时候加上 ()，并不会直接的掉用该方法，这个和 React 是有却别的
+       * 事件绑定的时候加上 ()，并不会直接的掉用该方法，这个和 React 是有区别的
        */
       createApp({
         setup() {

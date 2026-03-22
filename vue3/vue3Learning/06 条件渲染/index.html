@@ -1,10 +1,15 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>06条件渲染</title>
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <style>
+      .notShow {
+        display: none;
+      }
+    </style>
   </head>
 
   <body>
@@ -18,6 +23,9 @@
 
       /**
        * v-show 控制的是 display 属性为 none，v-if 是直接将元素从 DMO 中移除了
+       *
+       * v-if 是惰性的，只有为 true 的时候才会渲染
+       * v-show 是无论值为什么都元素都被保留在 DOM 中，通过控制 display 属性来判断是否应该展示。注意，如果使用了 v-show 那么该元素关于 display: none 的样式最好就不要在 sytle 或者 class 中设置了，否则会和 v-show 的控制冲突
        */
       createApp({
         setup() {
@@ -34,9 +42,11 @@
         },
         template: `
           <div>app1</div>
-          <div style="height: 48px">
+          <div style="height: 96px">
             <div v-if="show">使用 v-if</div>
-            <div v-show="show">使用 v-show</div>
+            <div v-show="show" :style="{display: 'inline'}">使用 v-show-1</div>
+            <div v-show="show" :style="{display: 'none'}">使用 v-show-2</div>
+            <div class="notShow" v-show="show" >使用 v-show-3</div>
           </div>
           <button @click="clickhandler">切换显示状态</button>
         `,
@@ -44,6 +54,7 @@
 
       /**
        * 在 Vue3 中 v-if 的优先级是高于 v-for 的，所以，如果 v-if 和 v-for 一起使用的时候，v-if 中是拿不到 v-for 循环出来的内容
+       * vue2 是先创建虚拟 DOM 再看是否使用到了，vue3 是先看是否使用到了再创建虚拟 DOM，这样没有用到的节点就不会创建虚拟 DOM，也不会参与到 diff 的判断
        */
       createApp({
         setup() {
@@ -85,7 +96,7 @@
           <ul>
             <!-- <li v-if="true" v-for="item in getList()" :key="item.id">{{item.name}}</li> -->
             <li v-if="itemShow(item)" v-for="item in getList()" :key="item.id">{{item.name}}</li>
-            <!-- 注意，如果使用这种写法，itemShow 方法传入的 item 是 undefined，说明 v-if 是在 v-for 之前执行的，v-if 的优先级要高于 v-for，这个和 Vue2 中的表现是相反的 -->
+            <!-- 注意，如果使用这种写法，itemShow 方法传入的 item 是 undefined，itemShow() 返回的是 false，v-for 中的 getList() 不会执行，说明 v-if 是在 v-for 之前执行的，v-if 的优先级要高于 v-for，这个和 Vue2 中的表现是相反的 -->
           </ul>
       `,
       }).mount('#app2');

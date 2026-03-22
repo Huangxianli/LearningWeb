@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="zh">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>vue2对比</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+    <style>
+      .redColor {
+        color: red;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div id="app1"></div>
+    <script>
+      /**
+       * 在 Vue2 中 即使使用了 inheritAttrs: false, class 和 style 依旧会继承到组件的根元素上
+       */
+      const Component1 = {
+        inheritAttrs: false,
+        template: `
+          <!-- 依旧会继承 class 和 style -->
+          <div>1</div>
+        `,
+      };
+      new Vue({
+        el: '#app1',
+        components: {
+          Component1,
+        },
+        template: `
+          <Component1 class="redColor" />
+        `,
+      });
+    </script>
+  </body>
+</html>

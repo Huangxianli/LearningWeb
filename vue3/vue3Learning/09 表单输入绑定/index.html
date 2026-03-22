@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh">
   <head>
     <meta charset="UTF-8" />
@@ -24,17 +24,42 @@
       createApp({
         setup() {
           const inputValue = ref('');
-          const inputHandler = (e) => {
+          // 状态锁：用于处理中文输入法的边界情况
+          let isComposing = false;
+          const onCompositionStart = () => {
+            isComposing = true;
+          };
+          const onCompositionEnd = (e) => {
+            isComposing = false;
             inputValue.value = e.target.value;
+          };
+          const inputHandler = (e) => {
+            if (!isComposing) {
+              inputValue.value = e.target.value;
+            }
           };
           return {
             inputValue,
+            onCompositionStart,
+            onCompositionEnd,
             inputHandler,
           };
         },
         template: `
+          <!-- 这里的实现是模仿，vue 内部通过 自定义指令 实现的 -->
           <div>{{inputValue}}</div>
-          <input :value="inputValue" @input="inputHandler" />
+          <input
+            :value="inputValue"
+            @input="inputHandler"
+            @compositionstart="onCompositionStart"
+            @compositionend="onCompositionEnd"
+            placeholder="请尝试输入..." />
+          <!-- 输入框中显示的内容是 dom.value，而不是 value attribute -->
+          <!-- 原生的 input 元素，在输入框中输入，改变的是 dom.value 而不是修改 value attribute -->
+          <!-- value 是一个 attribute，该 attribute 在被赋新的值（setAttribute()）的时候会同步修改 dom.value（dom property）（前提是没有任何的手动输入），但是 dom.value 的改变不会同步到 value attribute 上。这是 input 的原生特性。原生修改 attribute 的方法是 setAttribute() -->
+          <!-- 实际上在输入的时候，先会触发 input 事件，修改 inputValue 的值，为什么要再将 inputValue 和 input 的 value 给绑定呢，因为实现的是双向绑定，期望修改 inputValue 的时候，输入框的值也会重新同步，被该组件依赖收集的响应式数据发生改变的时候，会触发组件重新渲染的特性 -->
+
+          <!-- 用户输入 -> dom.value 马上被修改 -> input 回调触发 -> inputValue.value 的值被修改 -> 触发重新渲染 -> diff 对比发现新绑定的值 (inputValue.value) 与当前真实的 property (dom.value) 不一致时 -> 触发边界情况兜底，执行第二次的 dom.value 修改，值为 inputValue.value（注：若两者一致则跳过此步，以防止光标跳动） -->
         `,
       }).mount('#app1');
 
@@ -45,14 +70,49 @@
        */
       createApp({
         setup() {
-          const inputValue = ref('');
+          const isChecked = ref(false);
+          const change = (e) => {
+            isChecked.value = e.target.checked;
+          };
+          const checkboxGroupValue = ref([]);
+          const changeGoup = (e) => {
+            const isChecked = e.target.checked;
+            const currentValueIndex = checkboxGroupValue.value.indexOf(
+              e.target.value,
+            );
+            if (isChecked && currentValueIndex === -1) {
+              checkboxGroupValue.value.push(e.target.value);
+            } else if (!isChecked && currentValueIndex > -1) {
+              checkboxGroupValue.value.splice(currentValueIndex, 1);
+            }
+          };
           return {
-            inputValue,
+            isChecked,
+            change,
+            checkboxGroupValue,
+            changeGoup,
           };
         },
         template: `
-          <div>{{inputValue}}</div>
-          <input v-model="inputValue" />
+        <!-- 注意这里只是模仿，但实际上 vue 内部使用的是自定义指令实现的 -->
+          <!-- 用户点击 -> dom.checked 马上被原生修改为翻转后的状态 -> change 回调触发 -> 绑定的响应式数据（布尔值或数组）被修改 -> 触发重新渲染 -> diff 对比发现新绑定的状态与当前真实的 property (dom.checked) 不一致时 -> 触发边界情况兜底，执行第二次的 el.checked 修改，强制其状态与响应式数据保持一致（注：若两者一致则跳过此步，避免无意义的 DOM 操作） -->
+          <div>
+            <div>{{inputValue}}</div>
+            <!-- 如果是绑定在一个 checkbox 上的话，v-model 和 value 是没有关系的 -->
+            <input type="checkbox" v-model="isChecked" /> 1
+            <input type="checkbox" :checked="isChecked" @change="change"> 2
+          </div>
+          <div>
+            <!-- 用户勾选 B-> dom.checked 马上被原生修改为 true -> change 回调触发 -> Vue 发现绑定的响应式数据是一个数组，将 B 的 value Push 进入数组（此时数组内为 ['A', 'B']） -> 触发重新渲染 -> diff 遍历该组所有 checkbox，对比数组内容与各个 DOM 的实际 checked 状态 -> 触发边界情况兜底，确保数组里包含的项 el.checked = true，不在数组里的强制 el.checked = false（注：若完全匹配则跳过物理赋值） -->
+            <div>{{checkboxGroupValue}}</div>
+            <!-- 如果绑定在一组 checkbox 上面的话，v-model 和 value 是有关系的 -->
+            <!-- 其实本质上是根据初始值是 Array 还是 String 来判断是否和 value 有关系 -->
+            <input type="checkbox" :checked="checkboxGroupValue.includes('1')"  value="1" @change="changeGoup"/> 1
+            <input type="checkbox" :checked="checkboxGroupValue.includes('2')"  value="2" @change="changeGoup"/> 2
+            <input type="checkbox" :checked="checkboxGroupValue.includes('3')"  value="3" @change="changeGoup"/> 3
+            <input type="checkbox" :checked="checkboxGroupValue.includes('4')"  value="4" @change="changeGoup"/> 4
+            <input type="checkbox" :checked="checkboxGroupValue.includes('5')"  value="5" @change="changeGoup"/> 5
+          </div>
         `,
       }).mount('#app2');
 
@@ -67,6 +127,7 @@
           };
 
           const checkValues = ref([]); // 注意这里了是数组，不能使用 reactive，要使用 ref，说明 v-model 会修改这个数组指向的地址
+          // const checkValues = reactive([]); // 注意这里了是数组，不能使用 reactive，要使用 ref，说明 v-model 会修改这个数组指向的地址
           return {
             reactiveArr,
             clickHandler,
@@ -80,19 +141,25 @@
             <div>选中的内容：{{checkValues}}</div>
             <label>
               选项一
-            <input type="checkbox" value="one" v-model="checkValues" />
+              <input type="checkbox" value="one" v-model="checkValues" />
             </label>
             <label>
               选项二
-            <input type="checkbox" value="two" v-model="checkValues" />
+              <input type="checkbox" value="two" v-model="checkValues" />
             </label>
             <label>
               选项三
-            <input type="checkbox" value="three" v-model="checkValues" />
+              <input type="checkbox" value="three" v-model="checkValues" />
             </label>
           </div>
         `,
       }).mount('#app3');
+
+      // radio 的情况
+      // 用户点击 -> dom.checked 马上被原生修改为 true（同时浏览器原生会将同 name 组的其他 radio 设为 false） -> change 回调触发 -> 绑定的响应式数据的值被修改为该 radio 的 value -> 触发重新渲染 -> diff 对比响应式数据的值，发现该 radio 理论上应该的选中状态与当前真实的 property (dom.checked) 不一致时 -> 触发边界情况兜底，执行第二次的 el.checked 修改，强制其与响应式数据对齐。
+
+      // select 的情况
+      // 用户选择下拉项 -> dom.selectedIndex (以及对应 option 的 selected 属性) 马上被原生修改 -> change 回调触发 -> 绑定的响应式数据（单值或数组）被修改 -> 触发重新渲染 -> diff 对比发现新绑定的值与当前原生 select 的实际选中状态不一致时 -> 触发边界情况兜底，Vue 会遍历其底层的 <option> 元素，强制执行 option.selected 的修改，确保最终高亮的选项与你的响应式数据绝对同步
 
       createApp({
         components: {
@@ -111,18 +178,15 @@
           <div>{{time}}</div>
           <!-- 这里的表现和 react 是一样的，如果没有 key 的话，组件重新渲染的时候，会复用 input，这样的话，input 中的内容不会被清空掉（还要注意绑定了 v-model 的情况） -->
           <input />
-          <ChildComponent2 :time="time"/>
+          <ChildComponent2 />
         `,
       }).mount('#app4');
 
       function ChildComponent2(prop) {
-        // 只有在传入了 prop，并且依赖了传入的 prop 的时候，每次 prop 更新函数才会重新执行，和 react 不同，react 是无论是否传入，是否依赖，只要父组件重新渲染，子组件就会重新渲染
-        // 如果只是纯展示没有涉及到状态，那么，那么适合使用函数式组件
+        // 在传入了 prop，每次 prop 更新的时候，即使该  prop 在组件内没有被使用，组件会重新渲染，父组件重新渲染了，但是传入的 prop 没有改变的话，是不会重新渲染的；和 react 不同，react 是无论是否传入，是否依赖，只要父组件重新渲染，子组件就会重新渲染
+        // 在 vue3 中，即使是只展示的组件，也不推荐以这个理由使用函数式组件
         console.log('执行了 ChildComponent1');
-        return h('div', [
-          h('label', 'ChildComponent1' + prop.time),
-          h('input'),
-        ]);
+        return h('div', [h('label', 'ChildComponent1'), h('input')]);
       }
     </script>
   </body>

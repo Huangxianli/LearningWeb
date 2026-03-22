@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh">
   <head>
     <meta charset="UTF-8" />
@@ -20,6 +20,8 @@
     <div id="app5"></div>
     <hr />
     <div id="app6"></div>
+    <hr />
+    <div id="app7"></div>
 
     <script type="text/babel">
       Babel.registerPreset('presetVue', {
@@ -41,9 +43,15 @@
       const { createApp, h, ref, reactive } = Vue;
 
       createApp({
+        beforeCreate() {
+          console.log(
+            '--- app1 beforeCreate -----------------------------------',
+          );
+          // setup 的执行时机比 beforeCreate 要早
+        },
         setup() {
-          // setup 函数是在实例创建之前，props 解析完成之后，beforeCreate 之前执行，并且只会执行一次，不会随着组件的重新渲染而重新执行
-          console.log('--- app1 -----------------------------------');
+          // setup 函数是在实例创建之前，props 解析完成之后，beforeCreate 之前执行，并且只会执行一次，不会随着组件的重新渲染而重新执行，也就是一个实例只会执行一次
+          console.log('--- app1 setup -----------------------------------');
           let message1 = 'hello';
           const message2 = ref('world');
           const clickHandler1 = () => {
@@ -51,7 +59,7 @@
             console.log('app1 message1', message1);
           };
           const clickHandler2 = () => {
-            message2.value += '~'; // 好奇怪，这里的变化，只会触发下面部分的更新，message1 对应的部分不会被更新（return 的message1 是一个基本类型，模板中获取的就是单纯的值）(setup 只会执行一次，message1 是一个基本类型，return 的时候 message1 是一个具体值，无论怎么变，都不是响应式的，就和 message3 在模板中也不会改变一样)
+            message2.value += '~'; // 好奇怪，这里的变化，只会触发下面部分的更新，message1 对应的部分不会被更新（return 的 message1 是一个基本类型，模板中获取的就是单纯的值）(setup 只会执行一次，message1 是一个基本类型，return 的时候 message1 是一个具体值，无论怎么变，都不是响应式的，就和 message3 在模板中也不会改变一样)
           };
           return {
             message1,
@@ -65,10 +73,10 @@
           <div>app1</div>
           {{console.log('app1 render 了')}}
           <div>{{message1}}</div>
-          <button @click="clickHandler1">修改</button>
-          <!-- 组合式 api 的 template 里面可以读取到自己定义的变量，但是选项式 api 的写法读取不到 -->
+          <button @click="clickHandler1">修改 message1</button>
+          <!-- 组合式 api 的 template 里面可以读取到自己定义的变量（如果使用了 <script setup> 语法糖，），但是选项式 api 的写法无法直接读取到 -->
           <div>{{message2}}</div>
-          <button @click="clickHandler2">修改</button>
+          <button @click="clickHandler2">修改 message2</button>
           <div>{{message3}}</div>
         `,
       }).mount('#app1');
@@ -88,12 +96,13 @@
             message2.value += '~';
           };
 
-          // 返回渲染函数，每次响应式数据发生改变的时候，返回的函数就会重新执行，这种写法只要视图更新，视图中的变量得到的就是最新的数据（利用闭包），无论是否是响应式数据，哪怕是基础类型的数据（利用闭包）
+          // 返回渲染函数，每次响应式数据发生改变的时候，返回的函数就会重新执行，这种写法只要视图更新，视图中的变量得到的就是最新的数据（利用闭包），无论是否是响应式数据，哪怕是基础类型的数据（利用闭包），但是要注意，普通变量的变化，不会触发组件的重新渲染，只有响应式数据的变化才会触发组件的重新渲染
           return () =>
+            // vue 的组件，最总终都会被编译成 h() 函数的调用
             h('div', null, [
               h('div', 'app2'),
               h('div', null, message1),
-              // 这里的 message1 和 setup 中 return 基础类型的值不一样，只要重新渲染就会重新读取新的值（利用闭包）
+              // 这里的 message1 和 setup 中 return 基础类型的值不一样，只要重新渲染就会重新读取新的值（利用闭包），同样的是，都是非响应式数据，它的改变不能触发组件的重新渲染
               h('button', { onClick: clickHandler1 }, '修改'),
               h('div', null, message2.value),
               h('button', { onClick: clickHandler2 }, '修改'),
@@ -114,11 +123,11 @@
             message2.value += '~';
           };
           return () => (
-            // 如果要支持 vue3 jsx写法，要加 babel 以及其他的插件
+            // 如果要支持 vue3 jsx 写法，要加 babel 以及其他的插件
             <div>
               <div>app3</div>
               <div>{message1}</div>
-              {/* 这里的 message1 虽然也是一个常量，但是每次重新渲染的时候，都会重新获取最新的值，利用闭包 */}
+              {/* 这里的 message1 虽然也是一个普通变量，但是组件在每次重新渲染的时候，都会重新获取最新的值，利用闭包 */}
               <button onClick={clickHandler1}>修改</button>
               <div>{message2.value}</div>
               <button onClick={clickHandler2}>修改</button>
@@ -130,7 +139,7 @@
 
       /**
        * ref()
-       * ref() 会将传入的内容包裹成一个对象，并且将传入的内容赋值给对象的 value 属性，利用新生成的对象的 getter setter 来处理
+       * ref() 会将传入的内容包裹成一个对象，并且将传入的内容赋值给对象的 value 属性，利用新生成的对象的 getter setter 来处理，如果传入的是一个引用类型，不仅会传递给 .value，还会将这个对象进行 reactive() 处理，也就是 ref(对象).value 实际上等与 reactive(对象)
        *
        * ref() 如果接收的是一个 ref 对象，那么返回值就是原来的那个 ref 对象，不会再包一层
        */
@@ -145,13 +154,13 @@
         },
         template: `<div>app4</div>`,
       });
-      app4.mount('#app4');
+      app4.mount('#app4'); // 注意这里的 mount() 不是生命周期函数，并不是开始这行这个函数执行 onBeforeMount Mounted 生命周期函数
 
       /**
        * reactive 也可以将数据转化成响应式数据，和 ref 不同，reactive 是将数据用 Proxy 代理
-       * 不能直接代理 基础数据类型
-       * 不能对 reative 对象进行整个对象的覆盖赋值
-       * 如果结构赋值之后，被结构出来的内容不具备响应式（只是在解构出来的值是原始数据类型的时候才是这样的）
+       * 不能直接代理 基础数据类型（因为 Proxy 本身就只能代理对象）
+       * 不能对 reative 对象进行整个对象的覆盖赋值，进行覆盖之后就失去了其响应式，因为如果直接给 reactive 对象重新赋值为一个新对象的时候，这个 reactive 对象的 Proxy 就失效了，变成了一个普通对象了
+       * 如果结构赋值之后，被结构出来的内容不具备响应式（只是在解构出来的值是原始数据类型的时候才是这样的），原理是对这个对象进行了递归的 reactive 处理，但是是懒递归，里面的属性只有在访问的时候才会进行 reactive 处理
        *
        * 和 Vue2 不同，Set 和 Map 等类型的数据，其中一项修改了，也会触发重新渲染
        *
@@ -173,6 +182,7 @@
             },
           });
           let { clicks: clicks1 } = count1;
+          console.log('app5 count1', count1);
           const increat1 = function () {
             clicks1.clicks++;
             console.log('app5 count1', count1);
@@ -208,7 +218,10 @@
       app5.mount('#app5');
 
       /**
-       * 当一个 ref 作为 reactive/ref 变量的属性的时候，即使是在 setup 中，访问不需要 .value，会自动的进行解包，但是如果他的上一层（仅限于上一层）是数组或者是原生的集合中，需要手动的解包
+       * 在 setup 中 ref 的解包
+       * 当一个 ref 作为 reactive/ref 变量的属性的时候（向上查找，只要有一层是 reactive/ref），在 setup 中，访问不需要 .value，会自动的进行解包，但是如果他的上一层（仅限于上一层）是数组或者是原生的集合中，需要手动的解包
+       *
+       * 解包和 .value 是互斥的
        */
       const app6 = createApp({
         setup() {
@@ -217,8 +230,8 @@
           const state = reactive({
             count,
           });
-          const countTemp = state.count; // reactive 里面的 ref 属性，在访问的时候，不需要使用 .value 访问，会自动的解包
-          console.log('app6 countTemp', countTemp); // 0
+          const countTemp = state.count; // reactive 里面的 ref 属性，自动的解包
+          console.log('app6 countTemp', countTemp); // 0 访问的时候，不能使用 .value 访问，会自动解包
 
           const count1 = ref(0);
           const state1 = ref({
@@ -241,9 +254,65 @@
           const count3 = ref(0);
           const state3 = reactive([{ count3 }]);
           console.log('app6 state3[0].count3', state3[0].count3); // 0
+
+          const obj4 = {
+            data: {
+              reactiveData: reactive({
+                data: {
+                  refData: ref(0),
+                },
+              }),
+            },
+          };
+          console.log(
+            'app6 obj4.data.reactiveData.data.refData',
+            obj4.data.reactiveData.data.refData,
+          ); // 0
         },
         template: `<div>app6</div>`,
       }).mount('#app6');
+
+      /**
+       * ref 在模板中的解包
+       *
+       * 和在 setup 中不同的是，即使是最外层的 ref 被访问，也会直接解包，{{}} 对访问 ref 属性也有优化
+       * 1. 最外层是 ref 会解包，访问最外层会解包
+       * 2. 当一个 ref 作为 reactive/ref 变量的属性的时候（向上查找，只要有一层是 reactive/ref），访问这个属性，会解包
+       * 3. ref 的上一层是一个数组或者原生的集合，访问这个 ref 属性不会解包
+       * 4. {{}} 中 如果访问一个普通对象的属性最终是一个 ref 属性，而且只是单纯的读的话，会给这个 ref 属性解包，如果进行任何其他的操作（比如 +1，或者和其他变量进行拼接等），不会解包（这个是针对 {{}} 的优化，在模板中的其他地方不生效）
+       *
+       * 解包和 .value 是互斥的
+       */
+      createApp({
+        setup() {
+          const ref1 = ref(0); // ref 是顶层
+          const ref2 = ref({ data: 0 }); // ref 是顶层
+          const ref3 = ref({ data: { refData: ref(0) } }); // ref 是 ref/reactive 的属性，只要最外层是 ref/reactive 就会解包
+          const ref4 = { refData: ref(0) }; // ref 的上一层是普通对象，往上追踪没有一层是 ref/reactive
+          const ref5 = { refData: ref({ data: { refData: ref(0) } }) }; // ref 的上一层是普通对象，但往上追踪有一层是 reactive/ref
+          const ref6 = reactive([ref(0)]); // ref 的上一层是数组，不会解包
+          return {
+            ref1,
+            ref2,
+            ref3,
+            ref4,
+            ref5,
+            ref6,
+          };
+        },
+        template: `
+          <div>app7</div>
+          <div>{{ref1 + 1}}</div>
+          <div>{{ref2.data + 1}}</div>
+          <div>{{ref3.data.refData + 1}}</div>
+          <!-- 注意后面的两个，第一个会被渲染成 [object Object]1，第二个会被渲染成 0，第二个渲染是 {{}}（文本插值）的特性 -->
+          <div>{{ref4.refData + 1}}</div>
+          <div>{{ref4.refData}}</div>
+          <div>{{ref5.refData.value.data.refData + 1}}</div>
+          <div>{{ref6[0] + 1}}</div>
+          <div>{{ref6[0]}}</div>
+        `,
+      }).mount('#app7');
     </script>
   </body>
 </html>

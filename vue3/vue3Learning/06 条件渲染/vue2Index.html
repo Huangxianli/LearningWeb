@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh">
   <head>
     <meta charset="UTF-8" />
@@ -12,6 +12,8 @@
     <script>
       /**
        * 在 Vue2 中 v-for 的优先级是比 v-if 要高的，先执行 v-for 再执行 v-if
+       *
+       * vue3 的性能表现会比 vue2 的要好，vue2 是在遍历的时候会创建每一个节点的 VDOM，再去判断是否要渲染成真实 DOM，而 vue3 则是 v-if 先行，提前就知道哪些节点不需要渲染，也就不会去创建这些节点的 VDOM 了
        */
       new Vue({
         el: '#app1',

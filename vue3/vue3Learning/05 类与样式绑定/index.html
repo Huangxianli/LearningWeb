@@ -1,47 +1,95 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>05类与样式绑定</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <style>
+      .redColor {
+        color: red;
+      }
+    </style>
+  </head>
 
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>05类与样式绑定</title>
-  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+  <body>
+    <div id="app1"></div>
+    <hr />
+    <div id="app2"></div>
+    <hr />
+    <div id="app3"></div>
+    <script>
+      const { createApp, ref } = Vue;
+      /**
+       * class 写在组件上，默认的会被组件继承，如果组件只有一个根元素，会继承在根元素上，如果有多个根元素，那么该 class 就会失效，这种表现和 vue2 是一样的
+       * 设置了 inheritAttrs: false class 和 style 不会继承到组件的根元素上，但是 vue2 的表现不同，vue2 即使设置 inheritAttrs: false，写在组件上的 class 和 style 还是会继承到组件的根元素上（在 vue3 中，class 和 style 被当成了普通的属性）
+       * inheritAttrs：没有被声明为 prop 的属性，是否要自动挂载到根组件上
+       */
+      const Component1 = {
+        template: `
+          <div>1</div>
+          <div>2</div>
+        `,
+      };
+      const Component2 = {
+        template: `
+          <div>3</div>
+        `,
+      };
+      const Component3 = {
+        inheritAttrs: false,
+        template: `
+          <div>4</div>
+        `,
+      };
+      createApp({
+        components: {
+          Component1,
+          Component2,
+          Component3,
+        },
+        template: `
+          <Component1 class="redColor" />
+          <Component2 class="redColor" />
+          <Component3 class="redColor" />
+        `,
+      }).mount('#app1');
 
-</head>
+      createApp({
+        template: `
+          <div :class="{redColor: isRedColor}">1</div>
+          <button @click="changeColor">change color</button>
+        `,
+        setup() {
+          const isRedColor = ref(true);
+          const changeColor = () => {
+            isRedColor.value = !isRedColor.value;
+          };
+          return {
+            isRedColor,
+            changeColor,
+          };
+        },
+      }).mount('#app2');
 
-<body>
-  <div id="app1"></div>
-  <script>
-    const { createApp, ref } = Vue;
-    /**
-     * class 写在组件上，默认的会被组件继承，如果组件只有一个根元素，会继承在根元素上，如果有多个根元素，那么该 class 就会失效
-     */
-    const Component1 = {
-      template: `
-        <div>1</div>
-        <div>2</div>
-      `,
-    };
-    const Component2 = {
-      template: `
-        <div>3</div>
-      `,
-    }
-    createApp({
-      components: {
-        Component1,
-        Component2,
-      },
-      setup () {
-        return {};
-      },
-      template: `
-      <Component1 class="huang" />
-      <Component2 class="huang" />
-      `,
-    }).mount('#app1');
-  </script>
-
-</body>
-
+      /**
+       * 多根的组件的 class 的继承可以使用 $attrs 指定（vue2 中不同，$attrs 不包含 class 和 style）
+       * 无论 inheritAttrs 是 true 还是 false，$attrs 都包含了所有非 props 的属性
+       */
+      const Component4 = {
+        template: `
+          <div>1</div>
+          <div :class="$attrs.class">2</div>
+        `,
+      };
+      createApp({
+        components: {
+          Component4,
+        },
+        template: `
+          <Component4 class="redColor" />
+        `,
+      }).mount('#app3');
+    </script>
+  </body>
 </html>
