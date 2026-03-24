@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh">
   <head>
     <meta charset="UTF-8" />
@@ -36,12 +36,14 @@
         beforeCreate,
         watchEffect,
         onWatcherCleanup,
+        nextTick,
       } = Vue;
-      // 在状态发生改变的时候执行一些副作用，这个时候不应该用 computed，而应该用 watch watchEffect
+      // 在状态发生改变的时候执行一些副作用，这个时候不应该用 computed，而应该用 watch/watchEffect
       createApp({
         setup() {
           const value = ref('');
           watch(value, (newValue, oldValue) => {
+            // 这里面执行副作用
             console.log(newValue, oldValue);
           });
           return {
@@ -49,17 +51,22 @@
           };
         },
         template: `
-        <div>
-          <input v-model="value" />
-        </div>
-      `,
+          <div>app1</div>
+          <div>
+            <input v-model="value" />
+          </div>
+        `,
       }).mount('#app1');
 
       /**
-       * watch 可以监听的数据源： ref reactive getter函数 多个数据源组成的数组
+       * watch 可以监听的数据源： ref、reactive、getter 函数、多个数据源组成的数组
        * 要监听响应式对象的属性的话，要使用 getter 函数，不然会报错
        *
-       * 如果最总 watch 的是一个响应式对象，不需要使用 getter 函数的形式，反之，则要使用 getter 函数，不然不会进入回调中
+       * 如果最终 watch 的是一个响应式对象，不需要使用 getter 函数的形式，反之，则要使用 getter 函数，不然不会进入回调中
+       *
+       * 其实重要的是监听的内容有没有被代理拦截到 get 和 set，如果有的话，就能加入到响应式系统中，就能被 watch 监听到
+       * 至于为什么最终如果监听的内容不是一对象要使用 getter 函数的形式，是因为 JS 引擎在执行 watch 之前，就要将 watch 的监听内容读取出来，但是依赖收集是在执行的 watch() 的时候触发的，如果监听的是一个非引用类型，那么监听的那个值其实就已经和响应式系统断开了，（JS 对于函数参数寻值 和 vue 的依赖收集 错位了）
+       * 拿 data2 来说，如果 watch(data2.x, xxx)，在执行 watch 之前，JS 引擎就会先确定 data2.x 的值，然后将其替换掉 data2.x 这个表达式，这样在执行 watch 的时候，其实监听的内容就已经是一个非引用值了，上面没有被代理拦截 set 和 get，无法进入响应式系统
        */
       createApp({
         setup() {
@@ -73,30 +80,34 @@
           });
 
           watch(data1, (newValue, oldValue) => {
+            // data1 是一个 Ref 对象，watch 发现传入的是 Ref 对象的时候，会自动的追踪这个 Ref 对象的 value 属性，所以当 data1.value 发生改变的时候，就会进入这个回调中
             console.log('data1', newValue, oldValue);
           });
           watch(data1.value, (newValue, oldValue) => {
-            // 这里永远不会进入里面，因为 data1.value 是一个基础类型的值
+            // 这里永远不会进入里面，因为 data1.value 最终是一个基础类型的值，而不是一样响应式对象
             console.log('data1.value', newValue, oldValue);
           });
           watch(data2, (newValue, oldValue) => {
+            // data2 是一个对象，并且是响应式的
             console.log('data2', newValue, oldValue);
           });
           watch(
             () => data1.value,
+            // data1.value 最终不是一个对象，所以对他的 watch 要将其包裹成 getter 函数
             (newValue, oldValue) => {
               console.log('() => data1.value', newValue, oldValue);
-            }
+            },
           );
           /*  watch(data1.value, (newValue, oldValue) => {
-           // 这种写法是错误的，要么使用一个 getter 函数接收，要么直接监听 data1,
+           // 这种写法是错误的，要么使用一个 getter 函数接收，要么直接监听 data1，watch 是不能直接监听一个基础类型的值
            console.log('data1.value', newValue, oldValue);
          }) */
           watch(
             () => data2.x,
+            // data2.x 最终不是一个对象，所以对他的 watch 要将其包裹成 getter 函数，而且还要注意，如果 x 是一个基础类型的值的话，如果直接结构出来 x，即使使用了 () => x，改变 x 的值也不会进入回调，因为 x 已经脱离了响应式系统，可以通过使用 toRef toRefs 后来解构，这样就将 x 转化成了一个响应式的 ref 对象了
             (newValue, oldValue) => {
               console.log('() => data2.x', newValue, oldValue);
-            }
+            },
           );
           /* watch(data2.x, (newValue, oldValue) => {
           // 这种写法是错误的，要想监听其中的属性，要使用 getter 函数
@@ -109,22 +120,23 @@
             console.log('[data1, data2]', newValue, oldValue);
           });
           /* watch([data1, data2.x], (newValue, oldValue) => {
-          // 这种写法是错误的，要监听属性，要使用 getter 函数
+          // data2.x 最终不是一个对象，如果要监听它，要将其转化成要使用 getter 函数 [data1, () => data2.x]
           console.log('[data1, data2.x]', newValue, oldValue);
         }); */
 
           watch(data3.value, (newValue, oldValue) => {
+            // data3.value 是一个对象，且是响应式的
             console.log('data3.value', newValue, oldValue);
           });
           /* watch(data3.value.x, (newValue, oldValue) => {
-          // 这种写法是错误的，要监听属性，要使用 getter 函数
+          // data3.value.x 最终不是一个对象，所以这种写法是错误的，要监听的它的话，要使用 getter 函数的形式
           console.log('data3.value.x', newValue, oldValue);
         }); */
           watch(
             () => data3.value.x,
             (newValue, oldValue) => {
               console.log('() => data3.value.x', newValue, oldValue);
-            }
+            },
           );
 
           return {
@@ -134,30 +146,31 @@
           };
         },
         template: `
-        <label>data1：{{data1}}
-          <input v-model="data1" />
-        </label>
-        <br />
-        <label>data2.x：{{data2.x}}
-          <input v-model="data2.x" />
-        </label>
-        <br />
-        <label>data2.y：{{data2.y}}
-          <input v-model="data2.y" />
-        </label>
-        <br />
-        <label>data3.x：{{data3.x}}
-          <input v-model="data3.x" />
-        </label>
-      `,
+          <div>app2</div>
+          <label>data1：{{data1}}
+            <input v-model="data1" />
+          </label>
+          <br />
+          <label>data2.x：{{data2.x}}
+            <input v-model="data2.x" />
+          </label>
+          <br />
+          <label>data2.y：{{data2.y}}
+            <input v-model="data2.y" />
+          </label>
+          <br />
+          <label>data3.x：{{data3.x}}
+            <input v-model="data3.x" />
+          </label>
+        `,
       }).mount('#app2');
 
       /**
        * 深层次监听
        *
-       * 直接监听一个 reactive 对象，默认的就是深度监听
+       * 最终监听的是一个 reactive 对象，默认的就是深度监听，即使是 deep: false 也是深度监听（可以使用 getter 函数、computed 包裹到要监听的那一层、shallowReactive），但是在 3.4 之后可以 deep: 数字 来设置监听的深度，这样就会生效
        *
-       * 监听一个 ref，按照目前的验证来看不是深度监听（还要多重验证）
+       * 最终监听的是一个 ref，默认不是深度监听
        *
        * 如果监听的是一个 getter 函数，需要注意，如果不是直接改变其对应的值，那么就不会触发改变（非深度监听）
        */
@@ -175,12 +188,12 @@
           });
 
           watch(data1, (newValue, oldValue) => {
-            // 现在的修改方式 不会进入这个回调
-            // aaa
+            // 现在的修改方式 不会进入这个回调，data1 是一个响应式对象，但是 data1 是 ref 对象，而不是 reactive 对象，默认是浅层的监听
+            // 只有修改 data1.value = 新值 才会触发这个回调
             console.log('data1', newValue, oldValue);
           });
           watch(data1.value, (newValue, oldValue) => {
-            // 会进入这个里面，我认为因为 data1.value 是一个 proxy 对象，可能是相当于 reactive 对象的监听
+            // 会进入这个里面，我认为因为 data1.value 是一个 Reactive 对象
             console.log('data1.value', newValue, oldValue);
           });
           watch(
@@ -188,7 +201,7 @@
             (newValue, oldValue) => {
               // 现在的修改方式 不会进入这个回调
               console.log('() => data1.value', newValue, oldValue);
-            }
+            },
           );
           watch(
             () => data1.value.x,
@@ -196,13 +209,13 @@
             (newValue, oldValue) => {
               // 现在的修改方式 不会进入这个回调
               console.log('() => data1.x', newValue, oldValue);
-            }
+            },
           );
           watch(
             () => data1.value.x.x1,
             (newValue, oldValue) => {
               console.log('() => data1.x.x1', newValue, oldValue);
-            }
+            },
           );
           watch(data2, (newValue, oldValue) => {
             console.log('data2', newValue, oldValue);
@@ -212,17 +225,17 @@
             (newValue, oldValue) => {
               // 没有加 deep， 而且没有直接修改 x 的引用地址，所以不会进入这个 watch 之中
               console.log('() => data2.x', newValue, oldValue);
-            }
+            },
           );
           watch(
             () => data2.x,
             (newValue, oldValue) => {
-              // 没有加 deep， 而且没有直接修改 x 的引用地址，所以不会进入这个 watch 之中
-              console.log('() => data2.x', newValue, oldValue);
+              // 加了 deep：true，虽然没有直接修改 x 的引用地址，但是 deep: true 会递归的监听 x 这个对象中的所有属性，所以当 x 中的属性发生改变的时候，就会进入这个回调中
+              console.log('() => data2.x deep', newValue, oldValue);
             },
             {
               deep: true,
-            }
+            },
           );
 
           return {
@@ -231,25 +244,28 @@
           };
         },
         template: `
-        <label>data1.x.x1
-          <input v-model="data1.x.x1" />
-          {{data1.x.x1}}
-        </label>
-        <br />
-        <label>data2.x.x1
-          <input v-model="data2.x.x1" />
-          {{data2.x.x1}}
-        </label>
-      `,
+          <div>app3</div>
+          <label>data1.x.x1
+            <input v-model="data1.x.x1" />
+            {{data1.x.x1}}
+          </label>
+          <br />
+          <label>data2.x.x1
+            <input v-model="data2.x.x1" />
+            {{data2.x.x1}}
+          </label>
+        `,
       }).mount('#app3');
 
       /**
        * 即时回调的监听器
-       * 无需值被改变就会进入到 watch 的回调里面，而且是在 beforeCreate 回调函数执行之前进入，和 setup 中的代码执行的顺序，要看代码的位置
+       * 无需值被改变就会进入到 watch 的回调里面，而且是在 beforeCreate 回调函数执行之前进入，和 setup 中的其他代码的执行顺序先后，要看代码的位置
+       *
+       * 可以理解为，如果加了 immediate: true 的话，就会将 watch 的回调抽出来一次直接放在 setup 中，随着 setup 的执行执行一次。（前提是没有手动配置 flush 属性）
        */
       createApp({
         beforeCreate() {
-          console.log('beforeCreate');
+          console.log('app4 beforeCreate');
         },
         setup() {
           console.log('--- #app4 ----------------');
@@ -265,7 +281,7 @@
             (newValue, oldValue) => {
               console.log('newValue：', newValue, 'oldValue：', oldValue);
             },
-            { immediate: true }
+            { immediate: true },
           );
           watch(
             () => data2.value.x.x1,
@@ -273,7 +289,7 @@
               console.log('() => data2.value.x.x1');
               console.log(newValue, oldValue);
             },
-            { immediate: true }
+            { immediate: true },
           );
           console.log('--- app4 -------------');
 
@@ -283,10 +299,11 @@
         },
 
         template: `
-        <label>data1：
-          <input v-model="data1" />{{data1}}
-        </label>
-      `,
+          <div>app4</div>
+          <label>data1：
+            <input v-model="data1" />{{data1}}
+          </label>
+        `,
       }).mount('#app4');
 
       /**
@@ -304,24 +321,25 @@
             {
               once: true,
               immediate: true,
-            }
+            },
           );
           return {
             data1,
           };
         },
         template: `
-        <label>data1：
-          <input v-model="data1" />{{data1}}
-        </label>
-      `,
+          <div>app5</div>
+          <label>data1：
+            <input v-model="data1" />{{data1}}
+          </label>
+        `,
       }).mount('#app5');
 
       /**
        * watchEffect()
        * 会自动的追踪回调里面的响应式数据，并且 immediate 是 true
        * 如果是要监听一个数据结构中的几个属性，使用 watchEffect，它不是递归的跟踪数据结构中的所有属性，相对于 deep: true 的性能更好
-       * 要注意，不要在 watchEffect 的修改响应式数据同时又不给出终止条件，这样会陷入死循环
+       * 要注意，不要在 watchEffect 的修改响应式数据同时又不给停止修改改响应式数据的终止条件，这样会陷入死循环
        */
       createApp({
         setup() {
@@ -336,13 +354,14 @@
             () => data1.value.x.x1,
             () => {
               console.log('watch：() => data1.value.x.x1');
-            }
+            },
+            { immediate: true },
           );
           watchEffect((a, b) => {
-            data1.value.x.x1;
+            data1.value.x.x1; // 执行 setup  这一行的时候，会立马执行该函数，读了 data1.value.x.x1 这个响应式数据，进行依赖收集
             console.log('watchEffect');
             console.log('a：', a, 'b：', b);
-            // 注意 a、b 都不是 newValue 和 oldValue
+            // 注意 a、b 都不是 newValue 和 oldValue，a 是 onCleanup，b 是 undefined
           });
 
           return {
@@ -350,17 +369,18 @@
           };
         },
         template: `
-        <label>data1.x.x1
-          <input v-model="data1.x.x1" />{{data1.x.x1}}
-        </label>
-      `,
+          <div>app6</div>
+          <label>data1.x.x1
+            <input v-model="data1.x.x1" />{{data1.x.x1}}
+          </label>
+        `,
       }).mount('#app6');
 
       /**
        * watch 对比 watchEffect
-       * 1. watch 中如果修改了监听的内容会再次进入回调里面，但是如果修改的是回调函数中的其他的响应式数据，不会再次进入；watchEffect 的回调中，只要修改了回调函数中的响应式数据，就会再次进入
+       * 1. watch 是显式指定依赖，只有被明确监听的数据源发生改变时，才会触发回调。即使在回调中修改了其他响应式数据，只要它们没被监听，就不会触发当前 watch；watchEffect 是自动收集依赖，它会在同步执行期间追踪用到的所有响应式数据。只要这些被**依赖（读取）**的数据发生变化，回调就会重新执行。每次执行时，它都会重新建立依赖关系
        * 2. watch 默认是没有开始 immediate: true 的，但是 watchEffect 是默认开启的
-       * 3. watch 回调的参数是 newValue，oldValue，cleanup；watchEffect 回调的参数是 cleanup
+       * 3. watch 回调的参数是 newValue，oldValue，onCleanup；watchEffect 回调的参数是 onCleanup
        */
       createApp({
         setup() {
@@ -381,7 +401,7 @@
               if (data1.value.x.x1?.length !== 3) {
                 data1.value.x.x1 += 1;
               }
-            }
+            },
           );
           watchEffect(() => {
             console.log('进入了 watchEffect');
@@ -395,14 +415,15 @@
           };
         },
         template: `
-        <label>data1.x.x1
-          <input v-model="data1.x.x1" />{{data1.x.x1}}
-        </label>
-        <br />
-        <label>data2.x.x1
-          <input v-model="data2.x.x1" />{{data2.x.x1}}
-        </label>
-      `,
+          <div>app7</div>
+          <label>data1.x.x1
+            <input v-model="data1.x.x1" />{{data1.x.x1}}
+          </label>
+          <br />
+          <label>data2.x.x1
+            <input v-model="data2.x.x1" />{{data2.x.x1}}
+          </label>
+        `,
       }).mount('#app7');
 
       /**
@@ -410,7 +431,7 @@
        * onWatcherCleanup() 用来注册一个清理函数，当侦听器失效并准备重新运行的时候会被调用
        * 注意只能在 watch watchEffect 回调函数的的同步执行期间调用，不能在 await 后调用 onWatcherCleanup
        *
-       * watch 回调的第三个参数、watchEffect 回调的第一个参数 用来替代 onWatcherCleanup 方法；如果使用回调中的这个参数，就不受异步的影响
+       * watch 回调的第三个参数、watchEffect 回调的第一个参数可以用来替代 onWatcherCleanup 方法；如果使用回调中的这个参数，就不受异步的影响
        *
        * onWatcherCleanup 执行时机：
        * watch 停止监听时
@@ -419,7 +440,7 @@
        *
        * 有些类似于 React 的 useEffect
        */
-      createApp({
+      const app8 = createApp({
         setup() {
           const data1 = ref(0);
           let timer = setInterval(() => {
@@ -430,45 +451,95 @@
             }
           }, 500);
           watch(data1, (newValue) => {
-            console.log(newValue);
-            console.log('进入了 watch');
+            console.log('--------');
+            console.log('app8 newValue', newValue);
+            console.log('进入了 app8 watch');
             onWatcherCleanup(() => {
-              console.log('进入了 watch 的 onWatcherCleanup');
+              console.log('进入了 app8 watch 的 onWatcherCleanup');
             });
           });
 
           const data2 = ref(0);
           let timer1 = setInterval(() => {
+            console.log('--------');
             data2.value += 1;
             if (data2.value === 10) {
               clearInterval(timer1);
             }
           }, 500);
           watch(data2, (newValue, oldValue, onCleanup) => {
-            console.log('data2，执行了 watch');
+            // onCleanup 这个回调不受同步限制，可以写在 await 的后面
+            console.log('app8 data2，执行了 watch');
             onCleanup(() => {
-              console.log('data2，执行了 onCleanup');
+              console.log('app8 data2，执行了 onCleanup');
             });
           });
           return {};
         },
         template: `
-      `,
-      }).mount('#app8');
+          <div>app8</div>
+        `,
+      });
+      app8.mount('#app8');
+
+      setTimeout(() => {
+        console.log('--------');
+        console.log('app8 unmount');
+        app8.unmount();
+      }, 6000);
 
       /**
        * 回调的触发时机
        *
        * 默认情况下，侦听器的回调会在父组件更新之后、所属组件的 DOM 更新之前被调用；注意这个时候如果获取当前组件的 DOM，那么得到的是更新之前的 DOM（默认 flush: 'pre'）
        * 如果要在本组件的 DOM 更新之后执行侦听器的回调，可以添加参数 flush: 'post' 或者使用 watchPostEffect
-       * 如果要在 Vue 的任何更新之前触发侦听器的回调，可以添加参数 flush: 'sync'，或者使用 watchSyncEffect（注意，这种顺序，不会有任何的批量优化，不会对这种侦听器进行批量处理，只要其中的响应式数据发生了改变，就会马上进入侦听器回调）
+       * 如果要在 Vue 的任何更新之前触发侦听器的回调，可以添加参数 flush: 'sync'，或者使用 watchSyncEffect（注意，这种顺序，不会有任何的批量优化，不会对这种侦听器进行批量处理，只要其中的响应式数据发生了改变，就会马上进入侦听器回调。例如监听一个响应式的数组，push 一个内容的时候，会触发两次的回调，一次推入一个新的值，一次是 length 的改变引起的）
+       *
+       * 如果三个 watch 监听一个内容，flush 不同，那么触发的顺序应该是 sync -> pre（这里面获取 DOM 还是旧值） -> post
        *
        */
       createApp({
         setup() {
-          return {};
+          console.log('--- #app9 ---------------------');
+
+          const data1 = ref('');
+          watch(
+            data1,
+            () => {
+              console.log('app9 watch flush post');
+            },
+            {
+              flush: 'post', // dom 更新之后，有点类似于 nextTick
+            },
+          );
+
+          watch(
+            data1,
+            () => {
+              console.log('app9 watch flush pre');
+            },
+            {
+              flush: 'pre', // 默认值，父组件更新之后，本组件 DOM 更新之前
+            },
+          );
+          watch(
+            data1,
+            () => {
+              console.log('app9 watch flush sync');
+            },
+            {
+              flush: 'sync', // 一修改就马上执行，没有任何的优化
+            },
+          );
+
+          return {
+            data1,
+          };
         },
-        template: ``,
+        template: `
+          <div>app9</div>
+          <input v-model="data1" />
+        `,
       }).mount('#app9');
 
       /**
@@ -478,6 +549,7 @@
        */
       createApp({
         setup() {
+          console.log('--- #app10 ---------------------');
           const data1 = ref(0);
           let timer = setInterval(() => {
             data1.value += 1;
@@ -490,14 +562,30 @@
           let unWatch = null;
           setTimeout(() => {
             // 这种异步中创建的需要手动的销毁
-            unWatch = watch(data1, () => {});
-            console.log('unWatch', unWatch);
+            unWatch = watch(
+              data1,
+              () => {
+                console.log('app10 watch data1');
+                if (data1.value === 10) {
+                  nextTick(() => {
+                    // 这里的 nextTick 是为了确保 unWatch 一定是一个函数，防止以下边界情况：
+                    // 1. 由于 immediate: true，watch() 内部会同步执行一次回调函数
+                    // 2. 此时外部的赋值操作 (unWatch = watch(...)) 尚未完成，unWatch 仍为 null
+                    // 3. 如果不加 nextTick 直接调用，就会抛出 unWatch is not a function 错误
+                    // 4. 反之，如果不加 immediate: true，回调会在数据变化时异步触发，那时赋值早已完成，则无此隐患
+                    unWatch();
+                  });
+                }
+              },
+              { immediate: true },
+            );
+            console.log('app10 unWatch', unWatch);
           });
-          if (data1.value === 10) {
-            unWatch();
-          }
+          console.log('--- #app10  setup end---------------------');
         },
-        template: ``,
+        template: `
+          <div>app10</div>
+        `,
       }).mount('#app10');
     </script>
   </body>

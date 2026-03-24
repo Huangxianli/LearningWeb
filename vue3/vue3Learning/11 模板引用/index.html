@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh">
   <head>
     <meta charset="UTF-8" />
@@ -31,23 +31,26 @@
        * 在某些情况下，仍然需要对 DOM 进行访问，可以使用 ref attribute
        * 注意是在挂载之后才能访问到具体的值
        * 可以在 onMounted 或者 nextTick 中访问到 refDOM
+       *
+       * ref 和 useTemplateRef
        */
       createApp({
         setup() {
           console.log('--- app1 ------------------------------');
           const inputRef = useTemplateRef('input-ref'); // 3.5.0 版本之后，可以使用 useTemplateRef
           nextTick(() => {
-            // 注意 nectTick 的回调是在 onMounted 的回调之后执行的
+            // 注意这的 nectTick 的回调是在 onMounted 的回调之后执行的，但是并不是所有的 nextTick 回调都是在 onMounted 之后执行的
             console.log('app1 nextTick inputRef.value', inputRef.value); // <input>
             inputRef.value.focus();
           });
 
-          const inputRef1 = ref(null); // 3.5.0 版本之前，可以使用 ref
+          const inputRef1 = ref(null); // 3.5.0 版本之前，可以使用 ref（不能使用 reactive 变量）
           nextTick(() => {
             console.log('app1 nextTick inputRef1.value', inputRef1.value); // <input>
-            inputRef1.value.focus();
+            // inputRef1.value.focus();
           });
 
+          // setup 是在 beforeCreate 生命周期钩子执行之前执行的，所有在这里访问不到 dom
           console.log('app1 setup inputRef.value', inputRef.value); // null
           console.log('app1 setup inputRef1.value', inputRef1.value); // null
           onMounted(() => {
@@ -64,10 +67,12 @@
           <div>app1</div>
           <label>
             <input ref="input-ref"/>
+            <!-- 注意这里绑定的是一个字符串，和传入 useTemplateRef() 的字符串是一样的 -->
           </label>
           <br />
           <label>
             <input ref="inputRef1"/>
+            <!-- 注意这里绑定的是一个字符串，和 ref 变量的名称是一样的 -->
           </label>
         `,
       }).mount('#app1');
@@ -89,8 +94,19 @@
           nextTick(() => {
             console.log('app2 inputRef1.value', inputRef1.value); // Proxy(Array) {0: input, 1: input, 2: input}
           });
+
+          //  使用 Map 来处理
+          const inputRefs = ref(new Map());
+          const setInputRefs = (el, item) => {
+            if (el) {
+              inputRefs.value.set(item, el);
+            } else {
+              inputRefs.value.delete(item);
+            }
+          };
           return {
             inputRef1,
+            setInputRefs,
           };
         },
         template: `
@@ -98,6 +114,8 @@
           <input v-for="item in 3" :key="item"  ref="input-ref"/>
           <br />
           <input v-for="item in 3" :key="item"  ref="inputRef1"/>
+          <br />
+          <input v-for="item in 3" :key="item"  :ref="el => setInputRefs(el, item)" />
         `,
       }).mount('#app2');
 
@@ -109,21 +127,41 @@
           console.log('--- app3 ------------------------------');
           const refDOMs = new Map();
           onMounted(() => {
-            console.log('app3 refDOMs.get(4)', refDOMs.get(4)); // <input>
+            console.log('app3 refDOMs.get(4)', refDOMs.get(4)); // <input placeholder="4">
           });
 
           const focus3 = () => {
             refDOMs.get(3).focus();
           };
+
+          const input1 = reactive([{ id: 0 }, { id: 1 }, { id: 2 }, { id: 3 }]);
+          const refDOM1 = new Map();
+          const setRefDOM1 = (el, id) => {
+            if (el) {
+              refDOM1.set(id, el);
+            } else {
+              refDOM1.delete(id);
+            }
+          };
+          const focus1 = () => {
+            const input1 = refDOM1.get(1);
+            input1.focus();
+            input1.value = '我被聚焦了';
+          };
           return {
             refDOMs,
             focus3,
+            input1,
+            setRefDOM1,
+            focus1,
           };
         },
         template: `
           <div>app3</div>
           <input v-for="item in 10" :placeholder="item" :key="item" :ref="el=>{if(el){refDOMs.set(item, el)}else{refDOM.delete(item)}}" />
           <div><button @click="focus3">聚焦3</button></div>
+          <input v-for="item in input1" :key="item.id" :ref="(el)=> setRefDOM1(el, item.id)" />
+          <div><button @click="focus1">聚焦1</button></div>
         `,
       }).mount('#app3');
 
@@ -135,13 +173,13 @@
         setup() {
           const refDOM = useTemplateRef('inputRef');
           const inputFocus = () => {
-            refDOM.value.focus();
+            refDOM.value?.focus();
           };
-          // defineExpose({ // 在 setup 函数中不能不其作用
+          // defineExpose({ // 在 setup 函数中不能不起作用，如果要手动的控制暴露的内容，可以使用 setup(props, {expose}) 的 expose 参数来进行暴露
           //   inputFocus,
           // });
           return {
-            // setup 函数返回的内容，可以被 ref 访问 dom 的方式访问到；但如果是 <script setup> 就需要 defineExposes() 手动的暴露出去
+            // setup 函数返回的内容，可以被父组件通过获取组件实例的方式访问到；但如果是 <script setup> 就需要 defineExpose() 手动的暴露出去
             inputFocus,
           };
         },
@@ -154,9 +192,12 @@
           Component4,
         },
         setup() {
+          console.log('--- app4 ------------------------------');
+
           const refDOMs = new Map();
           const focus8 = () => {
-            refDOMs.get(8).inputFocus();
+            console.log('app4 focus8 refDOMs.get(8)', refDOMs.get(8)); // 组件实例
+            refDOMs.get(8)?.inputFocus();
           };
           return {
             refDOMs,
