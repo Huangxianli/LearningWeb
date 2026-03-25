@@ -1,154 +1,185 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>组件事件</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+  </head>
 
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>组件事件</title>
-  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
-</head>
+  <body>
+    <div id="app1"></div>
+    <hr />
+    <div id="app2"></div>
+    <hr />
+    <div id="app3"></div>
+    <hr />
+    <div id="app4"></div>
 
-<body>
-  <div id="app1"></div>
-  <hr />
-  <div id="app2"></div>
-  <hr />
-  <div id="app3"></div>
+    <script>
+      const { createApp, ref } = Vue;
 
-  <script>
-    const { createApp, ref } = Vue;
-
-    /**
-     * 触发与监听事件
-     * 注意，组件触发的事件没有事件冒泡，只能直接父组件接受
-     * 在 template 内触发，直接使用 $emit()
-     * 事件名命名使用小驼峰，绑定的时候，推荐使用 kabel-case
-     */
-    const Component1 = {
-      setup () {
-      },
-      template: `
-        <button @click="$emit('handle-click-1')">点击</button>
-      `,
-    };
-    createApp({
-      components: {
-        Component1
-      },
-      setup () {
-        const handleClick = () => {
-          console.log('子组件触发了点击事件')
-        };
-        return {
-          handleClick,
-        };
-      },
-      template: `
-        <Component1 @handle-click-1.once="handleClick"/>
-      `,
-    }).mount('#app1');
-
-
-    /**
-     * 事件参数
-     * $emit()中传入的参数都会直接传入监听器
-     */
-    const Component2 = {
-      // emits: ['input'],
-      // inheritAttrs: false,
-      template: `
-        <input @input="$emit('input', 1, 2, $event, 3, 4)" @change="$emit('my-change', 1, 2, 3, 4)"/>
-      `,
-    };
-
-    createApp({
-      components: {
-        Component2,
-      },
-      setup () {
-        const handleInput = event => {
-          // 这里会执行两次，原因是：组件内本身是在 input事件 内 $emit('input')，而且根组件就是触发这个 input 事件的标签，而触发的组件又没有 ineritAttrs: false emits: ['input'] 之一，就会导致我们在本组件上绑定的 input 事件又绑定在了触发的组件的标签上，这样子组件的标签上就有两个 input 事件绑定了，
-          console.log(event);
-        };
-        const handleMyChange = (...arg) => {
-          console.log(arg);
-        }
-
-        return {
-          handleInput,
-          handleMyChange,
-        };
-      },
-      template: `
-        <Component2 @input="handleInput" @my-change="handleMyChange" />
-      `,
-    }).mount('#app2');
-
-
-    /**
-     * 声明触发的事件
-     * 如果是在 <script setup> 中，要使用 const emit = defineEmits(['eventName']) emit('eventName') 这样使用
-     * 在 setup(){} 使用 使用 setup 的第二个参数 ctx.emit 来触发，可以在 setup 同级的 emits: ['evenetName'] 中声明，不声明也可以
-     * 
-     * 可以在声明中进行校验参数，注意即使是没有通过校验，还是会传递参数，只是在开发模式下控制台会有警告
-     */
-    const Component3 = {
-      emits: {
-        'my-input' () {
-          return true;
+      /**
+       * 触发与监听事件
+       * 注意，组件触发的自定义事件没有事件冒泡，只能直接父组件接受
+       * 在 template 内触发，直接使用 $emit()
+       * 事件名定义的时候使用小驼峰，绑定的时候推荐使用 kebab-case，emit 的时候要和定义的时候一模一样
+       */
+      const Component1 = {
+        setup() {},
+        template: `
+          <button @click="$emit('handleClick1')">点击</button>
+        `,
+      };
+      createApp({
+        components: {
+          Component1,
         },
-        'my-change' () {
-          return true;
+        setup() {
+          const handleClick = () => {
+            console.log('子组件触发了点击事件');
+          };
+          return {
+            handleClick,
+          };
         },
-        'my-blur' (playload) {
-          if (playload === '1') {
+        template: `
+          <Component1 @handle-click1.once="handleClick"/>
+        `,
+      }).mount('#app1');
+
+      /**
+       * 事件参数
+       * $emit()中传入的参数都会直接传入监听器
+       */
+      const Component2 = {
+        // emits: ['input'],
+        // inheritAttrs: false,
+        template: `
+          <input @input="$emit('input', 1, 2, $event, 3, 4)" @change="$emit('my-change', 1, 2, 3, 4)"/>
+        `,
+      };
+
+      createApp({
+        components: {
+          Component2,
+        },
+        setup() {
+          const handleInput = (event) => {
+            // 这里会执行两次，原因是发生了“事件透传”与“自定义事件”的重叠：
+            // 1. 本组件没有设置 inheritAttrs: false，也没有在 emits 中声明 'input'
+            // 2. 导致父组件绑定的 @input 既被当作组件自定义事件监听，又被透传为了子组件根 DOM 节点上的原生 DOM 事件监听
+            // 3. 用户输入时，原生 input 事件被触发（执行第1次），同时内联的 $emit('input') 又抛出了自定义事件（执行第2次）
+
+            // 没有声明成 props 和 emits 的 attributes 在 inheritAttrs 为 true（默认值）的情况下，会自动继承在子组价的根元素上（包括事件）
+            console.log('触发了 input 事件', event);
+          };
+          const handleMyChange = (...arg) => {
+            console.log(arg);
+          };
+
+          return {
+            handleInput,
+            handleMyChange,
+          };
+        },
+        template: `
+          <Component2 @input="handleInput" @my-change="handleMyChange" />
+        `,
+      }).mount('#app2');
+
+      /**
+       * 声明触发的事件
+       * 如果是在 <script setup> 中，要使用 const emit = defineEmits(['eventName']) emit('eventName') 这样使用
+       * 在 setup(){} 使用 使用 setup 的第二个参数 ctx.emit 来触发，可以在 setup 同级的 emits: ['evenetName'] 中声明，不声明也不会报错，但是会存在隐患
+       *
+       * 可以在声明中进行校验参数，注意即使是没有通过校验，还是会传递参数，只是在开发模式下控制台会有警告
+       */
+      const Component3 = {
+        emits: {
+          // 不写也没关系
+          'my-input'() {
             return true;
-          } else {
-            return false;
-          }
-        }
+          },
+          'my-change'() {
+            return true;
+          },
+          'my-blur'(playload) {
+            if (playload === '1') {
+              return true;
+            } else {
+              return false;
+            }
+          },
+        },
+        setup(props, ctx) {
+          const inputValue = ref('');
+          const handleChange = () => {
+            ctx.emit('my-change');
+          };
+          return {
+            inputValue,
+            handleChange,
+          };
+        },
+        template: `
+          <input v-model="inputValue" @input="$emit('my-input')"  @change="handleChange" @blur="$emit('my-blur', inputValue)"/>
+        `,
+      };
+      createApp({
+        components: {
+          Component3,
+        },
+        setup() {
+          const handleMyInput = () => {
+            console.log('进入了 HandleMyInput');
+          };
+          const handleMyChange = () => {
+            debugger;
+            console.log('进入了 handleMyChange');
+          };
+          const handleMyBlur = (playload) => {
+            console.log('进入了 handleMyBlur', playload);
+          };
 
-      }, // 不写也没关系
-      setup (props, ctx) {
-        const inputValue = ref('');
-        const handleChange = () => {
-          ctx.emit('my-change');
-        };
-        return {
-          handleChange,
-        }
-      },
-      template: `
-        <input v-model="inputValue" @input="$emit('my-input')"  @change="handleChange" @blur="$emit('my-blur', inputValue)"/>
-      `,
-    };
-    createApp({
-      components: {
-        Component3,
-      },
-      setup () {
-        const handleMyInput = () => {
-          console.log('进入了 HandleMyInput');
-        };
-        const handleMyChange = () => {
-          debugger
-          console.log('进入了 handleMyChange');
-        };
-        const handleMyBlur = (playload) => {
-          console.log('进入了 handleMyBlur', playload);
-        };
+          return {
+            handleMyInput,
+            handleMyChange,
+            handleMyBlur,
+          };
+        },
+        template: `
+          <Component3 @my-input="handleMyInput"  @my-change="handleMyChange" @my-blur="handleMyBlur" />
+        `,
+      }).mount('#app3');
 
-        return {
-          handleMyInput,
-          handleMyChange,
-          handleMyBlur
-        };
-      },
-      template: `
-        <Component3 @my-input="handleMyInput"  @my-change="handleMyChange" @my-blur="handleMyBlur" />
-      `,
-    }).mount('#app3');
-  </script>
-</body>
-
+      /**
+       * 在组件上接收的自定义的事件上，使用 $event，$event 就是子组件发出事件时传递的第一个参数
+       * 原生的事件，$event 是事件对象
+       */
+      const Component4 = {
+        emits: ['change-data', 'change-data-1', 'blur-data'],
+        setup() {},
+        template: `
+          <input @change="$emit('change-data', $event.target.value)" @input="$emit('change-data-1', 1, 2, 3)" @blur="$emit('blur-data', 1, 2, 3)" />
+        `,
+      };
+      createApp({
+        components: {
+          Component4,
+        },
+        setup() {
+          const blurData = (data) => {
+            console.log('blur-data', data);
+          };
+          return {
+            blurData,
+          };
+        },
+        template: `
+          <Component4 @change-data="console.log('change-data', $event)" @change-data-1="console.log('change-data-1', $event)" @blur-data="$event => blurData($event)" />
+        `,
+      }).mount('#app4');
+    </script>
+  </body>
 </html>
