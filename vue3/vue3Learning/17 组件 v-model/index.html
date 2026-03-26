@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh">
   <head>
     <meta charset="UTF-8" />
@@ -18,18 +18,26 @@
 
     <script>
       const { createApp, ref, defineModel, watchEffect } = Vue;
+      /**
+       * v-model="data" 是一个语法糖
+       *
+       * 在原生的元素上（拿 input[type="text"] 来说）
+       * :value="data" @input="data = $event.target.value"
+       *
+       * 在自定义的组件上
+       * :modelValue="data" @update:modelValue="data = $event"
+       */
 
       /**
        * Vue3.4 之后的推荐写法是
-       * 在子组件中 const model = defineModel() 生成一个 ref 对象，model.value 接收的是父组件传递的 modelValu，当他被子组件变更，会触发复组件绑定值的一起更新
+       * 在子组件中 const model = defineModel() 生成一个 ref 对象，model.value 接收的是父组件传递的 modelValue，当他被子组件变更，会触发父组件绑定值的一起更新
        * 会被解析为：
        * 一个名为 modelValue 的 prop，本地 ref 的值与其同步；
-       * 一个名为 update:modelValue 的事件，当本地 ref 的值发生变更时触发。
+       * 一个名为 update:modelValue 的事件，当本地 ref 的值发生变更时触发
        *
        * Vue3.4 之前的写法是
        * const props = defineProps(['modelValue'])
        * const emit = defineEmits(['update:modelValue'])
-       *
        *
        * const model = defineModel({
        *  required: true, // 使用该组件的时候，必须要加上 v-model
@@ -46,13 +54,14 @@
           },
         },
         template: `
+          <!-- 这里没有使用 v-model，因为 v-model 的一部分会解析为 @input="modelValue = $event.target.value"，直接修改了 prop，而且没有抛出事件给外部 -->
           <input :value="modelValue" @input="$emit('update:modelValue', $event.target.value)" />
         `,
       };
       // const Component1 = {
       //   setup() {
       //     const model = defineModel({
-      //       // 注意 defineModel 在 html 中和在 SFC <script setup> 中表现有所不同
+      //       // 注意 defineModel 在 html 中和在 SFC <script setup> 中表现有所不同，defineModel 只能在 <script setup> 中使用
       //       type: String,
       //       default: '',
       //     });
@@ -90,6 +99,7 @@
         },
         template: `
           <div>app1</div>
+          <!-- 下面两种写法，在这里其实是等价的 -->
           <Component1 v-model="inputValue" />{{inputValue}}
           <br />
           <Component1 :modelValue="inputValue1" @update:modelValue="inputValue1 = $event" />{{inputValue1}}
@@ -99,7 +109,7 @@
       /**
        * v-model 的参数
        * defineModel('model1'); 表示，有一个 prop 叫 model1，更新事件为 update:model1
-       * defineModel('model1', { required: true }); 也可以
+       * defineModel('model1', { required: true }) 表示在使用该组件的时候，其实在事实上也只限制了 prop 的必传，没有限制事件的必须被接收
        * 在使用该组件的时候，绑定 v-model 应该为 v-model:model1=""
        */
       const Component2 = {
@@ -189,7 +199,7 @@
           modelValue: {
             type: String,
             required: true,
-            default: '1', // 这里的默认值会向上传递，使用 defineModel({default: '1'}) 产生的默认值不会向上传递
+            default: '1', // 这里的默认值不会向上传递，使用 defineModel({default: '1'}) 产生的默认值不会向上传递
           },
           modelModifiers: {
             // 这里面传递的就是修饰符，如果 v-model.upper 那么 modelModifiers.upper = true
@@ -204,7 +214,7 @@
             default: () => ({}),
           },
         },
-        emits: ['update:modelValue'],
+        emits: ['update:modelValue', 'update:model1'],
         setup(props, ctx) {
           const handleInput = (e) => {
             let value = e.target.value;
@@ -246,6 +256,8 @@
         },
         template: `
           <div>app4</div>
+          <div>model:{{model}}</div>
+          <div>model1:{{model1}}</div>
           <Component4 v-model.upper="model" v-model:model1.upper="model1" />
         `,
       }).mount('#app4');
