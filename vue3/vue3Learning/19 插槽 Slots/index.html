@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh">
   <head>
     <meta charset="UTF-8" />
@@ -19,7 +19,7 @@
 
       /**
        * 具名插槽
-       * 所有位于顶级的非 <template> 节点被隐式地视为默认插槽的内容
+       * 所有位于顶级的非 <template> 节点都会被隐式地视为默认插槽的内容
        */
       const Component1 = {
         template: `
@@ -41,7 +41,7 @@
           Component1,
         },
         setup() {},
-        // 在没有显示的使用 default 插槽，两个游离的 div 都会在 slot default 中渲染出来
+        // 在没有显式的使用 default 插槽，两个游离的 div 都会在 slot default 中渲染出来；如果显式地使用了 <template #default>，再去写游离的元素，Vue 控制台会抛出警告提示插槽冲突，且游离的元素会被直接丢弃，不会被渲染出来
         template: `
           <div>app1</div>
           <Component1>
@@ -53,6 +53,7 @@
               这里是 foot
             </template>
             <div>这里是游离的 div2</div>
+            <!-- 这里如果显式地使用了 default 插槽，前面游离的内容会被丢弃 -->
             <!-- 
             <template #default>
               这里是 default
@@ -67,7 +68,8 @@
        *
        * 结合 $slot 和 v-if 来定义插槽
        *
-       * 还可以动态的使用插槽 #[sloteName]
+       * 还可以动态的使用插槽 #[sloteName] v-slot:[slotName] 但是定义是不能动态的定义的
+       * # 是 v-slot 的缩写
        */
       const Component2 = {
         template: `
@@ -90,8 +92,9 @@
         template: `
           <div>app2</div>
           <Component2>
-            <template #head>
-              head
+            <template #foot>
+            <!-- 相当于 <template v-slot:foot> -->
+              foot
             </template>
           </Component2>
         `,
@@ -100,9 +103,9 @@
       /**
        * 作用域插槽
        *
-       * 在 slot 上 v-bind 绑定的内容会被组合成一个对象，传递给使用这个 slot 标签上，可以通过 #slotName="data" 来获取，data 就是这个传递的对象
+       * 在 <slot> 上 v-bind 绑定的内容会被组合成一个对象，传递给使用这个插槽的 template 标签上，可以通过 #slotName="data" 来获取，data 就是这个传递的对象
        *
-       * v-slot 只能在组件标签（内部定义的时候，只定义了默认插槽时）和 template 标签上使用
+       * v-slot 只能在组件标签（组件内部定义的时候，只定义了默认插槽时）和 template 标签上使用
        */
       const Component3 = {
         setup() {

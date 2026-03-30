@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh">
   <head>
     <meta charset="UTF-8" />
@@ -21,6 +21,24 @@
       const { createApp, ref } = Vue;
 
       /**
+       * 注意，directive 的这些钩子触发的时序是严格绑定并跟随其所在组件（也就是父组件（宿主组件））的渲染和更新周期的
+       * 在绑定元素的 attribute 前 或 事件监听器应用前调用
+       * created(el, binding, vnode) {},
+       * 在元素被插入到 DOM 前调用
+       * beforeMount(el, binding, vnode) {},
+       * 在绑定元素的宿主组件 及 他自己的所有子节点都挂载完成后调用
+       * mounted(el, binding, vnode) {},
+       * 绑定元素的宿主组件更新前调用
+       * beforeUpdate(el, binding, vnode, prevVnode) {},
+       * 在绑定元素的宿主组件 及 他自己的所有子节点都更新后调用
+       * updated(el, binding, vnode, prevVnode) {},
+       * 绑定元素的宿主组件卸载前调用
+       * beforeUnmount(el, binding, vnode) {},
+       * 绑定元素的宿主组件卸载后调用
+       * unmounted(el, binding, vnode) {}
+       */
+
+      /**
        * 自定义指令主要是为了重用涉及普通元素的底层 DOM 访问的逻辑
        * 只有当所需功能只能通过直接的 DOM 操作来实现的时候，才应该使用自定义指令
        * 在 <script setup> 中，任何 v 开头的驼峰命名的变量都可以当成自定义指令使用
@@ -32,13 +50,22 @@
           const outClick = () => {
             console.log('点击了外部');
           };
+          const clicks = ref(0);
+          const clickHandler = () => {
+            clicks.value++;
+          };
           return {
             outClick,
+            clicks,
+            clickHandler,
           };
         },
         template: `
-         <div>app1</div>
-         <div v-highlight v-outClick="outClick">使用了 v-highlight</div>
+          <div>app1</div>
+          <div v-if="clicks % 2 === 0" v-highlight v-outClick="outClick" v-outClick="()=> {console.log('同一个元素上绑定的第二个 v-outClick')}">使用了 v-highlight</div>
+          <!-- 在一个元素上使用相同的指令会抛出警告 -->
+          <button @click="clickHandler">点击增加</button>
+          <div>{{clicks}}</div>
         `,
       });
       app.directive('highlight', {
@@ -46,17 +73,63 @@
           el.classList.add('highlight');
         },
       });
+
+      const elBindingMap = new Map();
+      const clickHandler = (event) => {
+        elBindingMap.forEach((fnSet, el) => {
+          if (el !== event.target && !el.contains(event.target)) {
+            fnSet?.forEach((fn) => {
+              fn();
+            });
+          }
+        });
+      };
+
       app.directive('outClick', {
         mounted(el, binding) {
-          el._clickHandelr = (e) => {
-            if (!el.contains(e.target)) {
-              binding.value();
+          if (typeof binding.value !== 'function') {
+            return;
+          }
+          let fnSet = elBindingMap.get(el);
+          if (fnSet?.size) {
+            fnSet.add(binding.value);
+          } else {
+            fnSet = new Set([binding.value]);
+          }
+          // elBindingMap.set(el, binding.value);
+          elBindingMap.set(el, fnSet);
+          if (elBindingMap.size === 1) {
+            // 这里的判断是因为可以有多个元素使用 v-outClick 但是其实只需要在 doucment 上监听一次就可以了
+            document.addEventListener('click', clickHandler, true);
+          }
+          // 在捕获阶段进行事件触发，防止当 document 里面的元素对点击事件进行了阻止事件传递的操作；如果当阻止了事件的传递，那么点击的元素就不会将点击事件向上冒泡，这样就不会触发绑定在 document 上的这个冒泡阶段才触发的点击事件
+        },
+        updated(el, binding) {
+          if (typeof binding.value !== 'function') {
+            elBindingMap.delete(el);
+            if (elBindingMap.size === 0) {
+              document.removeEventListener('click', clickHandler, true);
             }
-          };
-          document.addEventListener('click', el._clickHandelr);
+            return;
+          }
+          let fnSet = elBindingMap.get(el);
+          if (fnSet?.size) {
+            fnSet.delete(binding.oldValue);
+            fnSet.add(binding.value);
+          } else {
+            fnSet = new Set([binding.value]);
+          }
+          elBindingMap.set(el, fnSet);
         },
         beforeUnmount(el) {
-          document.removeEventListener('click', el._clickHandelr);
+          console.log('进入了 v-outClick 指令的 beforeUnmount');
+          if (elBindingMap.has(el)) {
+            elBindingMap.delete(el);
+          }
+          if (elBindingMap.size === 0) {
+            // 当最后一个 v-outClick 的元素被卸载前才取消事件绑定
+            document.removeEventListener('click', clickHandler, true);
+          }
         },
       });
       app.mount('#app1');
@@ -69,20 +142,15 @@
         setup() {},
         directives: {
           highlight: {
-            // 在绑定元素的 attribute 前
-            // 或事件监听器应用前调用
-            created(el, binding, vnode) {
-              // 下面会介绍各个参数的细节
-            },
+            // 在绑定元素的 attribute 前或事件监听器应用前调用
+            created(el, binding, vnode) {},
             // 在元素被插入到 DOM 前调用
             beforeMount(el, binding, vnode) {},
-            // 在绑定元素的父组件
-            // 及他自己的所有子节点都挂载完成后调用
+            // 在绑定元素的父组件及他自己的所有子节点都挂载完成后调用
             mounted(el, binding, vnode) {},
             // 绑定元素的父组件更新前调用
             beforeUpdate(el, binding, vnode, prevVnode) {},
-            // 在绑定元素的父组件
-            // 及他自己的所有子节点都更新后调用
+            // 在绑定元素的父组件及他自己的所有子节点都更新后调用
             updated(el, binding, vnode, prevVnode) {},
             // 绑定元素的父组件卸载前调用
             beforeUnmount(el, binding, vnode) {},
@@ -90,13 +158,15 @@
             unmounted(el, binding, vnode) {},
             /**
              * binding: {
-             *   value: 传递给指令的值 v-input="value"
-             *   oldValue
-             *   arg：传递给指令的参数 v-input:arg
-             *   modifiers: 修饰符对象 v-input.foo.bar => { foo: true, bar: true }
-             *   instance: 使用该指令的组件的实例
-             *   dir: 指令的定义对象
+             *   value: 传递给指令的值 v-highlight="value"
+             *   oldValue（只在 beforeUpdate 和 updated 中有值）
+             *   arg：传递给指令的参数 v-highlight:arg
+             *   modifiers: 修饰符对象 v-highlight.foo.bar => { foo: true, bar: true }
+             *   instance: 使用该指令所在的组件的实例
+             *   dir: 指令的定义对象（定义组件时传入的对象，注意，这个是被共用的，一旦在一处修改了，那么所有使用了这个指令的地方都会受影响）
              * }
+             *
+             * <div v-highlight:arg.modifiers="value"><div>
              */
           },
         },

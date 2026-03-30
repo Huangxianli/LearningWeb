@@ -3,14 +3,18 @@ const { ref, onMounted, onBeforeUnmount, watchEffect, toValue } = Vue;
 const useMouse = function () {
   const x = ref(0);
   const y = ref(0);
-  const updateMouse = event => {
+  const updateMouse = (event) => {
     x.value = event.pageX;
     y.value = event.pageY;
   };
-  onMounted(() => { window.addEventListener('mousemove', updateMouse); });
-  onBeforeUnmount(() => { window.removeEventListener('mousemove', updateMouse); });
+  onMounted(() => {
+    window.addEventListener('mousemove', updateMouse);
+  });
+  onBeforeUnmount(() => {
+    window.removeEventListener('mousemove', updateMouse);
+  });
 
-  return { x, y }
+  return { x, y };
 };
 
 const useFetch = function (url) {
@@ -29,16 +33,17 @@ const useFetch1 = function (url) {
   const result = ref({});
   const fetchData = function () {
     console.log('执行了 fetchData');
-    toValue(url)
+    toValue(url);
     setTimeout(() => {
       state.value = 'success';
       result.value = { name: '' };
     }, 3000);
   };
-  watchEffect(() => { fetchData() })
-
+  watchEffect(() => {
+    fetchData();
+  });
 
   return { state, result };
-}
+};
 
 export { useMouse, useFetch, useFetch1 };

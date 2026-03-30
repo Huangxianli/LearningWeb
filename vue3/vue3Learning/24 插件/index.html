@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="zh">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>插件</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+  </head>
+  <body>
+    <div id="app1"></div>
+    <script>
+      const { createApp } = Vue;
+      /**
+       * 插件，一种能为 Vue 添加全局功能的工具代码
+       */
+      const app1 = createApp({
+        setup() {
+          return {};
+        },
+        template: ``,
+      });
+      // app1.use(myPlugin, {});
+    </script>
+  </body>
+</html>

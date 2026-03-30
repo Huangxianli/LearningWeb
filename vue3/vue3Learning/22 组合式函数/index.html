@@ -1,74 +1,80 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>组合式函数</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+  </head>
 
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>组合式函数</title>
-  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
-</head>
+  <body>
+    <div id="app1"></div>
+    <hr />
+    <div id="app2"></div>
+    <hr />
+    <div id="app3"></div>
 
-<body>
-  <div id="app1"></div>
-  <hr />
-  <div id="app2"></div>
-  <hr />
-  <div id="app3"></div>
+    <script type="module">
+      import { useMouse, useFetch, useFetch1 } from './useFunction.js';
+      const { createApp, ref } = Vue;
 
-  <script type="module">
-    import { useMouse, useFetch, useFetch1 } from './useFunction.js'
-    const { createApp, ref } = Vue;
+      /**
+       * 组合式函数 是一个利用 Vue 的组合式 API 来封装和复用有状态逻辑的函数
+       * 也可以使用 非渲染组件（组价中实现数据逻辑，通过 <slot> 将数据暴露出去，让渲染组件自己决定渲染的内容）来等价实现，但是，组合式函数在绝绝大部分的情况下都更适合，组合式函数比起组件来开销更小，逻辑更明确，使用起来更灵活
+       */
 
-    /**
-     * 基础使用
-     */
-    createApp({
-      setup () {
-        const { x, y } = useMouse();
-        return { x, y }
-      },
-      template: `
-        <div>
-          x：{{x}}，y：{{y}}
-        </div>
-      `,
-    }).mount('#app1');
+      /**
+       * 基础使用
+       */
+      createApp({
+        setup() {
+          const { x, y } = useMouse();
+          return { x, y };
+        },
+        template: `
+          <div>
+            x：{{x}}，y：{{y}}
+          </div>
+        `,
+      }).mount('#app1');
 
+      /**
+       * 异步状态
+       *
+       * 如果要一个响应式数据发生改变就重新执行某一段逻辑，正确的做法是将该响应式数据通过参数传入到组合式函数中，在组合式函数中监听然后处理一段逻辑；而不是在外监听，在监听中调用组合式函数。这是因为组合式函数中，很多时候会使用到 computed watch 等等，执行一次组合式函数就会创建一次，如果在外部 watch 的话，可能会创建很多次
+       */
+      createApp({
+        // 如果是 async setup() {} 一定要搭配 suspenes 使用才能渲染出来内容
+        setup() {
+          const { state, result } = useFetch('./asdas');
 
-    /**
-     * 异步状态
-     */
-    createApp({
-      setup () {
-        const { state, result } = useFetch('./asdas');
+          const url = ref('');
+          const { state: state1, result: result1 } = useFetch1(url);
+          url.value = '12';
+          return { state, result, state1, result1 };
+        },
+        template: `
+          <div>
+            state：{{state}}，result： {{result}}
+            <br />
+            state1：{{state1}}，result1： {{result1}}
+          </div>
+        `,
+      }).mount('#app2');
 
-        const url = ref('');
-        const { state: state1, result: result1 } = useFetch1(url);
-        url.value = '12';
-        return { state, result, state1, result1 };
+      /**
+       * 约定和最佳实践
+       * 命名：驼峰命名，以 use 开头
+       * 输入参数 在内部可以使用 toValue() 来处理一下；如果要在内部能被正确的监听可以显示的 watch 相应的参数，或者在 watchEffect 中使用 toValue(参数)
+       * 返回值 用 ref() 而非 reactive()
+       * 使用限制 只能在 setup() {} <script setup> 的钩子中被同步调用
+       */
+      createApp({}).mount('#app3');
 
-      },
-      template: `
-        <div>
-          state：{{state}}，result： {{result}}
-          <br />
-          state1：{{state1}}，result1： {{result1}}
-        </div>
-      `,
-    }).mount('#app2');
-
-    /**
-     * 约定和最佳实践
-     */
-    createApp({}).mount('#app3');
-
-    /**
-     * 在选项式 API 中使用组合式函数
-     * 只能在在 setup() {} 中调用，并且将返回值 return 除去，才会绑定被绑定在 this 上
-     */
-
-  </script>
-
-</body>
-
+      /**
+       * 在选项式 API 中使用组合式函数
+       * 只能在在 setup() {} 中调用，并且将返回值 return 除去，才会绑定被绑定在 this 上
+       */
+    </script>
+  </body>
 </html>

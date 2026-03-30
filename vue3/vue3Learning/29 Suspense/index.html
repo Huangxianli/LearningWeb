@@ -1,15 +1,82 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Suspense</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+  </head>
 
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Suspense</title>
-  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
-</head>
-
-<body>
-
-</body>
-
+  <body>
+    <div id="app1"></div>
+    <script>
+      const { createApp, defineComponent, defineAsyncComponent, ref } = Vue;
+      /**
+       * Suspense 还是一个实验性的功能
+       *
+       * 用来在组件树中协调对异步依赖的处理，可以在等待时渲染一个加载状态
+       * 可以等待的异步依赖有两种
+       * 1. async setup(){}、<script setup> 标签顶层内使用了 await
+       * 2. 异步组件
+       */
+      const Component11 = defineComponent({
+        async setup() {
+          const data = ref(0);
+          data.value = await new Promise((resolve) => {
+            setTimeout(() => {
+              resolve(Math.random());
+            }, 5000);
+          });
+          return {
+            data,
+          };
+        },
+        template: `
+          <div>{{data}}</div>
+        `,
+      });
+      const Component12 = defineAsyncComponent({
+        loader: () =>
+          new Promise((resolve, reject) => {
+            setTimeout(() => {
+              // resolve({
+              //   template: `<div>{{Math.random()}}</div>`,
+              // });
+              reject(
+                // suspense 不会处理加载失败的情况，要在父组件中通过 errorCaptured 来捕获错误，或者在 defineAsyncComponent 的 options 中提供 errorComponent 来处理加载失败的情况
+                'new Error("加载组件失败")',
+              );
+            }, 5000);
+          }),
+        errorComponent: {
+          template: `<div>组件加载失败 errorComponent</div>`,
+        },
+      });
+      createApp({
+        components: {
+          Component11,
+          Component12,
+        },
+        errorCaptured(error) {
+          console.log('捕获到错误', error);
+          return false; // 如果返回 false 就不会继续向上传递错误了
+        },
+        template: `
+          <Suspense>
+            <Component11 />
+            <template #fallback>
+              Component11 正在加载中，请稍后...
+            </template>
+          </Suspense>
+          <hr />
+          <Suspense>
+            <Component12 />
+            <template #fallback>
+              Component12 正在加载中，请稍后...
+            </template>
+          </Suspense>
+        `,
+      }).mount('#app1');
+    </script>
+  </body>
 </html>

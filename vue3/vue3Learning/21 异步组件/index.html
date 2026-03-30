@@ -1,71 +1,97 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>异步组件</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+  </head>
 
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>异步组件</title>
-  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
-</head>
+  <body>
+    <div id="app1"></div>
+    <hr />
+    <div id="app2"></div>
 
-<body>
-  <div id="app1"></div>
-  <hr />
-  <div id="app2"></div>
+    <script>
+      const { createApp, ref, defineAsyncComponent } = Vue;
 
-  <script>
-    const { createApp, ref, defineAsyncComponent } = Vue;
-
-    /**
-     * 使用 defineAsyncComponent() 来创建一个异步组件
-     * 
-     */
-    const AsyncComponent1 = defineAsyncComponent(() => {
-      return new Promise((resolve, reject) => {
-        setTimeout(() => {
-          resolve({
-            template: `
-              <div>异步加载的组件</div>
-            `,
-          })
-        }, 1000);
-      })
-    });
-    createApp({
-      components: {
-        AsyncComponent1,
-      },
-      template: `
-        <AsyncComponent1 /s>
-      `,
-    }).mount('#app1');
-
-    /**
-     * 加载与错误状态
-     */
-    const AsyncComponent2 = defineAsyncComponent({
-      loader: () => new Promise((resolve, reject) => { // loader 要是一个函数
-        setTimeout(() => {
-          reject();
-        }, 3000);
-      }),
-      loadingComponent: {
+      /**
+       * defineAsyncComponent() 的核心目的是实现代码分割
+       * 1.. 条件渲染的组件 v-if 例如弹框、折叠面板等
+       * 2. 页面中不是一下子就要看到组件
+       * 3. 加载开销很大的组件
+       * 如果不是用户一打开就要看到的组件，那么这个组件就是一个异步组件的候选者
+       */
+      /**
+       * 使用 defineAsyncComponent() 来创建一个异步组件
+       *
+       * defineAsyncComponent 方法接收一个返回 Promise 的加载函数
+       *
+       */
+      const AsyncComponent1 = defineAsyncComponent(() => {
+        return new Promise((resolve, reject) => {
+          setTimeout(() => {
+            resolve({
+              template: `
+                <div>异步加载的组件</div>
+              `,
+            });
+          }, 1000);
+        });
+      });
+      createApp({
+        components: {
+          AsyncComponent1,
+        },
         template: `
-          <div>加载中</div>
+          <AsyncComponent1 />
         `,
-      },
-      errorComponent: {
-        template: `<div>加载失败</div>`
-      },
-      onError () { }
-    });
-    createApp({
-      components: { AsyncComponent2 },
-      template: `
-        <AsyncComponent2 />
-      `,
-    }).mount('#app2');
-  </script>
-</body>
+      }).mount('#app1');
 
+      /**
+       * 加载与错误状态
+       */
+      const AsyncComponent2 = defineAsyncComponent({
+        // 加载函数 loader，应该和直接使用一样，是一个函数，返回一个 promise
+        loader: () =>
+          new Promise((resolve, reject) => {
+            // loader 要是一个函数
+            setTimeout(() => {
+              reject();
+            }, 3000);
+          }),
+        // 加载异步组件时使用的组件
+        loadingComponent: {
+          template: `
+            <div>加载中</div>
+          `,
+        },
+        // 加载失败后展示的组件
+        errorComponent: {
+          template: `<div>加载失败</div>`,
+        },
+        // 展示架加载组件组件前的延迟事件，默认是 200ms
+        // delay: 200,
+        // 设置异步组件加载的超时时间，默认是 Infinity
+        // timeout: 3000
+
+        // 加载失败后的回调，优先级比 errorComponent 要高
+        onError(error, retry, fail, attempts) {
+          console.log('onError', error);
+          //  error：错误信息 retry：一个函数，调用它会重新加载组件 fail：一个函数，调用它会告诉 Vue 已经失败了，应该展示 errorComponent 了 attempts：已经尝试加载的次数
+          if (attempts > 2) {
+            fail();
+          } else {
+            retry();
+          }
+        },
+      });
+      createApp({
+        components: { AsyncComponent2 },
+        template: `
+          <AsyncComponent2 />
+        `,
+      }).mount('#app2');
+    </script>
+  </body>
 </html>
