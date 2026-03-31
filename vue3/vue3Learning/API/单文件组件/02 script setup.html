@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="zh">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>script setup</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+  </head>
+  <body>
+    <div id="app1"></div>
+    <script type="text/x-template" id="component1">
+      <div>component1</div>
+      <Component1Child1 />
+      <Component1Child1 />
+      <Component1Child2 />
+      <Component1Child2 />
+    </script>
+    <script type="text/x-template" id="component1child1">
+      <div>component1child1</div>
+      <div>{{clicks}}</div>
+      <button @click="add">增加</button>
+    </script>
+    <script type="text/x-template" id="component1child2">
+      <div>component1child2</div>
+      <div>{{clicks}}</div>
+      <button @click="add">增加</button>
+    </script>
+    <hr />
+
+    <div id="app2"></div>
+    <hr />
+
+    <div id="app3"></div>
+    <script type="text/x-template" id="component3">
+      <div>component3</div>
+      <Comp.Child1 />
+      <Comp.Child2 />
+    </script>
+    <script type="text/x-template" id="component3child1">
+      <div>component3child1</div>
+    </script>
+    <script type="text/x-template" id="component3child2">
+      <div>component3child2</div>
+    </script>
+    <hr />
+
+    <div id="app4"></div>
+    <script type="text/x-template" id="component4">
+      <div v-hight-light>component4</div>
+    </script>
+    <hr />
+
+    <script>
+      const { createApp, ref } = Vue;
+
+      /**
+       * <sciprt> 中的内容只在组件被引入的时候执行一次，所以要求 data 必须是一个工厂函数，不然在一个组件内使用多次该组件的时候，data 的内容是个个组件共享的
+       *
+       * <script setup> 中的内容在实例化的时候才会执行，如果在一个组件使用了10次，就会执行10次里面的内容
+       */
+      const Component1Child1 = {
+        setup() {
+          const clicks = ref(0);
+          const add = () => {
+            clicks.value++;
+          };
+          return {
+            clicks,
+            add,
+          };
+        },
+        template: '#component1child1',
+      };
+      const Component1Child2 = {
+        data() {
+          return {
+            clicks: 0,
+          };
+        },
+        methods: {
+          add() {
+            this.clicks++;
+          },
+        },
+        template: '#component1child2',
+      };
+      createApp({
+        components: {
+          Component1Child1,
+          Component1Child2,
+        },
+        setup() {},
+        template: '#component1',
+      }).mount('#app1');
+
+      /**
+       * 使用组件
+       * 在 <script setup> 中：
+       * import * as Comp from './....';
+       * <Comp.Child1 /> 这样使用
+       */
+      const Component3Child1 = {
+        template: '#component3child1',
+      };
+      const Component3Child2 = {
+        template: '#component3child2',
+      };
+      createApp({
+        components: {
+          'Comp.Child1': Component3Child1,
+          'Comp.Child2': Component3Child2,
+        },
+        setup() {},
+        template: '#component3',
+      }).mount('#app3');
+
+      /**
+       * 自定义指令
+       * 在 <script setup> 中，使用 v 开头的变量可以当成自定义指令使用
+       * 但是在 setup 函数中是不行的，要显示的在 directives 中定义
+       */
+      createApp({
+        setup() {
+          const vHightLight = {
+            mounted(el) {
+              e.style.backgroundColor = 'red';
+            },
+          };
+          return {
+            vHightLight,
+          };
+        },
+        template: '#component4',
+      }).mount('#app4');
+
+      /**
+       * defineProps defineEmits
+       * 都只能在 <sript setup> 中使用
+       * withDefaults(defineProps<..>{},{默认值}) 可以用来给 props 设置默认值
+       */
+
+      /**
+       * defineModel
+       * 默认的 props 是 modelValue
+       * defineModel<modelPropType, modifierType>(modelProp, {
+       *   type: ,
+       *   required: ,
+       *   set(value) { return }
+       *   get()
+       *   default:
+       * })
+       */
+
+      /**
+       * defineExpose()
+       */
+
+      /**
+       * defineOptions()
+       * 直接在 <script setip> 中声明组件选项，不必单独的使用 <script>
+       *
+       * defineOptions({
+       *   name:'',
+       *   inheritAttrs: false,
+       *   ...
+       * })
+       */
+
+      /**
+       * defineSlots()
+       * 只支持 defineSlots<>() 这种方式进行类型定义
+       * const slots = defineSlots<{ default: (props: { msg: string }): any}>()
+       */
+
+      /**
+       * useSlots 和 useAttrs
+       */
+
+      /**
+       * 与普通的 <script> 一起使用
+       * 1. 不要为已经可以使用 <script setup> 定义的选项单独的使用 <script> 例如：props
+       * 2. 在 <script setup> 中创建的变量不会作为属性添加到组件实例中。强烈的反对以这种方式混合 API
+       */
+
+      /**
+       * 顶层 await
+       * <script setup> 中可以使用顶层 await。结果代码会被编译成 async setup()
+       * async setup() 必须与 Suspense 组合使用，该特性目前仍处于实验阶段
+       */
+
+      /**
+       * 导入语句
+       * es 导入
+       */
+
+      /**
+       * 泛型
+       * 可以使用 <script> 标签上的 generic 属性声明泛型类型参数
+       */
+    </script>
+  </body>
+</html>

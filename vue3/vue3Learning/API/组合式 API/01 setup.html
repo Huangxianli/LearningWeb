@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh">
   <head>
     <meta charset="UTF-8" />
@@ -35,13 +35,15 @@
     <script type="text/x-template" id="component4">
       <div>component4</div>
       <div>{{count}}</div>
-      <Component4Child1 :addCount="addCount" axxx="axxx" @input="input" ref="componentRef" />
+      <Component4Child1 :addCount="addCount" axxx="axxx" @input="input" :count="count" ref="componentRef" />
       <div><button @click="focusComponentInput">聚焦</button></div>
     </script>
     <script type="text/x-template" id="component-4-child-1">
-      <div>component-4-child-1</div>
-      <div><button @click="addCount">增加</button></div>
-      <input @input="inputHandler" ref="inputRef" />
+      <div>
+        <div>component-4-child-1</div>
+        <div><button @click="addCount">增加</button></div>
+        <input @input="inputHandler" ref="inputRef" />
+      </div>
     </script>
     <hr />
 
@@ -53,15 +55,15 @@
       const { createApp, defineComponent, h, ref, toRef, useTemplateRef } = Vue;
       /**
        * 组合式 API：setup()
-       * setup() 钩子是在组件中使用组合式 API 的入口，通常只在一下情况下使用
+       * setup() 钩子是在组件中使用组合式 API 的入口，通常只在以下情况下使用
        * 1. 需要在非单文件组件中使用组合式 API 时
        * 2. 需要在基于选项式 API 的组件中集成基于组合式 API 的组件时
        */
       createApp({
         setup() {
           // setup 函数 return 的对象会暴露给模板和组件实例
-          // setup 函数本身没有对当前组件实例发访问权，this 会是 undefined
-          // setup 应该是同步的，唯一可以使用 async setup() 的情况是 Suspens 组件的后裔
+          // setup 函数本身没有对当前组件实例的访问权，this 会是 undefined，因为 setup 在 beforeCreate 之前执行，此时 data/computed/methods 尚未初始化
+          // setup 应该是同步的，唯一可以使用 async setup() 的情况是 Suspense 组件的后裔
           return {};
         },
         template: `
@@ -81,7 +83,7 @@
           function clickHandler() {
             // 这里的 clickHandler 会覆盖掉 methods 中的同名函数
             count.value += 2;
-            // this.count1 += 2; // setup 执行的时候组件实例还没有被创建，不能访问到
+            // this.count1 += 2; // 注意在 setup 中，this 是 undefined，所以不能访问 this.count1
           }
           return { count, clickHandler };
         },
@@ -102,7 +104,7 @@
 
       /**
        * props 要在 props 选项中声明，这样组件才知道哪些传入的内容是 prop
-       * props 在 setup 中要访问的话，要通过 setup 的第一个参数来来访问，注意，如果结构的话，可能会失去响应式
+       * props 在 setup 中要访问的话，要通过 setup 的第一个参数来来访问，注意，如果解构的话，可能会失去响应式，需要使用 toRef 或者 toRefs 来保持响应性和解构同步（普通的解构，如果得到的是非引用变量，父组件改变，子组件解构出来的内容不会同步）
        * template 中访问 props，只要在 props 声明了，就可以直接访问
        * setup 函数中调用 defineProps() 返回的是 undefined
        */
@@ -113,10 +115,12 @@
             type: Number,
           },
         },
-        setup(prop) {
-          // count; // 注意在 setup 函数中，count 即使在 props 中声明了，也不能直接这样访问，要通过 setup 的第一个参数 prop 来访问，而且 setup 函数中不支持 defineProps()，调用返回的数据是空
+        setup(props) {
+          // count; // 注意在 setup 函数中，count 即使在 props 中声明了，也不能直接这样访问，要通过 setup 的第一个参数 prop 来访问，而且 setup 函数中不支持 defineProps()（defineProps() 是一个编译器宏），调用返回的数据是空
+          // const count = toRef(prop, 'count'); // 将 props 的 count 属性转化成 ref 对象
+          // const { count } = toRefs(props); // 将 props 转化成一个其中全是 ref 的对象
           return {
-            count: toRef(prop, 'count'), // 注意，这里如果直接 prop.count，我们会发现 prop 是响应式的，prop.count 不是，所以要这样结构，或者直接将 prop 暴露出去，或者 return 中不用加 count，由于 props 选项中声明了，template 可以直接使用 count
+            count: toRef(props, 'count'), // 注意，这里如果直接 prop.count，我们会发现 prop 是响应式的，prop.count 不是，所以要这样结构，或者直接将 prop 暴露出去，或者 return 中不用加 count，由于 props 选项中声明了，template 可以直接使用 count
           };
         },
         template: '#componet-3-child-1',
@@ -222,7 +226,7 @@
                 {
                   onclick: inputFocus,
                 },
-                '聚焦'
+                '聚焦',
               ),
             ]);
         },

@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh">
   <head>
     <meta charset="UTF-8" />
@@ -89,7 +89,7 @@
           console.log('component-1-child-1 attrs', attrs);
           console.log(
             'component-1-child-1 isReadonly(attrs)',
-            isReadonly(attrs)
+            isReadonly(attrs),
           ); // false 虽然是返回的是 false，但是 attrs 确实是只读的，修改其值会修改失败并抛出警告
           attrs.title = '修改'; // 会给出警告
         },
@@ -113,7 +113,7 @@
 
       /**
        * useSlots
-       * 从 setup 上下文中返回 slots 对象，其中包含父组价你传递的插槽
+       * 从 setup 上下文中返回 slots 对象，其中包含父组价传递的插槽
        * 这些插槽为可调用的函数，返回虚拟 DOM 节点
        *
        * 如果使用 ts 的话更推荐使用 defineSlots()
@@ -121,7 +121,7 @@
       const Component2Child1 = {
         setup() {
           console.log(
-            '--- component-2-child-1 ----------------------------------------'
+            '--- component-2-child-1 ----------------------------------------',
           );
           const count = ref(0);
           const slots = useSlots();

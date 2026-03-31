@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="zh">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>特殊 Attributes</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+  </head>
+  <body>
+    <div id="app1"></div>
+    <script type="text/x-template" id="component1">
+      <div>component1</div>
+      <ul>
+        <li v-for="item in list" :key="item.id">{{item.name}}</li>
+      </ul>
+    </script>
+
+    <script>
+      const { createApp, ref } = Vue;
+
+      /**
+       * key
+       * 主要作为 Vue 的虚拟 DOM 端饭提示，在比较新旧节点列表时用于识别 vnode
+       * number | string | symbol
+       *
+       * 在没有 key 的情况下，Vue 将使用最小化元素移动的算法，尽可能的就地复用更新相同类型的元素
+       * 如果传了 key，根据 key 的变化顺序来重新排序元素
+       */
+      createApp({
+        setup() {
+          const list = ref([
+            { id: 0, name: 'name1' },
+            { id: 1, name: 'name2' },
+            { id: 2, name: 'name3' },
+            { id: 3, name: 'name4' },
+            { id: 4, name: 'name5' },
+          ]);
+          return {
+            list,
+          };
+        },
+        template: '#component1',
+      }).mount('#app1');
+
+      /**
+       * ref
+       * 用于模板绑定
+       */
+
+      /**
+       * is
+       * 用于动态绑定组件
+       */
+    </script>
+  </body>
+</html>

@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="zh">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>特殊元素</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+  </head>
+  <body>
+    <div id="app1"></div>
+    <script type="text/x-template" id="component1">
+      <div>component1</div>
+      <component is='Component1Child1' />
+    </script>
+    <script type="text/x-template" id="component1child1">
+      <div>component1child1</div>
+    </script>
+    <hr />
+
+    <div id="app2"></div>
+    <script type="text/x-template" id="component2">
+      <div>component2</div>
+      <Component2Child1>
+        <template #content>content 插槽被使用</template>
+      </Component2Child1>
+    </script>
+    <script type="text/x-template" id="component2child1">
+      <div>component2child1</div>
+      <div>
+        <slot name="header">header 的占位内容</slot>
+      </div>
+      <div>
+        <slot name="content">content 的占位内容</slot>
+      </div>
+    </script>
+
+    <script>
+      const { createApp, ref } = Vue;
+
+      /**
+       * <component>
+       * 注意，这个不是组件，具有组件类似的特性
+       */
+      const Component1Child1 = {
+        name: 'Component1Child1',
+        setup() {},
+        template: '#component1child1',
+      };
+      createApp({
+        components: {
+          Component1Child1,
+        },
+        setup() {
+          return {};
+        },
+        template: '#component1',
+      }).mount('#app1');
+
+      /**
+       * <slot> <template>
+       * 注意，不是组件
+       */
+      const Component2Child1 = {
+        setup() {},
+        template: '#component2child1',
+      };
+      createApp({
+        components: {
+          Component2Child1,
+        },
+        steup() {},
+        template: '#component2',
+      }).mount('#app2');
+    </script>
+  </body>
+</html>

@@ -13,6 +13,9 @@
       <div>{{countShallowRef.count}}</div>
       <div><button @click="addCount">直接增加</button></div>
       <div><button @click="addCountByValue">修改 .value</button></div>
+      <div>测试传入的是一个 reactive 的情况</div>
+      <div>{{countShallowRef1.count}}</div>
+      <button @click="addCount1">直接增加</button>
     </script>
     <hr />
 
@@ -21,6 +24,9 @@
       <div>component2</div>
       <div>{{countShallowRef.count}}</div>
       <div><button @click="addCount">增加</button></div>
+      <div>测试如果修改的是响应式内容，调用triggerRef</div>
+      <div>{{countShallowRef1.count}}</div>
+      <button @click="addCount1">增加</button>
     </script>
     <hr />
 
@@ -69,6 +75,7 @@
     <script type="text/x-template" id="component8">
       <div>component8</div>
       <div>{{count}}</div>
+      <div>{{doubleCount}}</div>
       <div><button @click="addCount">增加</button></div>
     </script>
     <hr />
@@ -84,6 +91,7 @@
         ref,
         reactive,
         watch,
+        watchEffect,
         shallowRef,
         triggerRef,
         customRef,
@@ -92,6 +100,7 @@
         toRaw,
         markRaw,
         effectScope,
+        computed,
         getCurrentScope,
         onScopeDispose,
       } = Vue;
@@ -99,6 +108,9 @@
       /**
        * shallowRef
        * ref 的浅层作用形式，只有对 .value 的访问是响应式的
+       * 但是如果本身传入的是 reactive 对象的话，其内部的响应式是不会被破坏的
+       *
+       * 在有些性能优化的场景下可以使用
        */
       createApp({
         setup() {
@@ -118,10 +130,18 @@
               count: countShallowRef.value.count + 1,
             }; // 这样修改，页面才会触发改变
           };
+
+          const countReactive = reactive({ count: 0 });
+          const countShallowRef1 = shallowRef(countReactive); // 不会破坏 .value 对应对象内部属性的响应式
+          const addCount1 = () => {
+            countShallowRef1.value.count++;
+          };
           return {
             countShallowRef,
             addCount,
             addCountByValue,
+            countShallowRef1,
+            addCount1,
           };
         },
         template: '#component1',
@@ -130,9 +150,12 @@
       /**
        * triggerRef
        * 强制触发依赖于一个浅层 ref 的副作用，通常在对浅引用的内部值进行深度变更后使用
+       * 通常和 shallowRef 结合起来一起使用
        */
       createApp({
         setup() {
+          console.log('--- component2 -------------------------------');
+
           const countShallowRef = shallowRef({
             count: 0,
           });
@@ -140,9 +163,26 @@
             countShallowRef.value.count++;
             triggerRef(countShallowRef); // 触发其修改后的副作用，这里是重新渲染，也可以重新执行 watch 监听等等
           };
+          watchEffect(() => {
+            console.log(
+              'countShallowRef.value.count',
+              countShallowRef.value.count
+            );
+            // 按理来 .count 不是响应式的，修改它的值，不会触发该回调，但是由于使用了 triggerRef() 所以会触发
+          });
+
+          const countShallowRef1 = shallowRef({ count: 0 });
+          const addCount1 = () => {
+            countShallowRef1.value = {
+              count: countShallowRef1.value.count + 1,
+            };
+            triggerRef(countShallowRef1);
+          };
           return {
             countShallowRef,
             addCount,
+            countShallowRef1,
+            addCount1,
           };
         },
         template: '#component2',
@@ -183,8 +223,9 @@
       /**
        * shallowReactive
        * reactive 的浅层作用形式
-       * 只有跟级别的属性是响应式的
+       * 只有根级别的属性是响应式的
        * 值为 ref 的属性，不会被自动的解包
+       * 注意，只会处理第一层，如果内层本身就是响应式的，不会受影响
        */
       createApp({
         setup() {
@@ -212,7 +253,7 @@
       /**
        * shallowReadonly
        * readonly 的浅层作用形式
-       * 只有跟层级的属性会被设置成只读
+       * 只有根层级的属性会被设置成只读
        * 值为 ref 的属性不会自动的解包
        */
       createApp({
@@ -253,9 +294,11 @@
       createApp({
         setup() {
           console.log('--- component6 ------------------');
-          const ref1 = ref(1);
+          const raw = {};
+          const ref1 = ref(raw);
           const refToRaw = toRaw(ref1.value);
-          console.log('refToRaw === ref1.value', refToRaw === ref1.value); // true
+          console.log('refToRaw === ref1.value', refToRaw === raw); // true
+          console.log('refToRaw === ref1.value', refToRaw === ref1.value); // false 注意这里，原始对象并不是 ref1.value
         },
         template: '#component6',
       }).mount('#app6');
@@ -307,7 +350,8 @@
           console.log('--- component8 ---------------------------');
           const count = ref(0);
           const scope = effectScope();
-          scope.run(() => {
+          const scopData = scope.run(() => {
+            const doubleCount = computed(() => count.value * 2);
             watch(
               count,
               () => {
@@ -317,6 +361,9 @@
                 immediate: true,
               }
             );
+            return {
+              doubleCount,
+            };
           });
           const addCount = () => {
             count.value++;
@@ -328,6 +375,7 @@
           return {
             count,
             addCount,
+            doubleCount: scopData.doubleCount,
           };
         },
         template: '#component8',

@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh">
   <head>
     <meta charset="UTF-8" />
@@ -29,40 +29,50 @@
     <div id="app5"></div>
     <script>
       const { createApp, h, ref, computed, defineComponent } = Vue;
+      /**
+       * template -> 转化成 h 函数形式（编译阶段） -> 执行函数生成 vnode（vnode 就已经和响应式变量没有关系了，就是一张快照）（运行/渲染阶段）
+       * setup return 的是 () => jsx 或者 () => h() 的时候： 转化成 h 函数形式（编译阶段） -> 执行 h 函数生成 vnode（运行/渲染阶段） 如果 jsx 或者 h 没有写在 setup 的 return 里面，是什么时候读到就什么时候转化成 vnode
+       *
+       * projectTest/practice 中有更详细的解析
+       */
 
       /**
        * 基本用法
        *
        */
-      const vnode = h(
-        'div', // vnode.type
-        {
-          // vnode.props
-          id: 'vnode1',
-          onClick: () => {},
-          class: 'vnode1',
-          '.name': '', // 强制作为 prop，对应 name.prop
-          '^width': 100, // 强制作为 attr，对应 width.attr
-        },
-        'vnode1' // vnode.children
-      );
+      const vnode = () =>
+        // 这里写成函数的模式，是 vnode 必须是唯一的，例如生成两个 vnode 的时候，必须要是两个不同的 vnode
+        h(
+          'div', // vnode.type
+          {
+            // vnode.props
+            id: 'vnode1',
+            onClick: () => {},
+            class: 'vnode1',
+            '.name': '', // 强制作为 prop，对应 name.prop
+            '^width': 100, // 强制作为 attr，对应 width.attr
+          },
+          'vnode1', // vnode.children
+        );
       const ChildComponent1 = {
         setup() {
-          return () => vnode; // 确保返回的是一个函数而不是一个值！setup() 函数在每个组件中只会被调用一次，而返回的渲染函数将会被调用多次。
+          return () => vnode(); // 确保 return 的是一个函数而不是一个值！setup() 函数在每个组件中只会被调用一次，而返回的渲染函数将会被调用多次。
         },
       };
       createApp({
         components: {
           ChildComponent1,
         },
-        template: `
-      `,
+        template: ``,
       }).mount('#root1');
 
       /**
        * JSX / TSX
        */
-
+      /**
+       * h 函数的第三个参数是 插槽对象的时候，第一个参数只能是 组件（vnode）
+       * 如果第一个参数是组件的时候，第三个参数可以是 string / Array（占用 slots.default()），也可以是插槽对象
+       */
       /**
        * 案例
        */
@@ -85,13 +95,13 @@
                   onClick: clickButton,
                   onClickOnce: clickButtonOnce, // 在绑定的时候，将修饰符添加到事件后面可以起到相同的效果
                 },
-                '切换显示'
+                '切换显示',
               ),
               h('br'),
-              text.value, // 在渲染函数中，不会自动的解构出来
+              text.value, // 在渲染函数中，不会自动的解包出来
               h(
                 'div',
-                [1, 2, 3, 4].map((item, index) => [h('span', index), h('br')])
+                [1, 2, 3, 4].map((item, index) => [h('span', index), h('br')]),
               ),
               h('hr'),
               h(
@@ -101,19 +111,22 @@
                 },
                 // () => '默认插槽'
                 {
+                  // 这是使用 childComponent3 中的插槽
                   default: () => '默认插槽',
                   content: ({ i }) => `content 插槽 - ${i}`,
-                }
+                },
               ),
               h('hr'),
               h('div', [
+                // 这是定义 ChildComponent2 的插槽 default
                 h('div', slots.default?.() ?? '插槽默认内容'),
                 h(
                   'div',
+                  // 这里定义 ChildComponent2 的插槽 content
                   slots.content?.({
                     // 作用域插槽传递给父组件的参数和值
                     ChildComponent2ContentSlot: 'ChildComponent2ContentSlot',
-                  }) ?? 'content 插槽默认内容'
+                  }) ?? 'content 插槽默认内容',
                 ),
               ]),
             ]);
@@ -152,7 +165,7 @@
       /**
        * 函数式组件
        * 没有任何状态的组件，很像纯函数：接受 props，返回 vnode
-       *  函数式组件在渲染过程中不会创建组件实例（没有 this），不会触发常规的组件生命周期钩子
+       * 函数式组件在渲染过程中不会创建组件实例（没有 this），不会触发常规的组件生命周期钩子
        */
       function ChildComponent4(props, { slots, attrs, emit }) {
         return h('div', 'childComponent4');

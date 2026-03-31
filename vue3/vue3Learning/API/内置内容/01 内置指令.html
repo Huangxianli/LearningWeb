@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="zh">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>内置指令</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+  </head>
+  <body>
+    <div id="app1"></div>
+    <script type="text/x-template" id="component1">
+      <div>component1</div>
+      <div v-text="text">使用 v-text</div>
+      <!-- 和下面的效果是一样的 -->
+       <div>{{text}}</div>
+    </script>
+    <hr />
+
+    <div id="app2"></div>
+    <script type="text/x-template" id="component2">
+      <div>component2</div>
+      <div v-html="html">使用 html</div>
+    </script>
+    <hr />
+
+    <div id="app3"></div>
+    <script type="text/x-template" id="component3">
+      <div>component3</div>
+      <div v-pre>
+        <div>v-pre 测试</div>
+        <span>
+          {{ preTest ? 1 : 2}}
+        </span>
+      </div>
+    </script>
+    <hr />
+
+    <div id="app4"></div>
+    <script type="text/x-template" id="component4">
+      <div>component4</div>
+      <div>测试 v-once</div>
+      <div>{{clicks}}</div>
+      <div v-once>{{clicks}}</div>
+    </script>
+    <hr />
+
+    <div id="app5"></div>
+    <script type="text/x-template" id="component5">
+      <div>component5</div>
+      <div>测试 v-memo</div>
+        <button @click="addListItem">增加</button>
+        <ul v-memo="[list]">
+          <li v-for="item in list" :key="item.id" >{{item.name}}-{{test1}}</li>
+        </ul>
+        <ul v-memo="[list.length]">
+          <li v-for="item in list" :key="item.id" >{{item.name}}-{{test1}}</li>
+        </ul>
+    </script>
+
+    <script>
+      const { createApp, ref } = Vue;
+
+      /**
+       * v-text
+       * 修改的是元素的 textContent 属性，会覆盖掉元素内的所有内容，生成一个文本节点插入
+       */
+      createApp({
+        setup() {
+          const text = '现在使用的是 v-text，会覆盖掉元素原有的内容';
+          return {
+            text,
+          };
+        },
+        template: '#component1',
+      }).mount('#app1');
+
+      /**
+       * v-html
+       * 更新元素的 innerHTML
+       * 绝对不要将用户提供的内容使用在 v-html 上，会有 xss 攻击的风险
+       * 在单文件组件中，scoped 的样式不会作用在 v-html 的内容上
+       */
+      createApp({
+        setup() {
+          const html = `<div>使用 v-html，会符合的标签渲染出来<123></123></div>`;
+          return {
+            html,
+          };
+        },
+        template: '#component2',
+      }).mount('#app2');
+
+      /**
+       * v-show 控制 display
+       * v-if 将元素插入或删除 注意在 vue3 中 v-if 的优先级比 v-for 更高
+       * v-else
+       * v-else-if
+       * v-for
+       * v-on 特殊变量 $event
+       * v-bind
+       * v-model
+       * v-slot
+       */
+
+      /**
+       * v-pre
+       * 跳过该元素及其子元素的编译
+       * 所有 Vue 模板语法都会被保留并按照原样渲染
+       * 标签会被渲染，但是其中的模板语法会按照原样渲染
+       */
+      createApp({
+        setup() {
+          const preTest = false;
+          return { preTest };
+        },
+        template: '#component3',
+      }).mount('#app3');
+
+      /**
+       * v-once
+       * 只渲染元素和组件一次，并跳过之后的更新
+       * 在后面的重新渲染中，元素/组件及其所有子项会被当成静态内容并跳过渲染，可以用来优化更新时的性能
+       */
+      createApp({
+        setup() {
+          const clicks = ref(0);
+          const timmer = setInterval(() => {
+            clicks.value++;
+            if (clicks.value === 20) {
+              clearInterval(timmer);
+            }
+          }, 1000);
+
+          return {
+            clicks,
+          };
+        },
+        template: '#component4',
+      }).mount('#app4');
+
+      /**
+       * v-memo
+       * 缓存一个模板的子树。在组件和元素上都可以使用
+       * 传入固定长度的依赖值数组进行比较。如果数组里的每一个值都与最后一次的渲染相同，那么这个子树的更新将被跳过。实际上，甚至虚拟 DOM 的 vnode 创建也将被跳过，因为缓存的子树副本可以被重新使用
+       * v-memo="[]" 和 v-once 的效果是一样的
+       * 当搭配 v-for 使用 v-memo，确保两者都绑定在同一个元素上。v-memo 不能用在 v-for 内部
+       */
+      createApp({
+        setup() {
+          const list = ref([
+            { id: 0, name: `name0` },
+            { id: 1, name: `name1` },
+            { id: 2, name: `name2` },
+          ]);
+          const test1 = ref(1);
+          const addListItem = () => {
+            list.value.push({
+              id: list.value.length,
+              name: `name${list.value.length}`,
+            });
+            test1.value++;
+          };
+
+          return {
+            list,
+            test1,
+            addListItem,
+          };
+        },
+        template: '#component5',
+      }).mount('#app5');
+
+      /**
+       * v-cloak
+       * 用于隐藏尚未完成编译的 DOM 模板
+       */
+    </script>
+  </body>
+</html>

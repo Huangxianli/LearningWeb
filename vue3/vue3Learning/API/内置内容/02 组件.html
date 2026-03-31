@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="zh">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>组件</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+  </head>
+  <body>
+    <div id="app1"></div>
+    <script type="text/x-template" id="component1"></script>
+
+    <div id="app3"></div>
+    <script type="text/x-template" id="component3">
+      <div>component3</div>
+      <button @click="changeComponent">切换</button>
+      <KeepAlive :include="['Component3Child1']">
+        <component :is="currentComponent" />
+      </KeepAlive>
+    </script>
+    <script type="text/x-template" id="component-3-child-1">
+      <div>component-3-child-1</div>
+    </script>
+    <script type="text/x-template" id="component-3-child-2">
+      <div>component-3-child-2</div>
+    </script>
+    <hr />
+
+    <div id="app4"></div>
+    <script type="text/x-template" id="component4">
+      <div>component4</div>
+      <Component4Child1 />
+      <Component4Child2 />
+    </script>
+    <script type="text/x-template" id="component-4-child-1">
+      <div>component-4-child-1</div>
+      <div id="component-4-child-1-div">
+        <button @click="changeShowBox">切换显示 box</button>
+        <Teleport defer  to="#component-4-child-2-div" :disabled="!toNewBox">
+          这个是 teleport 的内容
+        </Teleport>
+      </div>
+    </script>
+    <script type="text/x-template" id="component-4-child-2">
+      <div>component-4-child-2</div>
+      <div id="component-4-child-2-div"></div>
+    </script>
+
+    <script>
+      const {
+        createApp,
+        ref,
+        computed,
+        onActivated,
+        onDeactivated,
+        onMounted,
+      } = Vue;
+
+      /**
+       * <Transition>
+       * <TransitionGroup>
+       */
+
+      /**
+       * <KeepAlive>
+       * 包裹动态组件时，会缓存不活跃的组件实例，而不是销毁它们
+       * 在任何的时候都只有一个活跃的组件实例作为其的子节点
+       * 里面的组件和子孙组件会有两个额外额度声明周期钩子函数 onActivated onDeactivated
+       * include exclude 用于指定缓存或排除缓存某些组件 注意匹配的的是组件的 name，而且如果被排除了不再缓存一个组件，那么这个组件的 onActivated 和 onDeavtivated 生命周期钩子不会执行
+       * max 最多缓存多少个
+       */
+      const Component3Child1 = {
+        name: 'Component3Child1',
+        setup() {
+          onMounted(() => {
+            console.log('component-3-child-1 onMounted');
+          });
+          onActivated(() => {
+            console.log('component-3-child-1 onActived');
+          });
+          onDeactivated(() => {
+            console.log('component-3-child-1 onDeactived');
+          });
+        },
+        template: '#component-3-child-1',
+      };
+      const Component3Child2 = {
+        name: 'Component3Child2',
+        setup() {
+          onMounted(() => {
+            console.log('component-3-child-2 onMounted');
+          });
+          onActivated(() => {
+            console.log('component-3-child-2 onActived');
+          });
+          onDeactivated(() => {
+            console.log('component-3-child-2 onDeactived');
+          });
+        },
+        template: '#component-3-child-2',
+      };
+      createApp({
+        components: {
+          Component3Child1,
+          Component3Child2,
+        },
+        setup() {
+          console.log('--- app3 ----------------------------------------');
+          const componentArr = ['Component3Child1', 'Component3Child2'];
+          const currentIndex = ref(0);
+          const currentComponent = computed(
+            () => componentArr[currentIndex.value]
+          );
+          const changeComponent = () => {
+            currentIndex.value = (currentIndex.value + 1) % 2;
+          };
+
+          return {
+            currentComponent,
+            changeComponent,
+          };
+        },
+        template: '#component3',
+      }).mount('#app3');
+
+      /**
+       * <Teleport>
+       * 将其插槽内容渲染到 DOM 的另一个位置
+       */
+      const Component4Child1 = {
+        setup() {
+          const toNewBox = ref(false);
+          const changeShowBox = () => {
+            toNewBox.value = !toNewBox.value;
+            debugger;
+          };
+          return {
+            toNewBox,
+            changeShowBox,
+          };
+        },
+        template: '#component-4-child-1',
+      };
+      const Component4Child2 = {
+        setup() {},
+        template: '#component-4-child-2',
+      };
+      createApp({
+        components: {
+          Component4Child1,
+          Component4Child2,
+        },
+        setup() {},
+        template: '#component4',
+      }).mount('#app4');
+    </script>
+  </body>
+</html>
